@@ -21,3 +21,11 @@
 - Placeholder snapshot có thể trông hợp lệ; quality gate hiện bắt buộc `.render-meta.json` với `mode: runtime`.
 - `pr.sh` phụ thuộc cwd và có nguy cơ bỏ qua snapshot do `.gitignore`; đã chuyển về repo root, thêm Git guard và cho phép track PNG.
 - CI thiếu dependency/browser và có bước YAML sai; đã bổ sung install/runtime preparation và context-aware gate.
+
+## Strategy research
+
+- [x] Đối chiếu các pattern skill/agent repo phổ biến và nguồn chính thức về interoperability.
+- [x] So sánh Animation Skill Kit theo các chiều: context, contract, provenance, runtime evidence, feedback loop và PR.
+- [x] Xác định năng lực khác biệt bền vững, tránh chỉ thêm prompt/template.
+- [x] Thiết kế contract phối hợp Agent, capability discovery và handoff schema.
+- [x] Đề xuất roadmap P0/P1/P2 cùng metric đo chất lượng và lợi ích thực tế.

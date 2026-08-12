@@ -25,7 +25,7 @@ if [ ! -d "$SCENE_DIR" ]; then
   exit 1
 fi
 
-if [[ ! "$SCENE" =~ ^[A-Za-z0-9._-]+$ ]]; then
+if [[ ! "$SCENE" =~ ^[A-Za-z0-9._-]+$ || "$SCENE" == "." || "$SCENE" == ".." ]]; then
   echo "error: scene id contains unsafe branch/path characters: $SCENE" >&2
   exit 1
 fi
@@ -38,12 +38,32 @@ else
   echo "error: TASK_DIR is required; browser Agent must persist review.json before PR" >&2
   exit 1
 fi
+
+TASK_DIR_ABS="$(cd "$TASK_DIR" && pwd -P)"
+case "$TASK_DIR_ABS" in
+  "$REPO"/*) ;;
+  *) echo "error: TASK_DIR must be inside the repository so evidence can be staged" >&2; exit 1 ;;
+esac
+TASK_SCENE="$(python3 - "$TASK_DIR_ABS/task.json" <<'PY'
+import json, sys
+from pathlib import Path
+data = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+print(data.get("scene", ""))
+PY
+)"
+if [ "$TASK_SCENE" != "$SCENE" ]; then
+  echo "error: TASK_DIR task.scene does not match requested scene" >&2
+  exit 1
+fi
 python3 "$REPO/scripts/quality-gate.py" "${QUALITY_ARGS[@]}"
-python3 "$REPO/scripts/review-hook.py" validate --task-dir "$TASK_DIR"
+python3 "$REPO/scripts/review-hook.py" validate --task-dir "$TASK_DIR" --require-approved
+python3 "$REPO/scripts/report.py" check --task-dir "$TASK_DIR"
 
 BRANCH="fix/$SCENE"
 git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
 git add "src/output/$SCENE"
+TASK_REL="${TASK_DIR_ABS#"$REPO/"}"
+git add "$TASK_REL"
 if git diff --cached --quiet; then
   echo "error: no staged scene changes to commit" >&2
   exit 1
@@ -55,7 +75,7 @@ git commit -m "feat(animation): scene '$SCENE' — proven in Dev Lab
 - context-bound quality gate: passed
 - brand tokens bound from $CONTEXT_PATH"
 
-if [ "${OPEN_PR:-1}" != "1" ]; then
+if [ "${OPEN_PR:-0}" != "1" ]; then
   echo "== committed to $BRANCH — OPEN_PR=0, push/open PR manually =="
   exit 0
 fi

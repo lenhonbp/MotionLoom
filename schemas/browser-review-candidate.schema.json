@@ -3,12 +3,12 @@
   "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/browser-review-candidate.schema.json",
   "title": "Animation browser review candidate",
   "type": "object",
-  "required": ["schema_version", "candidate_id", "task_id", "scene", "url", "status", "context_sha256", "source_sha256", "review_artifact"],
+  "required": ["schema_version", "candidate_id", "task_id", "scene", "url", "status", "context_sha256", "source_sha256", "review_artifact", "expires_at"],
   "properties": {
     "schema_version": {"type": "string"},
     "candidate_id": {"type": "string", "pattern": "^[a-f0-9]{20}$"},
     "task_id": {"type": "string"},
-    "scene": {"type": "string"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
     "url": {"type": "string", "format": "uri"},
     "status": {"type": "string", "enum": ["prepared", "opened", "reviewed", "approved", "changes_requested", "expired"]},
     "context_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
@@ -17,7 +17,8 @@
     "checkpoints": {"type": "array", "items": {"type": "integer", "enum": [0, 50, 100]}},
     "review_artifact": {"type": "string"},
     "requires_user_approval": {"type": "boolean"},
-    "prepared_at": {"type": "string", "format": "date-time"}
+    "prepared_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"}
   },
   "additionalProperties": true
 }

@@ -3,18 +3,23 @@
   "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/runtime-evidence.schema.json",
   "title": "Animation runtime adapter evidence",
   "type": "object",
-  "required": ["schema_version", "generated_at", "mode", "harness", "frameworks"],
+  "required": ["schema_version", "run_id", "generated_at", "mode", "harness", "status", "frameworks"],
   "properties": {
     "schema_version": {"type": "string"},
+    "run_id": {"type": "string", "minLength": 1},
     "generated_at": {"type": "string", "format": "date-time"},
     "mode": {"const": "runtime"},
     "harness": {"type": "string", "minLength": 1},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "status": {"const": "pass"},
     "frameworks": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["framework", "runtime", "status", "ready", "frames"],
+        "required": ["run_id", "framework", "runtime", "status", "ready", "frames"],
         "properties": {
           "framework": {"type": "string"},
           "runtime": {"type": "string"},

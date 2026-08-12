@@ -1,0 +1,29 @@
+{
+  "handoff_version": "1.0",
+  "task_id": "browser-review-smoke-task",
+  "from_agent": "motionloom",
+  "to_agent": "motionloom",
+  "state": "ready_for_pr",
+  "summary": "Quality gate and browser approval are complete; request explicit confirmation before opening a PR.",
+  "next_actions": [
+    {
+      "action": "Request explicit PR confirmation",
+      "kind": "confirm_to_pr",
+      "agent": "motionloom",
+      "skill": "motionloom",
+      "candidate_id": "956caeb2f56397430c4f",
+      "requires_user_approval": true,
+      "evidence_needed": ["quality-report.json", "review.json"],
+      "output_artifacts": ["pr_url"]
+    }
+  ],
+  "required_artifacts": [
+    "browser-review.json",
+    "project-context.json",
+    "execution-report.json",
+    "quality-report.json",
+    "review.json",
+    "task.json"
+  ],
+  "blockers": []
+}

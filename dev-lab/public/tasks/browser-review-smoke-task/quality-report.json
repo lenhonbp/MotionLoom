@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "status": "pass",
+  "scene": "browser-review-smoke",
+  "candidate_id": "956caeb2f56397430c4f",
+  "checks": [
+    "context binding",
+    "source binding",
+    "runtime snapshots",
+    "browser review approval"
+  ],
+  "generated_at": "2026-08-13T00:00:00Z"
+}

@@ -9,6 +9,7 @@
     "validate": "python3 scripts/quality-gate.py --all",
     "doctor": "python3 scripts/skill-doctor.py --json",
     "report": "python3 scripts/report.py",
+    "report:check": "python3 scripts/report-contract.py",
     "review": "python3 scripts/review-hook.py",
     "manifest": "python3 scripts/manifest.py",
     "pack:dotlottie": "bash scripts/to-dotlottie.sh",

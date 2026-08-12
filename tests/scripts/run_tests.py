@@ -7,10 +7,12 @@ Usage: python3 tests/scripts/run_tests.py
 """
 
 import json
+import hashlib
 import os
 import subprocess
 import sys
 import tempfile
+import shutil
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
@@ -210,6 +212,81 @@ def test_placeholder_is_not_runtime_evidence():
         check("quality gate rejects placeholder evidence", result.returncode != 0)
 
 
+def test_runtime_evidence_binding():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        scene = root / "src/output/browser-review-smoke"
+        shutil.copytree(ROOT / "src/output/browser-review-smoke", scene)
+        context = root / "project-context.json"
+        shutil.copy(ROOT / "artifacts/browser-review-smoke-task/project-context.json", context)
+
+        spec_path = scene / "motion-spec.json"
+        spec = json.loads(spec_path.read_text())
+        spec["framework"] = "gsap"
+        spec["category"] = "hero-scene"
+        spec_path.write_text(json.dumps(spec, indent=2) + "\n")
+
+        manifest_path = scene / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["framework"] = "gsap"
+        manifest["category"] = "hero-scene"
+        manifest["runtime_evidence"] = "runtime-evidence.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+        source_sha = hashlib.sha256((scene / "animation.json").read_bytes()).hexdigest()
+        manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        evidence = {
+            "schema_version": "1.0", "run_id": "test-runtime-run", "mode": "runtime",
+            "status": "pass", "scene": scene.name, "source_sha256": source_sha,
+            "manifest_sha256": manifest_sha,
+            "frameworks": [{"framework": "gsap", "status": "pass", "ready": True}],
+        }
+        (scene / "runtime-evidence.json").write_text(json.dumps(evidence, indent=2) + "\n")
+        accepted = subprocess.run([
+            sys.executable, str(ROOT / "scripts/quality-gate.py"), "--root", str(root),
+            "--scene", scene.name, "--context", str(context),
+        ], capture_output=True, text=True)
+        check("quality gate accepts bound runtime evidence", accepted.returncode == 0, accepted.stdout.strip())
+
+        manifest["description"] = "stale manifest mutation"
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+        stale = subprocess.run([
+            sys.executable, str(ROOT / "scripts/quality-gate.py"), "--root", str(root),
+            "--scene", scene.name, "--context", str(context),
+        ], capture_output=True, text=True)
+        check("quality gate rejects stale runtime evidence", stale.returncode != 0 and "manifest_sha256" in stale.stdout)
+
+
+def test_deep_audit_contracts():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", root / "artifacts/browser-review-smoke-task")
+        scenes = root / "changed-scenes"
+        scenes.write_text("browser-review-smoke\n")
+        contract = subprocess.run([
+            sys.executable, str(ROOT / "scripts/report-contract.py"),
+            "--root", str(root), "--scenes-file", str(scenes),
+        ], capture_output=True, text=True)
+        check("report contract accepts tracked smoke bundle", contract.returncode == 0, contract.stdout.strip())
+
+        candidate_path = root / "artifacts/browser-review-smoke-task/browser-review.json"
+        candidate = json.loads(candidate_path.read_text())
+        candidate["expires_at"] = "2000-01-01T00:00:00Z"
+        candidate_path.write_text(json.dumps(candidate))
+        expired = subprocess.run([
+            sys.executable, str(ROOT / "scripts/review-hook.py"), "validate",
+            "--task-dir", str(root / "artifacts/browser-review-smoke-task"), "--require-approved",
+        ], capture_output=True, text=True)
+        check("review hook rejects expired candidate", expired.returncode != 0 and "expired" in expired.stdout)
+
+    unsafe_runtime = subprocess.run(
+        ["node", str(ROOT / "scripts/runtime-adapters.mjs")],
+        env={**os.environ, "RUNTIME_FRAMEWORKS": "../../escape"},
+        capture_output=True, text=True,
+    )
+    check("runtime adapter rejects unsupported framework path", unsafe_runtime.returncode != 0 and "unsupported" in (unsafe_runtime.stderr + unsafe_runtime.stdout))
+
+
 def test_malformed_spec_is_rejected_cleanly():
     with tempfile.TemporaryDirectory() as td:
         bad = Path(td) / "bad.json"
@@ -274,10 +351,11 @@ def test_observability_contract():
         (task_dir / "browser-review.json").write_text(json.dumps({
             "schema_version": "1.0",
             "candidate_id": "fixture-candidate",
-            "task_id": "fixture-task",
+            "task_id": "observability-fixture",
             "scene": "wave",
             "status": "prepared",
             "requires_user_approval": True,
+            "expires_at": "2099-01-01T00:00:00Z",
         }))
         subprocess.run([
             sys.executable, str(report_script), "review", "--task-dir", str(task_dir),
@@ -312,6 +390,16 @@ def test_observability_contract():
         check("artifact manifest has checksums", bool(manifest.get("artifacts")) and all(len(item.get("sha256", "")) == 64 for item in manifest["artifacts"]))
         check("semantic report check passes", report_check.returncode == 0 and json.loads(report_check.stdout).get("status") == "pass")
 
+        candidate = json.loads((task_dir / "browser-review.json").read_text())
+        candidate["status"] = "prepared"
+        candidate["task_id"] = "foreign-task"
+        (task_dir / "browser-review.json").write_text(json.dumps(candidate))
+        foreign_review = subprocess.run([
+            sys.executable, str(report_script), "review", "--task-dir", str(task_dir),
+            "--candidate-id", "fixture-candidate", "--decision", "approved", "--reviewer", "fixture",
+        ], capture_output=True, text=True)
+        check("review rejects foreign task candidate", foreign_review.returncode != 0 and "task_id" in foreign_review.stderr)
+
     doctor = subprocess.run([sys.executable, str(ROOT / "scripts/skill-doctor.py"), "--json"], capture_output=True, text=True)
     doctor_data = json.loads(doctor.stdout)
     check("skill doctor passes package structure", doctor.returncode == 0 and doctor_data.get("status") == "pass")
@@ -327,6 +415,8 @@ if __name__ == "__main__":
     test_dotlottie_packager()
     test_source_binding_contract()
     test_placeholder_is_not_runtime_evidence()
+    test_runtime_evidence_binding()
+    test_deep_audit_contracts()
     test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()

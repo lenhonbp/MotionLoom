@@ -72,3 +72,14 @@
 - [x] Chạy lại quality checks và xác nhận archive/release files trước khi push.
 - [x] Cấu hình `https://github.com/lenhonbp/MotionLoom.git` làm origin và push branch chính.
 - [x] Xác minh commit, branch, remote URL và repository contents sau khi push.
+
+## Deep audit and development pass
+
+- [ ] Kiểm tra trạng thái GitHub Actions thực tế và khả năng tái lập CI từ clean checkout.
+- [ ] Audit toàn bộ CLI theo nhiều working directory, missing dependency, malformed input và path traversal.
+- [ ] Kiểm tra schema cross-reference, artifact provenance, checksum validation và các đường bypass quality gate.
+- [ ] Kiểm tra runtime adapter evidence có chống stale output, framework mismatch và evidence giả hay không.
+- [ ] Audit browser-review candidate identity, approval replay, expiry và transition state machine.
+- [ ] Đánh giá Dev Lab có load candidate thật từ artifact bundle hay còn phụ thuộc catalog/demo data.
+- [ ] Bổ sung các test hoặc hardening có giá trị sau audit, ưu tiên lỗi có thể làm PR gate sai.
+- [ ] Tạo deep-audit report với mức độ rủi ro, bằng chứng, remediation và giới hạn còn lại.

@@ -44,6 +44,21 @@ def read_json(path: Path, default: dict | list | None = None):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def candidate_expiry(candidate: dict) -> datetime | None:
+    value = candidate.get("expires_at")
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+
+
+def candidate_is_current(candidate: dict) -> bool:
+    expiry = candidate_expiry(candidate)
+    return expiry is not None and datetime.now(timezone.utc) <= expiry
+
+
 def init_task(args: argparse.Namespace) -> int:
     task_dir = Path(args.output or ROOT / "artifacts" / args.task_id).resolve()
     timestamp = now()
@@ -161,6 +176,28 @@ def record_review(args: argparse.Namespace) -> int:
     if args.candidate_id and candidate.get("candidate_id") != args.candidate_id:
         print("review candidate id does not match browser-review.json", file=sys.stderr)
         return 2
+    if candidate.get("task_id") != task.get("task_id"):
+        print("review candidate task_id does not match task.json", file=sys.stderr)
+        return 2
+    if candidate.get("scene") != task.get("scene"):
+        print("review candidate scene does not match task.json", file=sys.stderr)
+        return 2
+    if not str(args.reviewer or "").strip():
+        print("reviewer is required and cannot be empty", file=sys.stderr)
+        return 2
+    expires_at = candidate.get("expires_at")
+    if not expires_at:
+        print("browser-review candidate expiry is required", file=sys.stderr)
+        return 2
+    if candidate_expiry(candidate) is None:
+        print("browser-review candidate expiry is invalid", file=sys.stderr)
+        return 2
+    if not candidate_is_current(candidate):
+        print("browser-review candidate has expired", file=sys.stderr)
+        return 2
+    if candidate.get("status") in {"expired", "approved"}:
+        print("browser-review candidate cannot be reviewed again; prepare a new candidate", file=sys.stderr)
+        return 2
     scene_candidate_path = ROOT / "src" / "output" / str(task.get("scene", "")) / "browser-review.json"
     scene_candidate = read_json(scene_candidate_path)
     if scene_candidate_path.is_file() and scene_candidate.get("candidate_id") != candidate.get("candidate_id"):
@@ -276,16 +313,24 @@ def transition(args: argparse.Namespace) -> int:
     if target not in TRANSITIONS.get(current, set()):
         print(f"Illegal transition: {current} -> {target}", file=sys.stderr)
         return 2
-    if target == "validated" and not (task_dir / "quality-report.json").is_file():
-        print("validated requires quality-report.json", file=sys.stderr)
-        return 2
+    if target == "validated":
+        quality = read_json(task_dir / "quality-report.json")
+        if quality.get("status") != "pass":
+            print("validated requires quality-report.json status=pass", file=sys.stderr)
+            return 2
     if target == "ready_for_pr" and not (task_dir / "review.json").is_file():
         print("ready_for_pr requires review.json", file=sys.stderr)
         return 2
     if target == "ready_for_pr":
         review = read_json(task_dir / "review.json")
         candidate = read_json(task_dir / "browser-review.json")
-        if review.get("decision") != "approved" or not candidate.get("candidate_id") or review.get("candidate_id") != candidate.get("candidate_id") or candidate.get("status") != "approved":
+        if not candidate_is_current(candidate):
+            print("ready_for_pr requires a non-expired browser-review candidate", file=sys.stderr)
+            return 2
+        if not str(review.get("reviewer") or "").strip():
+            print("ready_for_pr requires a non-empty review reviewer", file=sys.stderr)
+            return 2
+        if review.get("decision") != "approved" or candidate.get("task_id") != task.get("task_id") or candidate.get("scene") != task.get("scene") or not candidate.get("candidate_id") or review.get("candidate_id") != candidate.get("candidate_id") or candidate.get("status") != "approved":
             print("ready_for_pr requires approved review.json for the exact browser-review candidate", file=sys.stderr)
             return 2
     if target == "confirmed" and not (args.commit_sha or args.pr_url):

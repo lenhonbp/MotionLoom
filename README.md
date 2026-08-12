@@ -54,6 +54,19 @@ bash scripts/pr.sh my-scene
 
 The kit is intended to run from a Git clone. Copy `project-context.example.json` only as a schema reference; always generate the real context with `scripts/analyze.sh` against the host project. Do not commit a context containing a temporary path or another project's brand tokens.
 
+For a reproducible review fixture, keep `project-context.json`, `quality-report.json`, `review.json`, `execution-report.json`, `handoff.json` and `artifact-manifest.json` under the repository's `artifacts/<task-id>/` directory. `scripts/pr.sh` rejects task bundles outside the repository, requires the task scene to match the requested scene, runs the semantic report check, and stages the evidence bundle together with the scene. This prevents a gate from consuming evidence that is omitted from the resulting commit.
+
+Runtime adapter evidence can be bound to a scene and its exact source/manifest bytes:
+
+```bash
+RUNTIME_SCENE=my-scene \
+RUNTIME_SOURCE_PATH=src/output/my-scene/animation.json \
+RUNTIME_MANIFEST_PATH=src/output/my-scene/manifest.json \
+node scripts/runtime-adapters.mjs
+```
+
+When these variables are supplied, `runtime-evidence.json` records `scene`, `source_sha256` and `manifest_sha256`; the quality gate rejects evidence copied from another scene or generated against an older manifest.
+
 ## Pipeline
 
 | Step | Module | What it does |

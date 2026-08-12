@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "intent": "Verify mandatory internal browser review",
+  "project_name": "MotionLoom",
+  "context_path": "artifacts/browser-review-smoke-task/project-context.json",
+  "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+  "state": "ready_for_pr",
+  "browser_review": {
+    "required": true,
+    "status": "approved",
+    "candidate_id": "956caeb2f56397430c4f",
+    "candidate_path": "browser-review.json",
+    "review_artifact": "review.json"
+  },
+  "owner_agent": "motionloom",
+  "created_at": "2026-08-12T14:23:25Z",
+  "updated_at": "2026-08-13T00:00:00Z"
+}

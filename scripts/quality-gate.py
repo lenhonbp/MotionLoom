@@ -7,12 +7,16 @@ runtime snapshots (not placeholders), and a completed checklist.
 """
 
 import argparse
+import hashlib
 import importlib.util
 import json
+import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
 sys.path.insert(0, str(ROOT / "src"))
 from core.spec import validate_spec  # noqa: E402
 
@@ -92,6 +96,13 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
         except ValueError as exc:
             issues.append(str(exc))
 
+    source_name = manifest.get("file")
+    source_path_for_evidence = (scene_dir / source_name).resolve() if source_name else scene_dir / "__missing-source__"
+    source_sha_for_evidence = ""
+    if source_path_for_evidence.is_file() and scene_dir.resolve() in source_path_for_evidence.parents:
+        source_sha_for_evidence = hashlib.sha256(source_path_for_evidence.read_bytes()).hexdigest()
+    manifest_sha_for_evidence = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+
     if spec.get("framework") in {"rive", "gsap", "framer-motion"}:
         evidence_name = manifest.get("runtime_evidence")
         if not evidence_name:
@@ -105,8 +116,18 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                     evidence = _json(evidence_path)
                     if evidence.get("mode") != "runtime":
                         issues.append("runtime evidence mode must be runtime")
+                    if not evidence.get("run_id"):
+                        issues.append("runtime evidence run_id is required")
+                    if evidence.get("status") != "pass":
+                        issues.append("runtime evidence top-level status must be pass")
                     if evidence.get("framework") and evidence.get("framework") != spec.get("framework"):
                         issues.append("runtime evidence framework does not match motion-spec.framework")
+                    if evidence.get("scene") != scene_dir.name:
+                        issues.append("runtime evidence scene does not match scene directory")
+                    if evidence.get("source_sha256") != source_sha_for_evidence:
+                        issues.append("runtime evidence source_sha256 does not match manifest.file")
+                    if evidence.get("manifest_sha256") != manifest_sha_for_evidence:
+                        issues.append("runtime evidence manifest_sha256 does not match manifest.json")
                     if evidence.get("frameworks"):
                         match = next((item for item in evidence["frameworks"] if item.get("framework") == spec.get("framework")), None)
                         if not match or match.get("status") != "pass" or match.get("ready") is not True:
@@ -135,7 +156,6 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
             if isinstance(source_binding, dict):
                 if source_binding.get("source_path") != source:
                     issues.append("manifest.source_binding.source_path must match manifest.file")
-                import hashlib
                 source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
                 if source_binding.get("sha256") != source_sha:
                     issues.append("manifest.source_binding.sha256 does not match manifest.file")
@@ -149,17 +169,29 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
         else:
             try:
                 candidate = _json(candidate_path)
-                import hashlib
                 source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
                 context_sha = hashlib.sha256(context_path.read_bytes()).hexdigest()
                 if candidate.get("scene") != scene_dir.name:
                     issues.append("browser review candidate scene mismatch")
+                if task_dir:
+                    task = _json(task_dir / "task.json")
+                    if candidate.get("task_id") != task.get("task_id"):
+                        issues.append("browser review candidate task_id mismatch")
                 if candidate.get("source_sha256") != source_sha:
                     issues.append("browser review candidate source_sha256 is stale")
                 if candidate.get("context_sha256") not in {context_sha, spec.get("context_binding", {}).get("context_sha256")}:
                     issues.append("browser review candidate context_sha256 is stale")
                 if candidate.get("status") not in {"prepared", "opened", "reviewed", "approved"}:
                     issues.append(f"browser review candidate status is not reviewable: {candidate.get('status')}")
+                expires_at = candidate.get("expires_at")
+                if not expires_at:
+                    issues.append("browser review candidate expiry is required")
+                else:
+                    try:
+                        if datetime.now(timezone.utc) > datetime.fromisoformat(expires_at.replace("Z", "+00:00")):
+                            issues.append("browser review candidate has expired")
+                    except (TypeError, ValueError):
+                        issues.append("browser review candidate expiry is invalid")
                 if require_review:
                     review_path = (task_dir / "review.json") if task_dir else (scene_dir / "review.json")
                     if not review_path.is_file():
@@ -170,6 +202,19 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                             issues.append("PR gate requires browser review decision=approved")
                         if review.get("candidate_id") != candidate.get("candidate_id"):
                             issues.append("browser review approves a different candidate")
+                        if task_dir:
+                            task = _json(task_dir / "task.json")
+                            if review.get("task_id") != task.get("task_id"):
+                                issues.append("browser review task_id mismatch")
+                        if not str(review.get("reviewer") or "").strip():
+                            issues.append("browser review reviewer is required")
+                        reviewed_at = review.get("reviewed_at")
+                        if reviewed_at:
+                            try:
+                                if datetime.fromisoformat(reviewed_at.replace("Z", "+00:00")) > datetime.fromisoformat(expires_at.replace("Z", "+00:00")):
+                                    issues.append("browser review was recorded after candidate expiry")
+                            except (TypeError, ValueError):
+                                issues.append("browser review reviewed_at is invalid")
                         if candidate.get("status") != "approved":
                             issues.append("PR gate requires browser-review.json status=approved")
             except (ValueError, OSError) as exc:
@@ -187,6 +232,9 @@ def main() -> int:
     parser.add_argument("--task-dir")
     parser.add_argument("--require-browser-review", action="store_true")
     args = parser.parse_args()
+    if args.scene and (args.scene in {".", ".."} or not SAFE_SCENE.fullmatch(args.scene)):
+        print("QUALITY GATE: unsafe scene identifier")
+        return 1
     root = Path(args.root).resolve()
     context = Path(args.context)
     if not context.is_absolute():

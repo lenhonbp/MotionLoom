@@ -1,0 +1,70 @@
+{
+  "report_version": "1.0",
+  "task_id": "report-demo",
+  "status": "created",
+  "confidence": "low",
+  "completed": [
+    {
+      "id": "analyze",
+      "summary": "Host project context analyzed",
+      "status": "pass",
+      "evidence": [
+        "project-context.json"
+      ]
+    }
+  ],
+  "verified": [
+    {
+      "id": "spec",
+      "summary": "Motion spec context binding created",
+      "status": "pass",
+      "evidence": [
+        "motion-spec.json"
+      ]
+    }
+  ],
+  "not_completed": [
+    {
+      "id": "runtime",
+      "summary": "Runtime render has not been executed in this example",
+      "status": "pending",
+      "next_action": "Run scripts/render.sh onboarding-wave"
+    }
+  ],
+  "problems": [
+    {
+      "id": "runtime-evidence",
+      "summary": "PR evidence is incomplete until runtime snapshots exist",
+      "status": "open",
+      "severity": "P1",
+      "next_action": "Render frames 0/50/100 and attach .render-meta.json"
+    }
+  ],
+  "structure_review": {
+    "missing_files": [
+      "project-context.json"
+    ],
+    "broken_references": [
+      "src/output/onboarding-wave/animation.json"
+    ],
+    "untracked_artifacts": []
+  },
+  "next_agent": [
+    {
+      "agent": "animation-studio",
+      "action": "Run project analysis and populate context before generation."
+    },
+    {
+      "id": "render",
+      "summary": "Continue with runtime render and Dev Lab review",
+      "status": "pending",
+      "agent": "animation-studio",
+      "skill": "animation-studio",
+      "evidence_needed": [
+        "snapshot/.render-meta.json",
+        "review.json"
+      ]
+    }
+  ],
+  "generated_at": "2026-08-12T13:57:24Z"
+}

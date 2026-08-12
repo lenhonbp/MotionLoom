@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://animation-skill-kit.dev/schemas/artifact-manifest.schema.json",
+  "title": "Animation artifact manifest",
+  "type": "object",
+  "required": ["manifest_version", "task_id", "generated_at", "artifacts"],
+  "properties": {
+    "manifest_version": {"type": "string"},
+    "task_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "type", "sha256", "bytes"],
+        "properties": {"path": {"type": "string"}, "type": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "bytes": {"type": "integer", "minimum": 0}},
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

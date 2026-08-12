@@ -29,3 +29,15 @@
 - [x] Xác định năng lực khác biệt bền vững, tránh chỉ thêm prompt/template.
 - [x] Thiết kế contract phối hợp Agent, capability discovery và handoff schema.
 - [x] Đề xuất roadmap P0/P1/P2 cùng metric đo chất lượng và lợi ích thực tế.
+
+## Depth and transparency roadmap
+
+- [x] Xác định product north star và ranh giới giữa Skill, Agent, runtime adapter và Dev Lab.
+- [x] Audit lại cấu trúc repo theo Agent Skills specification và phân loại P0/P1/P2.
+- [x] Thiết kế task ledger với state machine, execution log và decision log.
+- [x] Thiết kế execution report: done, not done, blocked, failed, risks, changed files và evidence.
+- [x] Thiết kế artifact manifest, issue register, fix plan và Agent handoff contract.
+- [x] Nghiên cứu skill công khai có thể reuse; ghi rõ license, trust, capability và giới hạn.
+- [x] Chọn phần nên reuse, adapter hóa hoặc tự xây; không duplicate skill ecosystem.
+- [x] Định nghĩa CI/release gate cho report completeness, schema validation và provenance.
+- [x] Đề xuất roadmap triển khai và metrics theo dõi giá trị thực tế.

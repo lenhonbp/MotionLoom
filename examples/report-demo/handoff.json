@@ -1,0 +1,22 @@
+{
+  "handoff_version": "1.0",
+  "task_id": "report-demo",
+  "from_agent": "animation-studio",
+  "to_agent": "animation-studio",
+  "state": "created",
+  "summary": "New animation task initialized.",
+  "next_actions": [
+    {
+      "action": "Analyze host project context",
+      "skill": "animation-studio",
+      "evidence_needed": [
+        "project-context.json"
+      ]
+    }
+  ],
+  "required_artifacts": [
+    "task.json",
+    "execution-report.json"
+  ],
+  "blockers": []
+}

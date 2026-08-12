@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://animation-skill-kit.dev/schemas/task.schema.json",
+  "title": "Animation task",
+  "type": "object",
+  "required": ["schema_version", "task_id", "scene", "intent", "state", "created_at", "updated_at"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$"},
+    "intent": {"type": "string", "minLength": 1},
+    "project_name": {"type": "string"},
+    "context_path": {"type": "string"},
+    "context_hash": {"type": "string"},
+    "state": {
+      "type": "string",
+      "enum": ["created", "needs_context", "planning", "sourcing", "generating", "rendering", "review_required", "blocked", "failed", "validated", "ready_for_pr", "confirmed"]
+    },
+    "owner_agent": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "commit_sha": {"type": "string"},
+    "pr_url": {"type": "string", "format": "uri"}
+  },
+  "additionalProperties": true
+}

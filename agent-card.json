@@ -1,0 +1,84 @@
+{
+  "card_version": "1.0",
+  "name": "animation-studio",
+  "version": "1.2.0",
+  "description": "Project-aware animation production, runtime verification and Agent handoff.",
+  "capabilities": [
+    "project.analyze",
+    "motion.plan",
+    "asset.provenance",
+    "rig.cutout",
+    "runtime.render.lottie",
+    "devlab.review",
+    "quality.gate",
+    "report.generate",
+    "handoff.prepare",
+    "pr.prepare"
+  ],
+  "input_artifacts": [
+    "host-project",
+    "project-manifest",
+    "animation-request",
+    "source-asset"
+  ],
+  "output_artifacts": [
+    "project-context",
+    "motion-spec",
+    "runtime-scene",
+    "evidence-bundle",
+    "execution-report",
+    "handoff",
+    "pr-patch"
+  ],
+  "runtime_capabilities": {
+    "verified": ["lottie-json", "svg-cutout-rig"],
+    "scaffold_only": ["dotlottie-package", "rive", "gsap", "framer-motion", "spine", "threejs"]
+  },
+  "side_effects": {
+    "read_files": "allowed",
+    "write_files": "allowed",
+    "network": "optional-and-declared",
+    "git_commit": "explicit-confirmation",
+    "git_push": "explicit-confirmation",
+    "open_pull_request": "explicit-confirmation"
+  },
+  "recommended_integrations": [
+    {
+      "id": "dotlottie-web-skill",
+      "url": "https://github.com/LottieFiles/dotlottie-web/blob/main/SKILL.md",
+      "role": "official-runtime-reference",
+      "trust": "official",
+      "use_for": ["dotLottie runtime API", "worker rendering", "state machines", "slots"],
+      "not_for": ["project planning", "provenance", "PR acceptance"]
+    },
+    {
+      "id": "text-to-lottie",
+      "url": "https://github.com/diffusionstudio/lottie",
+      "role": "optional-scaffold",
+      "trust": "community-open-source",
+      "use_for": ["scene setup", "live preview patterns", "prompt conventions"],
+      "not_for": ["runtime truth", "context binding"]
+    },
+    {
+      "id": "animation-design",
+      "url": "https://github.com/b1rdmania/claude-lottie-skill/blob/main/SKILL.md",
+      "role": "optional-asset-discovery",
+      "trust": "community-open-source",
+      "use_for": ["brand-aware Lottie/Rive search", "series coherence"],
+      "not_for": ["license authority", "runtime verification"]
+    }
+  ],
+  "entrypoints": {
+    "analyze": "bash scripts/analyze.sh <project-path>",
+    "report_init": "python3 scripts/report.py init --task-id <id>",
+    "report_collect": "python3 scripts/report.py collect --task-dir <dir>",
+    "report_render": "python3 scripts/report.py render --task-dir <dir>",
+    "skill_doctor": "python3 scripts/skill-doctor.py --json",
+    "quality_gate": "python3 scripts/quality-gate.py --scene <scene> --context <path>",
+    "pr_prepare": "bash scripts/pr.sh <scene>"
+  },
+  "report_contract": {
+    "required_sections": ["completed", "verified", "not_completed", "problems", "structure_review", "next_agent"],
+    "artifact_root": "artifacts/<task-id>/"
+  }
+}

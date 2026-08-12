@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "task_id": "report-demo",
+  "scene": "onboarding-wave",
+  "intent": "Demonstrate transparent execution reporting",
+  "project_name": "example-project",
+  "context_path": "",
+  "context_hash": "",
+  "state": "created",
+  "owner_agent": "animation-studio",
+  "created_at": "2026-08-12T13:57:24Z",
+  "updated_at": "2026-08-12T13:57:24Z"
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://animation-skill-kit.dev/schemas/execution-report.schema.json",
+  "title": "Animation execution report",
+  "type": "object",
+  "required": ["report_version", "task_id", "status", "confidence", "completed", "verified", "not_completed", "problems", "structure_review", "next_agent", "generated_at"],
+  "properties": {
+    "report_version": {"type": "string"},
+    "task_id": {"type": "string"},
+    "status": {"type": "string", "enum": ["created", "needs_context", "planning", "sourcing", "generating", "rendering", "review_required", "blocked", "failed", "validated", "ready_for_pr", "confirmed"]},
+    "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+    "completed": {"type": "array", "items": {"$ref": "#/$defs/report_item"}},
+    "verified": {"type": "array", "items": {"$ref": "#/$defs/report_item"}},
+    "not_completed": {"type": "array", "items": {"$ref": "#/$defs/report_item"}},
+    "problems": {"type": "array", "items": {"$ref": "#/$defs/problem"}},
+    "structure_review": {"type": "object"},
+    "next_agent": {"type": "array", "items": {"type": "object"}},
+    "generated_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "report_item": {
+      "type": "object",
+      "required": ["id", "summary", "status"],
+      "properties": {"id": {"type": "string"}, "summary": {"type": "string"}, "status": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "string"}}, "confidence": {"type": "string"}},
+      "additionalProperties": true
+    },
+    "problem": {
+      "type": "object",
+      "required": ["id", "severity", "summary", "status"],
+      "properties": {"id": {"type": "string"}, "severity": {"type": "string", "enum": ["P0", "P1", "P2", "P3"]}, "summary": {"type": "string"}, "status": {"type": "string"}, "next_action": {"type": "string"}},
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

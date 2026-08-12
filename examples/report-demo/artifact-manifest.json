@@ -1,0 +1,25 @@
+{
+  "manifest_version": "1.0",
+  "task_id": "report-demo",
+  "generated_at": "2026-08-12T13:57:24Z",
+  "artifacts": [
+    {
+      "path": "handoff.json",
+      "type": "json",
+      "sha256": "b4b14fce76fa027276ab569c1b74a2de1ebdb3f8f0e3f46d9930a1e3fb5a96ae",
+      "bytes": 479
+    },
+    {
+      "path": "issue-register.json",
+      "type": "json",
+      "sha256": "56667cfd1b718546956e2b0b6a08adb328fe4d7c3df6814dda81b33fb8296504",
+      "bytes": 67
+    },
+    {
+      "path": "task.json",
+      "type": "json",
+      "sha256": "ee315e0c3eee2f12d80d4856623520b894bfdec404f0838973026401b42c2c27",
+      "bytes": 367
+    }
+  ]
+}

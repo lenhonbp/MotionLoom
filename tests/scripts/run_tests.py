@@ -179,6 +179,87 @@ def test_category_coverage():
     check("all categories defined", required <= set(CATEGORIES))
 
 
+def test_observability_contract():
+    with tempfile.TemporaryDirectory() as td:
+        task_dir = Path(td) / "task"
+        report_script = ROOT / "scripts/report.py"
+        subprocess.run([
+            sys.executable, str(report_script), "init", "--task-id", "observability-fixture",
+            "--scene", "wave", "--intent", "Test report contract", "--output", str(task_dir),
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "add", "--task-dir", str(task_dir), "--section", "completed",
+            "--id", "context", "--summary", "Project context analyzed", "--status", "pass",
+            "--evidence", "project-context.json",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "add", "--task-dir", str(task_dir), "--section", "verified",
+            "--id", "runtime", "--summary", "Runtime frame rendered", "--status", "pass",
+            "--evidence", "snapshot/frame-50.png",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "add", "--task-dir", str(task_dir), "--section", "problems",
+            "--id", "asset-license", "--summary", "Asset license needs confirmation", "--status", "open",
+            "--severity", "P1", "--next-action", "Ask user to confirm source license",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "add", "--task-dir", str(task_dir), "--section", "next_agent",
+            "--id", "review", "--summary", "Review scene in Dev Lab", "--status", "pending",
+            "--agent", "animation-review-agent", "--skill", "animation-studio",
+            "--evidence-needed", "review.json",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "structure", "--task-dir", str(task_dir),
+            "--missing-file", "project-context.json", "--broken-reference", "src/output/wave/animation.json",
+        ], check=True, capture_output=True)
+
+        for state in ("planning", "sourcing", "generating", "rendering", "review_required"):
+            subprocess.run([
+                sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", state,
+            ], check=True, capture_output=True)
+
+        (task_dir / "quality-report.json").write_text(json.dumps({"status": "pass", "rules": []}))
+        subprocess.run([
+            sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", "validated",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "review", "--task-dir", str(task_dir),
+            "--decision", "approved", "--reviewer", "fixture", "--notes", "Evidence looks consistent.",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", "ready_for_pr",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", "confirmed",
+            "--commit-sha", "0123456789abcdef0123456789abcdef01234567",
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "collect", "--task-dir", str(task_dir),
+        ], check=True, capture_output=True)
+        subprocess.run([
+            sys.executable, str(report_script), "render", "--task-dir", str(task_dir),
+        ], check=True, capture_output=True)
+        report_check = subprocess.run([
+            sys.executable, str(report_script), "check", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+
+        task = json.loads((task_dir / "task.json").read_text())
+        report = (task_dir / "REPORT.md").read_text()
+        manifest = json.loads((task_dir / "artifact-manifest.json").read_text())
+        check("task lifecycle reaches confirmed", task.get("state") == "confirmed")
+        check("confirmed task records commit", task.get("commit_sha", "").startswith("01234567"))
+        check("execution report exposes required sections", all(section in report for section in ("## Completed", "## Verified", "## Not completed", "## Problems to fix", "## Structure review")))
+        check("execution report includes recorded problem", "Asset license needs confirmation" in report)
+        check("report removes initial placeholder after progress", "Task has not run yet." not in report)
+        check("report includes structure findings", "project-context.json" in report and "src/output/wave/animation.json" in report)
+        check("artifact manifest has checksums", bool(manifest.get("artifacts")) and all(len(item.get("sha256", "")) == 64 for item in manifest["artifacts"]))
+        check("semantic report check passes", report_check.returncode == 0 and json.loads(report_check.stdout).get("status") == "pass")
+
+    doctor = subprocess.run([sys.executable, str(ROOT / "scripts/skill-doctor.py"), "--json"], capture_output=True, text=True)
+    doctor_data = json.loads(doctor.stdout)
+    check("skill doctor passes package structure", doctor.returncode == 0 and doctor_data.get("status") == "pass")
+
+
 if __name__ == "__main__":
     print("== Animation Studio engine tests ==")
     test_analyzer_on_fixture()
@@ -190,6 +271,7 @@ if __name__ == "__main__":
     test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()
+    test_observability_contract()
     print()
     if FAILED:
         print(f"{len(FAILED)} test(s) FAILED: {', '.join(FAILED)}")

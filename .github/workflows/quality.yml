@@ -92,12 +92,19 @@ jobs:
 
       - name: Enforce context-bound quality gate
         run: |
-          if [ ! -f project-context.json ]; then
-            if [ -s /tmp/changed-scenes ]; then
-              echo "FAIL: changed scenes require project-context.json at repository root"
-              exit 1
-            fi
+          if [ ! -s /tmp/changed-scenes ]; then
             echo "No scene outputs changed; context-bound scene gate is skipped."
             exit 0
           fi
-          python3 scripts/quality-gate.py --all --context project-context.json
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            if [ -f project-context.json ]; then
+              context="project-context.json"
+            elif [ -f "artifacts/${scene}-task/project-context.json" ]; then
+              context="artifacts/${scene}-task/project-context.json"
+            else
+              echo "FAIL: no project context found for changed scene: $scene"
+              exit 1
+            fi
+            python3 scripts/quality-gate.py --scene "$scene" --context "$context"
+          done < /tmp/changed-scenes

@@ -67,6 +67,24 @@ node scripts/runtime-adapters.mjs
 
 When these variables are supplied, `runtime-evidence.json` records `scene`, `source_sha256` and `manifest_sha256`; the quality gate rejects evidence copied from another scene or generated against an older manifest.
 
+### Intelligence Core v0.1
+
+After render and before strict acceptance, build the task-bound Intelligence Core artifacts. They give an Agent a single relationship graph, step-level provenance, framework-neutral Motion IR, capability selection policy and deterministic replay inventory instead of requiring it to infer relationships from prose and unrelated files:
+
+```bash
+python3 scripts/intelligence.py motion-ir build --task-dir artifacts/onboarding-wave
+python3 scripts/intelligence.py graph build --task-dir artifacts/onboarding-wave
+python3 scripts/intelligence.py provenance build --task-dir artifacts/onboarding-wave
+python3 scripts/intelligence.py replay capture --root . --task-dir artifacts/onboarding-wave
+python3 scripts/quality-gate.py --scene my-scene \
+  --context /path/to/your/project/project-context.json \
+  --task-dir artifacts/onboarding-wave \
+  --require-browser-review --require-intelligence
+python3 scripts/eval-intelligence.py
+```
+
+The graph, provenance and replay bundle are evidence contracts, not approval tokens. They cannot replace runtime assertions, Dev Lab review or user consent. See [Intelligence Core v0.1](references/intelligence-core.md) for failure semantics and [the release note](docs/releases/1.5.0.md) for the verified scope.
+
 ## Pipeline
 
 | Step | Module | What it does |
@@ -87,11 +105,11 @@ When these variables are supplied, `runtime-evidence.json` records `scene`, `sou
 | `src/rig/` | Cutout character body rig engine |
 | `templates/` | Canonical Lottie / Rive / GSAP / Framer Motion templates |
 | `assets/library/` | Vetted source assets + attribution, including the MIT Rive adapter fixture |
-| `scripts/` | Pipeline CLI (`analyze`, `render`, `devlab`, `pr`, `quality-gate`, `validate-lottie`, `to-dotlottie`, `runtime-adapters`, `skill-doctor`, `report`) |
+| `scripts/` | Pipeline CLI plus Intelligence Core (`analyze`, `render`, `devlab`, `pr`, `quality-gate`, `validate-lottie`, `to-dotlottie`, `runtime-adapters`, `skill-doctor`, `report`, `intelligence`, `eval-intelligence`) |
 | `dev-lab/` | Self-contained static Dev Lab + Playwright snapshot harness |
 | `agent-card.json` | Capability discovery, runtime levels and side-effect policy for other Agents |
-| `schemas/` | Task, report, artifact-manifest, scene-manifest and handoff JSON Schemas |
-| `references/` | Progressive-disclosure contracts for reporting, runtime capability and dotLottie packaging |
+| `schemas/` | Task, report, artifact-manifest, scene-manifest, handoff and Intelligence Core JSON Schemas |
+| `references/` | Progressive-disclosure contracts for reporting, runtime capability, dotLottie packaging and Intelligence Core |
 | `artifacts/<task-id>/` | Per-task ledger, evidence, review, issue register and handoff bundle |
 | `tests/` | Deterministic engine tests |
 | `.github/workflows/quality.yml` | CI that re-runs the quality gate on every PR |

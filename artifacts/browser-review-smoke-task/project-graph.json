@@ -1,0 +1,206 @@
+{
+  "schema_version": "0.1",
+  "graph_id": "graph-browser-review-smoke-task-browser-review-smoke",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "generated_at": "2026-08-12T18:16:53Z",
+  "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+  "nodes": [
+    {
+      "id": "project:MotionLoom",
+      "kind": "project",
+      "label": "MotionLoom",
+      "ref": "browser-review-smoke-task"
+    },
+    {
+      "id": "intent:browser-review-smoke-task",
+      "kind": "intent",
+      "label": "Verify mandatory internal browser review",
+      "ref": "browser-review-smoke-task"
+    },
+    {
+      "id": "scene:browser-review-smoke",
+      "kind": "scene",
+      "label": "browser-review-smoke",
+      "ref": "browser-review-smoke"
+    },
+    {
+      "id": "artifact:project-context.json",
+      "kind": "artifact",
+      "label": "project-context.json",
+      "ref": "/home/ubuntu/animation-skill/artifacts/browser-review-smoke-task/project-context.json",
+      "sha256": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa"
+    },
+    {
+      "id": "artifact:artifact-manifest.json",
+      "kind": "artifact",
+      "label": "artifact-manifest.json",
+      "ref": "artifact-manifest.json",
+      "sha256": "f9afaac33e8ab1b5542bd89b62ff7bfc11b8343effe243123fbf0f54a6ed6d26"
+    },
+    {
+      "id": "artifact:browser-review.json",
+      "kind": "review",
+      "label": "browser-review.json",
+      "ref": "browser-review.json",
+      "sha256": "8266fabd0acda274d077e5e1ca072921cda8c1e7c8c23b72b900a9fc9f015ceb"
+    },
+    {
+      "id": "artifact:decision-log.jsonl",
+      "kind": "artifact",
+      "label": "decision-log.jsonl",
+      "ref": "decision-log.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "artifact:execution-report.json",
+      "kind": "evidence",
+      "label": "execution-report.json",
+      "ref": "execution-report.json",
+      "sha256": "af9aac049ef1b52d483e5baa44cbe2810179b0e2fb38de598e33b54d48cb33ad"
+    },
+    {
+      "id": "artifact:handoff.json",
+      "kind": "evidence",
+      "label": "handoff.json",
+      "ref": "handoff.json",
+      "sha256": "70af7be27bef44c5476af0162b058c63e1fcb78a7bd2aba6912ca5d23b00e366"
+    },
+    {
+      "id": "artifact:issue-register.json",
+      "kind": "artifact",
+      "label": "issue-register.json",
+      "ref": "issue-register.json",
+      "sha256": "e657bf5b8036b391b6c186aa713f9ae08b35fa201ffb2deb8f58546b4f7d6ad9"
+    },
+    {
+      "id": "artifact:motion-ir.json",
+      "kind": "motion_spec",
+      "label": "motion-ir.json",
+      "ref": "motion-ir.json",
+      "sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f"
+    },
+    {
+      "id": "artifact:quality-report.json",
+      "kind": "evidence",
+      "label": "quality-report.json",
+      "ref": "quality-report.json",
+      "sha256": "f1901ab182da189632a5a0819c26fbf8767467388204e0dacb5e61ab31cd3b97"
+    },
+    {
+      "id": "artifact:review.json",
+      "kind": "review",
+      "label": "review.json",
+      "ref": "review.json",
+      "sha256": "217a10e85522fb9f69ccc5bd5afe865fc779e96687cabc20138a54260817b736"
+    },
+    {
+      "id": "artifact:task.json",
+      "kind": "evidence",
+      "label": "task.json",
+      "ref": "task.json",
+      "sha256": "11a07d2862d4b1353bab00885f84a82bdadad88988cbfa12e1064a532f01395b"
+    },
+    {
+      "id": "review:browser-review-smoke-task",
+      "kind": "review",
+      "label": "Browser review",
+      "ref": "review.json"
+    }
+  ],
+  "edges": [
+    {
+      "from": "project:MotionLoom",
+      "to": "intent:browser-review-smoke-task",
+      "relation": "contains"
+    },
+    {
+      "from": "project:MotionLoom",
+      "to": "scene:browser-review-smoke",
+      "relation": "contains"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "intent:browser-review-smoke-task",
+      "relation": "constrained_by"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:project-context.json",
+      "relation": "derived_from"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:artifact-manifest.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:browser-review.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:decision-log.jsonl",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:execution-report.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:handoff.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:issue-register.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:motion-ir.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:project-context.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:quality-report.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:review.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "artifact:task.json",
+      "relation": "uses"
+    },
+    {
+      "from": "scene:browser-review-smoke",
+      "to": "review:browser-review-smoke-task",
+      "relation": "reviewed_as"
+    }
+  ],
+  "roots": [
+    "project:MotionLoom",
+    "scene:browser-review-smoke"
+  ],
+  "policy": {
+    "source_of_truth": "task-bundle",
+    "allow_unresolved_edges": false,
+    "required_node_kinds": [
+      "project",
+      "intent",
+      "scene"
+    ]
+  }
+}

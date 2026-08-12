@@ -93,3 +93,26 @@
 - [x] Chạy `review-hook.py validate --require-approved` và `quality-gate.py --require-browser-review` trên cùng task bundle.
 - [x] Chạy `pr.sh` với `OPEN_PR=0`, xác nhận commit local-only và chứng minh không mở/push PR ngoài ý muốn.
 - [x] Lưu execution evidence, cập nhật report/handoff và bổ sung test tái lập flow từ clean task bundle.
+
+## Next-depth architecture roadmap
+
+- [ ] Xây canonical project graph từ context, source, scene, runtime, artifact và review để Agent reasoning trên quan hệ thay vì file rời.
+- [ ] Bổ sung uncertainty/confidence contract và provenance chain cho mọi quyết định generate, chọn framework, chọn asset và quality gate.
+- [ ] Tạo capability registry có version, adapter health, evidence age và compatibility matrix thay cho capability flag tĩnh.
+- [ ] Xây semantic animation linting: kiểm tra intent, timing, accessibility, continuity và anti-pattern trước runtime render.
+- [ ] Chuẩn hóa deterministic replay bundle để tái hiện cùng scene từ clean checkout, lockfile, browser/runtime version và input hashes.
+- [ ] Thêm mutation/adversarial tests cho stale evidence, context drift, manifest tampering, replay approval và cross-task contamination.
+- [ ] Xây feedback loop từ Dev Lab thành structured fix plan để Agent sửa đúng nguyên nhân thay vì chỉ rerender toàn scene.
+- [ ] Định nghĩa benchmark suite và metrics: acceptance precision, false approval rate, provenance completeness, replay success và time-to-fix.
+- [ ] Tách release channels/compatibility policy cho core contracts, runtime adapters, Dev Lab protocol và Agent-facing SKILL.md.
+
+## Intelligence Core v0.1 implementation
+
+- [x] Thêm schema `project-graph`, `provenance`, `capability-registry` và `motion-ir` với version/policy rõ ràng.
+- [x] Xây CLI tạo/validate project graph từ task context, scene manifest, motion spec, runtime evidence và review.
+- [x] Xây provenance emitter/validator cho từng step và liên kết parent attestation, materials, products, actor và builder.
+- [x] Nâng capability discovery từ flat flags thành registry có adapter version, evidence age, browser matrix, fallback và risk.
+- [x] Thêm deterministic replay command ghi environment, input hashes, output hashes và tolerance policy.
+- [x] Tạo eval corpus và adversarial fixtures cho context drift, stale evidence, tampering, unsupported runtime và cross-task contamination.
+- [x] Tích hợp các contract mới vào report lifecycle, quality gate, Skill Doctor, CI và smoke fixtures.
+- [x] Cập nhật SKILL.md/agent-card/references theo progressive disclosure và chạy full validation trước milestone commit.

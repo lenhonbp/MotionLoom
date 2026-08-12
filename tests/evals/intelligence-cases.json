@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1",
+  "suite": "motionloom-intelligence-core",
+  "cases": [
+    {
+      "id": "verified-runtime-selection",
+      "class": "positive",
+      "assertion": "A verified runtime with fresh matching evidence can be selected."
+    },
+    {
+      "id": "scaffold-runtime-blocked",
+      "class": "negative",
+      "assertion": "A scaffold-only runtime cannot be selected as production verified."
+    },
+    {
+      "id": "stale-capability-evidence",
+      "class": "negative",
+      "assertion": "A verified capability whose evidence is older than policy is rejected."
+    },
+    {
+      "id": "tampered-capability-evidence",
+      "class": "negative",
+      "assertion": "A capability with a mismatched evidence hash is rejected."
+    },
+    {
+      "id": "graph-edge-corruption",
+      "class": "negative",
+      "assertion": "A graph edge referencing an unknown node is rejected."
+    },
+    {
+      "id": "replay-artifact-tamper",
+      "class": "negative",
+      "assertion": "A replay bundle fails after a bound artifact is changed."
+    },
+    {
+      "id": "foreign-task-candidate",
+      "class": "negative",
+      "assertion": "A browser-review candidate belonging to another task is rejected."
+    }
+  ]
+}

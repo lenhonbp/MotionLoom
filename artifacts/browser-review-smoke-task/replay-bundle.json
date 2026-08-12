@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "bundle_id": "replay-browser-review-smoke-task-browser-review-smoke",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "task_dir": "artifacts/browser-review-smoke-task",
+  "generated_at": "2026-08-12T18:23:22Z",
+  "environment": {
+    "python": "3.12.3",
+    "node": "v22.13.0",
+    "os": "Linux-6.1.102-x86_64-with-glibc2.39"
+  },
+  "files": [
+    {
+      "path": "artifacts/browser-review-smoke-task/browser-review.json",
+      "sha256": "8266fabd0acda274d077e5e1ca072921cda8c1e7c8c23b72b900a9fc9f015ceb",
+      "bytes": 740
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/handoff.json",
+      "sha256": "70af7be27bef44c5476af0162b058c63e1fcb78a7bd2aba6912ca5d23b00e366",
+      "bytes": 832
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/issue-register.json",
+      "sha256": "e657bf5b8036b391b6c186aa713f9ae08b35fa201ffb2deb8f58546b4f7d6ad9",
+      "bytes": 81
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/motion-ir.json",
+      "sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+      "bytes": 2045
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/project-context.json",
+      "sha256": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "bytes": 1442
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/project-graph.json",
+      "sha256": "d680382fabcec9b83086cc7726e974dac676571f7e7fd53fbc52c65b0324175c",
+      "bytes": 5865
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/provenance.json",
+      "sha256": "c6aa7d66c4b033ba6cf3330ac78a6cd1eaa54199796bcedaf66171d76efbad11",
+      "bytes": 6597
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/quality-report.json",
+      "sha256": "f1901ab182da189632a5a0819c26fbf8767467388204e0dacb5e61ab31cd3b97",
+      "bytes": 288
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/review.json",
+      "sha256": "217a10e85522fb9f69ccc5bd5afe865fc779e96687cabc20138a54260817b736",
+      "bytes": 303
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/task.json",
+      "sha256": "11a07d2862d4b1353bab00885f84a82bdadad88988cbfa12e1064a532f01395b",
+      "bytes": 698
+    }
+  ],
+  "policy": {
+    "hash_algorithm": "sha256",
+    "exclude": [
+      "REPORT.md",
+      "artifact-manifest.json",
+      "decision-log.jsonl",
+      "execution-report.json",
+      "replay-bundle.json"
+    ],
+    "mode": "integrity"
+  },
+  "replay_command": "python3 scripts/intelligence.py replay verify --bundle <bundle> --root <clean-root>"
+}

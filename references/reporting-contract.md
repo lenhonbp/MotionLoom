@@ -14,10 +14,14 @@ Use this reference when a task needs to be continued by another Agent or reviewe
 | `issue-register.json` | Problems, severity, status, owner and next action |
 | `review.json` | Human/Agent review decision and categorized feedback |
 | `handoff.json` | What the next Agent should read, do, verify or ask the user |
+| `project-graph.json` | Task-bound relationship index for project, intent, scene, artifacts, evidence and review |
+| `provenance.json` | Step-level attestation with actor, builder, materials, products, policy and hash chain |
+| `motion-ir.json` | Framework-neutral motion intent bound to task, scene, context and source hashes |
+| `replay-bundle.json` | Clean replay environment metadata and artifact hash inventory |
 
 ## Status semantics
 
-Use `blocked` when required input, permission or consent is missing. Use `failed` when an attempted operation produced a technical error. Use `review_required` when the artifact exists but a human or downstream Agent must inspect it. Use `validated` only when the quality gate passes. Use `ready_for_pr` only when validation and review are both complete.
+Use `blocked` when required input, permission or consent is missing. Use `failed` when an attempted operation produced a technical error. Use `review_required` when the artifact exists but a human or downstream Agent must inspect it. Use `validated` only when the quality gate passes, including strict Intelligence Core validation when the task declares `intelligence_required`. Use `ready_for_pr` only when validation and review are both complete.
 
 Never mark an item completed without an evidence path or command result. Never convert a scaffold-only runtime into a verified runtime in prose.
 
@@ -31,4 +35,4 @@ The report is an evidence index, not a chat transcript. Each item should point t
 
 ## Handoff rule
 
-The receiving Agent should be able to continue from `handoff.json`, `task.json`, `quality-report.json` and the artifact manifest without reconstructing the previous conversation. If that is not possible, the handoff is incomplete.
+The receiving Agent should be able to continue from `handoff.json`, `task.json`, `quality-report.json`, `project-graph.json`, `provenance.json`, `motion-ir.json`, `replay-bundle.json` and the artifact manifest without reconstructing the previous conversation. If that is not possible, the handoff is incomplete. Graph and provenance are indexes and attestations, not permission to skip browser review or user consent.

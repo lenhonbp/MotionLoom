@@ -1,0 +1,258 @@
+{
+  "schema_version": "0.1",
+  "attestation_id": "attestation-professional-review-e2e",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "generated_at": "2026-08-12T18:16:54Z",
+  "subjects": [
+    {
+      "id": "task.json",
+      "path": "task.json",
+      "type": "json",
+      "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+      "bytes": 710
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "context",
+      "step_type": "context",
+      "actor": {
+        "type": "agent",
+        "id": "motionloom"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "task.json",
+          "path": "task.json",
+          "type": "json",
+          "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+          "bytes": 710
+        }
+      ],
+      "products": [
+        {
+          "id": "task.json",
+          "path": "task.json",
+          "type": "json",
+          "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+          "bytes": 710
+        }
+      ],
+      "policy": "schemas/provenance.schema.json#context",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": []
+    },
+    {
+      "step_id": "spec",
+      "step_type": "spec",
+      "actor": {
+        "type": "agent",
+        "id": "motionloom"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "task.json",
+          "path": "task.json",
+          "type": "json",
+          "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+          "bytes": 710
+        }
+      ],
+      "products": [],
+      "policy": "schemas/provenance.schema.json#spec",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": [
+        "context"
+      ]
+    },
+    {
+      "step_id": "motion-ir",
+      "step_type": "motion-ir",
+      "actor": {
+        "type": "agent",
+        "id": "motionloom"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "task.json",
+          "path": "task.json",
+          "type": "json",
+          "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+          "bytes": 710
+        }
+      ],
+      "products": [
+        {
+          "id": "motion-ir.json",
+          "path": "motion-ir.json",
+          "type": "json",
+          "sha256": "a3fee6be2ae667935ebe1e2aec2dd439bf77e85f9135835ff4dfb6df6cb681c4",
+          "bytes": 2095
+        }
+      ],
+      "policy": "schemas/provenance.schema.json#motion-ir",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": [
+        "spec"
+      ]
+    },
+    {
+      "step_id": "browser-review",
+      "step_type": "browser-review",
+      "actor": {
+        "type": "user",
+        "id": "user"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "browser-review.json",
+          "path": "browser-review.json",
+          "type": "json",
+          "sha256": "3a74b4aac673133c9e3cbda8e82fa8e147e0fc89204d60fd39912f8abd179948",
+          "bytes": 1005
+        }
+      ],
+      "products": [
+        {
+          "id": "review.json",
+          "path": "review.json",
+          "type": "json",
+          "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
+          "bytes": 457
+        },
+        {
+          "id": "browser-observation.md",
+          "path": "browser-observation.md",
+          "type": "md",
+          "sha256": "4161597a40ab9d924844a7d48e18093e1e5f6083643d4362163b6c7275bf4de0",
+          "bytes": 2213
+        }
+      ],
+      "policy": "schemas/provenance.schema.json#browser-review",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": [
+        "motion-ir"
+      ]
+    },
+    {
+      "step_id": "quality-gate",
+      "step_type": "quality-gate",
+      "actor": {
+        "type": "ci",
+        "id": "motionloom"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "browser-review.json",
+          "path": "browser-review.json",
+          "type": "json",
+          "sha256": "3a74b4aac673133c9e3cbda8e82fa8e147e0fc89204d60fd39912f8abd179948",
+          "bytes": 1005
+        },
+        {
+          "id": "review.json",
+          "path": "review.json",
+          "type": "json",
+          "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
+          "bytes": 457
+        }
+      ],
+      "products": [
+        {
+          "id": "quality-report.json",
+          "path": "quality-report.json",
+          "type": "json",
+          "sha256": "1fae971797329d3526240b8bb578ac1e8e809a132e7cbbb0b75604b1eba3a009",
+          "bytes": 583
+        }
+      ],
+      "policy": "schemas/provenance.schema.json#quality-gate",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": [
+        "browser-review"
+      ]
+    },
+    {
+      "step_id": "confirm",
+      "step_type": "confirm",
+      "actor": {
+        "type": "user",
+        "id": "user"
+      },
+      "builder": {
+        "name": "motionloom",
+        "version": "1.4.0",
+        "os": "linux"
+      },
+      "materials": [
+        {
+          "id": "quality-report.json",
+          "path": "quality-report.json",
+          "type": "json",
+          "sha256": "1fae971797329d3526240b8bb578ac1e8e809a132e7cbbb0b75604b1eba3a009",
+          "bytes": 583
+        }
+      ],
+      "products": [
+        {
+          "id": "task.json",
+          "path": "task.json",
+          "type": "json",
+          "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+          "bytes": 710
+        }
+      ],
+      "policy": "schemas/provenance.schema.json#confirm",
+      "started_at": "2026-08-12T18:16:54Z",
+      "finished_at": "2026-08-12T18:16:54Z",
+      "result": "pass",
+      "parent_step_ids": [
+        "quality-gate"
+      ]
+    }
+  ],
+  "verification": {
+    "hash_algorithm": "sha256",
+    "chain_hash": "1e10d4c5dce3aa48ec85df8b5e4ddaf95bee8b10fdf52a564f099aec8f7b8897",
+    "status": "verified",
+    "signature": {
+      "status": "unsigned"
+    }
+  }
+}

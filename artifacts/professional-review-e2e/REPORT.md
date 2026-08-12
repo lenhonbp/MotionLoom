@@ -27,7 +27,7 @@ _None recorded._
 ## Structure review
 - Missing files: `none`
 - Broken references: `none`
-- Artifact count: **8**
+- Artifact count: **12**
 - Quality gate: **pass**
 
 ## Browser review
@@ -45,14 +45,18 @@ _None recorded._
 ## Evidence files
 | Path | Type | Bytes | SHA-256 |
 | --- | --- | --- | --- |
-| REPORT.md | md | 1993 | eb817f5b7f72ff4aa2dbc5306ae8f80b9288ca34bdd1c0cdccd5972bfde1e88b |
+| REPORT.md | md | 2800 | 6166632554e5fb7f1ed62244a93aea67da90dbab593fc0934220bff66af1df91 |
 | browser-observation.md | md | 2213 | 4161597a40ab9d924844a7d48e18093e1e5f6083643d4362163b6c7275bf4de0 |
 | browser-review.json | json | 1005 | 3a74b4aac673133c9e3cbda8e82fa8e147e0fc89204d60fd39912f8abd179948 |
 | handoff.json | json | 1212 | 1b913e12536232e7fea137df02225495921788ba2eb2a7f10353c0582e443ca9 |
 | issue-register.json | json | 79 | abe11ae8d5386db09c9a6dd0a989dea38d9714334afbcc765b8bcd1a074aba70 |
+| motion-ir.json | json | 2095 | a3fee6be2ae667935ebe1e2aec2dd439bf77e85f9135835ff4dfb6df6cb681c4 |
+| project-graph.json | json | 6478 | eac3193483929ce17c422cd173c8985a3cba0fdfbd95bf86a83d4839f3f12f4d |
+| provenance.json | json | 6838 | a22d68c5bd8f5226906ec07134deac8e3a6e2465c7795fe0a5be4852ec8d833e |
 | quality-report.json | json | 583 | 1fae971797329d3526240b8bb578ac1e8e809a132e7cbbb0b75604b1eba3a009 |
+| replay-bundle.json | json | 2591 | f4cde276d376d30de303950e0c359cbbd7069087357a62b9af78fbff60e7e531 |
 | review.json | json | 457 | 556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26 |
-| task.json | json | 686 | 5bb09e7daf87cadb584b06ab1a166ab7f83e03832f72c796b98d512f5db52e63 |
+| task.json | json | 710 | 723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d |
 
 
-_Generated at 2026-08-12T17:53:02Z by `scripts/report.py`._
+_Generated at 2026-08-12T18:23:22Z by `scripts/report.py`._

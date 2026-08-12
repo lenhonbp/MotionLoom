@@ -1,8 +1,14 @@
 {
   "manifest_version": "1.0",
   "task_id": "browser-review-smoke-task",
-  "generated_at": "2026-08-12T17:12:24Z",
+  "generated_at": "2026-08-12T18:23:22Z",
   "artifacts": [
+    {
+      "path": "REPORT.md",
+      "type": "md",
+      "sha256": "78b221bc3d30215ab5b4e627e860e31fa0a2c65d1717eb993139bd58b56f7195",
+      "bytes": 2476
+    },
     {
       "path": "browser-review.json",
       "type": "json",
@@ -22,16 +28,40 @@
       "bytes": 81
     },
     {
+      "path": "motion-ir.json",
+      "type": "json",
+      "sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+      "bytes": 2045
+    },
+    {
       "path": "project-context.json",
       "type": "json",
       "sha256": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
       "bytes": 1442
     },
     {
+      "path": "project-graph.json",
+      "type": "json",
+      "sha256": "d680382fabcec9b83086cc7726e974dac676571f7e7fd53fbc52c65b0324175c",
+      "bytes": 5865
+    },
+    {
+      "path": "provenance.json",
+      "type": "json",
+      "sha256": "c6aa7d66c4b033ba6cf3330ac78a6cd1eaa54199796bcedaf66171d76efbad11",
+      "bytes": 6597
+    },
+    {
       "path": "quality-report.json",
       "type": "json",
       "sha256": "f1901ab182da189632a5a0819c26fbf8767467388204e0dacb5e61ab31cd3b97",
       "bytes": 288
+    },
+    {
+      "path": "replay-bundle.json",
+      "type": "json",
+      "sha256": "1fcc311e0b9fecd56e4a31c051639536832b8c2436603020a0ea9bfac0dd3933",
+      "bytes": 2613
     },
     {
       "path": "review.json",

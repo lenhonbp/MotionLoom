@@ -44,11 +44,19 @@ jobs:
       - name: Run engine tests
         run: python3 tests/scripts/run_tests.py
 
+      - name: Run Intelligence Core adversarial evals
+        run: python3 scripts/eval-intelligence.py
+
       - name: Run browser runtime adapter evidence
         run: npm run runtime:test
 
       - name: Validate Skill package and metadata
         run: python3 scripts/skill-doctor.py --json
+
+      - name: Validate Intelligence Core registry
+        run: |
+          python3 scripts/intelligence.py capabilities build --output /tmp/capability-registry.json
+          python3 scripts/intelligence.py capabilities validate --path /tmp/capability-registry.json
 
       - name: Resolve changed scenes
         run: |
@@ -106,5 +114,11 @@ jobs:
               echo "FAIL: no project context found for changed scene: $scene"
               exit 1
             fi
-            python3 scripts/quality-gate.py --scene "$scene" --context "$context"
+            task_dir="artifacts/${scene}-task"
+            if [ ! -f "$task_dir/task.json" ]; then
+              echo "FAIL: no task bundle found for changed scene: $scene"
+              exit 1
+            fi
+            python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
+              --task-dir "$task_dir" --require-browser-review --require-intelligence
           done < /tmp/changed-scenes

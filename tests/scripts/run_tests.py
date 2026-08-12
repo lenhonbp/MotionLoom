@@ -330,6 +330,108 @@ def test_approved_browser_review_e2e_contract():
         check("e2e report contract accepts confirmed task", report_check.returncode == 0, report_check.stdout.strip())
 
 
+def test_intelligence_core_contracts():
+    """Exercise the deterministic intelligence layer and its adversarial boundary."""
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "artifacts/professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+
+        intelligence = ROOT / "scripts/intelligence.py"
+        motion_ir = subprocess.run([
+            sys.executable, str(intelligence), "motion-ir", "build", "--task-dir", str(task_dir),
+            "--spec", str(ROOT / "src/output/browser-review-smoke/motion-spec.json"),
+        ], capture_output=True, text=True)
+        check("intelligence Motion IR builds", motion_ir.returncode == 0, motion_ir.stdout.strip())
+        motion_ir_check = subprocess.run([
+            sys.executable, str(intelligence), "motion-ir", "validate",
+            "--path", str(task_dir / "motion-ir.json"),
+        ], capture_output=True, text=True)
+        check("intelligence Motion IR validates", motion_ir_check.returncode == 0, motion_ir_check.stdout.strip())
+        graph = subprocess.run([
+            sys.executable, str(intelligence), "graph", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence graph builds", graph.returncode == 0, graph.stdout.strip())
+        graph_check = subprocess.run([
+            sys.executable, str(intelligence), "graph", "validate",
+            "--path", str(task_dir / "project-graph.json"),
+        ], capture_output=True, text=True)
+        check("intelligence graph validates", graph_check.returncode == 0, graph_check.stdout.strip())
+
+        provenance = subprocess.run([
+            sys.executable, str(intelligence), "provenance", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence provenance builds", provenance.returncode == 0, provenance.stdout.strip())
+        provenance_check = subprocess.run([
+            sys.executable, str(intelligence), "provenance", "validate",
+            "--task-dir", str(task_dir), "--path", str(task_dir / "provenance.json"),
+        ], capture_output=True, text=True)
+        check("intelligence provenance validates", provenance_check.returncode == 0, provenance_check.stdout.strip())
+
+        registry = root / "capability-registry.json"
+        capability = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "build",
+            "--evidence", str(ROOT / "artifacts/browser-review-smoke-task/quality-report.json"),
+            "--evidence-kind", "ci", "--output", str(registry),
+        ], capture_output=True, text=True)
+        check("intelligence capability registry builds", capability.returncode == 0, capability.stdout.strip())
+        registry_check = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "validate", "--path", str(registry),
+        ], capture_output=True, text=True)
+        check("intelligence capability registry validates", registry_check.returncode == 0, registry_check.stdout.strip())
+        selected = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(registry), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence selects verified runtime", selected.returncode == 0 and '"status": "verified"' in selected.stdout)
+        scaffold = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(registry), "--capability", "runtime.spine",
+        ], capture_output=True, text=True)
+        check("intelligence blocks scaffold-only runtime", scaffold.returncode != 0)
+
+        stale_registry = json.loads(registry.read_text())
+        for entry in stale_registry["capabilities"]:
+            if entry.get("status") == "verified":
+                entry["last_verified_at"] = "2000-01-01T00:00:00Z"
+        stale_path = root / "stale-capability-registry.json"
+        stale_path.write_text(json.dumps(stale_registry, indent=2) + "\n")
+        stale_select = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(stale_path), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence blocks stale capability evidence", stale_select.returncode != 0)
+
+        tampered_registry = json.loads(registry.read_text())
+        rive_entry = next(entry for entry in tampered_registry["capabilities"] if entry.get("id") == "runtime.rive")
+        rive_entry["evidence"][0]["sha256"] = "0" * 64
+        tampered_path = root / "tampered-capability-registry.json"
+        tampered_path.write_text(json.dumps(tampered_registry, indent=2) + "\n")
+        tampered_select = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(tampered_path), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence blocks tampered capability evidence", tampered_select.returncode != 0)
+
+        replay = subprocess.run([
+            sys.executable, str(intelligence), "replay", "capture",
+            "--root", str(root), "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence replay captures bundle", replay.returncode == 0, replay.stdout.strip())
+        replay_check = subprocess.run([
+            sys.executable, str(intelligence), "replay", "verify",
+            "--root", str(root), "--bundle", str(task_dir / "replay-bundle.json"),
+        ], capture_output=True, text=True)
+        check("intelligence replay verifies clean bundle", replay_check.returncode == 0, replay_check.stdout.strip())
+        review = task_dir / "review.json"
+        review.write_text(review.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        tampered = subprocess.run([
+            sys.executable, str(intelligence), "replay", "verify",
+            "--root", str(root), "--bundle", str(task_dir / "replay-bundle.json"),
+        ], capture_output=True, text=True)
+        check("intelligence replay rejects tampered artifact", tampered.returncode != 0 and "hash_mismatch" in tampered.stdout)
+
+
 def test_malformed_spec_is_rejected_cleanly():
     with tempfile.TemporaryDirectory() as td:
         bad = Path(td) / "bad.json"
@@ -461,6 +563,7 @@ if __name__ == "__main__":
     test_runtime_evidence_binding()
     test_deep_audit_contracts()
     test_approved_browser_review_e2e_contract()
+    test_intelligence_core_contracts()
     test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()

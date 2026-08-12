@@ -1,13 +1,13 @@
 {
   "manifest_version": "1.0",
   "task_id": "professional-review-e2e",
-  "generated_at": "2026-08-12T17:50:05Z",
+  "generated_at": "2026-08-12T17:53:02Z",
   "artifacts": [
     {
       "path": "REPORT.md",
       "type": "md",
-      "sha256": "eb817f5b7f72ff4aa2dbc5306ae8f80b9288ca34bdd1c0cdccd5972bfde1e88b",
-      "bytes": 1993
+      "sha256": "265403199e73bf13ef3bebbc6ef278ec3eb1662eb6127e79e1bc9e9e50a1629a",
+      "bytes": 2390
     },
     {
       "path": "browser-observation.md",
@@ -48,8 +48,8 @@
     {
       "path": "task.json",
       "type": "json",
-      "sha256": "5bb09e7daf87cadb584b06ab1a166ab7f83e03832f72c796b98d512f5db52e63",
-      "bytes": 686
+      "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+      "bytes": 710
     }
   ]
 }

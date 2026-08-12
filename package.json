@@ -1,6 +1,6 @@
 {
   "name": "animation-skill-kit",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "description": "Project-aware animation skill with runtime render validation and Dev Lab evidence.",
@@ -9,14 +9,23 @@
     "validate": "python3 scripts/quality-gate.py --all",
     "doctor": "python3 scripts/skill-doctor.py --json",
     "report": "python3 scripts/report.py",
-    "review": "python3 scripts/review-hook.py"
+    "review": "python3 scripts/review-hook.py",
+    "manifest": "python3 scripts/manifest.py",
+    "pack:dotlottie": "bash scripts/to-dotlottie.sh",
+    "runtime:test": "node scripts/runtime-adapters.mjs"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",
-    "@napi-rs/canvas": "^1.0.5"
+    "@napi-rs/canvas": "^1.0.5",
+    "@rive-app/canvas": "^2.39.2",
+    "framer-motion": "^13.1.0",
+    "gsap": "^3.15.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "playwright": "^1.56.0"
+    "playwright": "^1.62.1",
+    "vite": "^8.2.1"
   },
   "license": "MIT"
 }

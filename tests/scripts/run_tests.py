@@ -132,6 +132,55 @@ def test_dotlottie_manifest_selection():
         check("dotLottie follows manifest animation", result.returncode == 0, result.stdout.strip())
 
 
+def test_dotlottie_packager():
+    with tempfile.TemporaryDirectory() as td:
+        check("dotLottie packager script is executable", (ROOT / "scripts/to-dotlottie.sh").is_file())
+        smoke = ROOT / "src/output/browser-review-smoke"
+        archive = Path(td) / "smoke.lottie"
+        result = subprocess.run([
+            "bash", str(ROOT / "scripts/to-dotlottie.sh"), "browser-review-smoke", str(archive),
+        ], cwd=ROOT, capture_output=True, text=True)
+        check("dotLottie packager exits cleanly", result.returncode == 0, result.stderr)
+        if result.returncode == 0:
+            with zipfile.ZipFile(archive) as zf:
+                names = set(zf.namelist())
+                manifest = json.loads(zf.read("manifest.json"))
+                check("dotLottie packager emits root manifest", "manifest.json" in names)
+                check("dotLottie packager emits initial animation", "a/animation.json" in names)
+                check("dotLottie packager sets v2 initial id", manifest.get("version") == "2" and manifest.get("initial", {}).get("animation") == "animation")
+            validate = subprocess.run([
+                sys.executable, str(ROOT / "scripts/validate-lottie.py"), str(archive),
+                "--spec", str(smoke / "motion-spec.json"),
+            ], capture_output=True, text=True)
+            check("packaged dotLottie passes validator", validate.returncode == 0, validate.stdout.strip())
+
+
+def test_source_binding_contract():
+    manifest = json.loads((ROOT / "src/output/browser-review-smoke/manifest.json").read_text())
+    binding = manifest.get("source_binding", {})
+    source = ROOT / "src/output/browser-review-smoke" / manifest.get("file", "")
+    import hashlib
+    check("scene manifest includes source binding", all(binding.get(key) for key in ("kind", "source_path", "authority", "license", "sha256")))
+    check("source binding path matches scene file", binding.get("source_path") == manifest.get("file"))
+    check("source binding checksum matches bytes", binding.get("sha256") == hashlib.sha256(source.read_bytes()).hexdigest())
+
+    with tempfile.TemporaryDirectory() as td:
+        scene = Path(td) / "src/output/unbound"
+        scene.mkdir(parents=True)
+        context = Path(td) / "project-context.json"
+        context.write_text(json.dumps({"name": "unbound", "project_root": td, "brand": {"primary": "#2563EB"}, "stack": {"framework": "lottie"}, "source_authority": "test"}))
+        spec = scene / "motion-spec.json"
+        subprocess.run([sys.executable, str(ROOT / "src/core/spec.py"), "generate", "loading", "--context", str(context), "--output", str(spec)], check=True, capture_output=True)
+        (scene / "animation.json").write_text((ROOT / "templates/lottie/scaffold/animation.json").read_text())
+        (scene / "manifest.json").write_text(json.dumps({"framework": "lottie", "category": "loading", "file": "animation.json", "checks": [{"id": "ok", "pass": True}]}))
+        snap = scene / "snapshot"
+        snap.mkdir()
+        for pct in (0, 50, 100): (snap / f"frame-{pct:02d}.png").write_bytes(b"runtime")
+        (snap / ".render-meta.json").write_text(json.dumps({"mode": "runtime", "scene": "unbound"}))
+        result = subprocess.run([sys.executable, str(ROOT / "scripts/quality-gate.py"), "--root", td, "--scene", "unbound", "--context", str(context)], capture_output=True, text=True)
+        check("quality gate rejects missing source binding", result.returncode != 0 and "source_binding" in result.stdout)
+
+
 def test_placeholder_is_not_runtime_evidence():
     with tempfile.TemporaryDirectory() as td:
         scene = Path(td) / "src/output/placeholder"
@@ -275,6 +324,8 @@ if __name__ == "__main__":
     test_rig_build_and_pose()
     test_lottie_scaffold_valid()
     test_dotlottie_manifest_selection()
+    test_dotlottie_packager()
+    test_source_binding_contract()
     test_placeholder_is_not_runtime_evidence()
     test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))

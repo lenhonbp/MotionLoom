@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://animation-skill-kit.dev/schemas/scene-manifest.schema.json",
+  "title": "Animation scene manifest",
+  "type": "object",
+  "required": ["name", "description", "framework", "category", "file", "source_binding", "checks"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "framework": {"type": "string", "minLength": 1},
+    "category": {"type": "string", "minLength": 1},
+    "file": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "runtime_evidence": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "source_binding": {
+      "type": "object",
+      "required": ["kind", "source_path", "authority", "license", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["project", "library", "generated", "fixture", "remote"]},
+        "source_path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+        "source_url": {"type": "string", "format": "uri-reference"},
+        "authority": {"type": "string", "minLength": 1},
+        "license": {"type": "string", "minLength": 1},
+        "attribution": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "pass"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "detail": {"type": "string"},
+          "pass": {"const": true}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://animation-skill-kit.dev/schemas/runtime-evidence.schema.json",
+  "title": "Animation runtime adapter evidence",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "mode", "harness", "frameworks"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "mode": {"const": "runtime"},
+    "harness": {"type": "string", "minLength": 1},
+    "frameworks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["framework", "runtime", "status", "ready", "frames"],
+        "properties": {
+          "framework": {"type": "string"},
+          "runtime": {"type": "string"},
+          "status": {"const": "pass"},
+          "ready": {"const": true},
+          "frames": {"type": "array", "minItems": 3},
+          "console_errors": {"type": "array"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

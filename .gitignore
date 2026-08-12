@@ -6,3 +6,4 @@ __pycache__/
 dist/
 src/output/*/lab-snapshot/
 dev-lab/public/scenes/
+/artifacts/runtime-adapters/

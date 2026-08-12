@@ -19,6 +19,8 @@ REQUIRED_SCHEMAS = [
     "artifact-manifest.schema.json",
     "handoff.schema.json",
     "browser-review-candidate.schema.json",
+    "scene-manifest.schema.json",
+    "runtime-evidence.schema.json",
 ]
 
 

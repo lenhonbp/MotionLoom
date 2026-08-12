@@ -37,12 +37,15 @@ jobs:
       - name: Install runtime and Dev Lab dependencies
         run: |
           npm install
+          npx playwright install --with-deps chromium
           cd dev-lab
           npm install
-          npx playwright install --with-deps chromium
 
       - name: Run engine tests
         run: python3 tests/scripts/run_tests.py
+
+      - name: Run browser runtime adapter evidence
+        run: npm run runtime:test
 
       - name: Validate Skill package and metadata
         run: python3 scripts/skill-doctor.py --json

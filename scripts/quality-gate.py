@@ -92,6 +92,38 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
         except ValueError as exc:
             issues.append(str(exc))
 
+    if spec.get("framework") in {"rive", "gsap", "framer-motion"}:
+        evidence_name = manifest.get("runtime_evidence")
+        if not evidence_name:
+            issues.append(f"manifest.runtime_evidence is required for {spec.get('framework')} scenes")
+        else:
+            evidence_path = (scene_dir / evidence_name).resolve()
+            if not evidence_path.is_file() or scene_dir.resolve() not in evidence_path.parents:
+                issues.append("manifest.runtime_evidence must point to an existing file inside the scene directory")
+            else:
+                try:
+                    evidence = _json(evidence_path)
+                    if evidence.get("mode") != "runtime":
+                        issues.append("runtime evidence mode must be runtime")
+                    if evidence.get("framework") and evidence.get("framework") != spec.get("framework"):
+                        issues.append("runtime evidence framework does not match motion-spec.framework")
+                    if evidence.get("frameworks"):
+                        match = next((item for item in evidence["frameworks"] if item.get("framework") == spec.get("framework")), None)
+                        if not match or match.get("status") != "pass" or match.get("ready") is not True:
+                            issues.append("runtime evidence does not contain a passing adapter result")
+                except ValueError as exc:
+                    issues.append(str(exc))
+
+    source_binding = manifest.get("source_binding")
+    if not isinstance(source_binding, dict):
+        issues.append("manifest.source_binding is required for production scenes")
+    else:
+        for field in ("kind", "source_path", "authority", "license", "sha256"):
+            if not str(source_binding.get(field, "")).strip():
+                issues.append(f"manifest.source_binding.{field} is required")
+        if source_binding.get("kind") not in {"project", "library", "generated", "fixture", "remote"}:
+            issues.append("manifest.source_binding.kind is invalid")
+
     source = manifest.get("file")
     if not source:
         issues.append("manifest.file is required")
@@ -99,11 +131,19 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
         source_path = (scene_dir / source).resolve()
         if not source_path.is_file() or scene_dir.resolve() not in source_path.parents:
             issues.append("manifest.file must point to an existing file inside the scene directory")
-        elif spec.get("framework") in ("lottie", "dotlottie") and source_path.suffix in (".json", ".lottie"):
-            validator = _load_validator()
-            issues.extend(validator.validate(source_path, spec, int(spec.get("performance", {}).get("max_layers", 80))))
+        else:
+            if isinstance(source_binding, dict):
+                if source_binding.get("source_path") != source:
+                    issues.append("manifest.source_binding.source_path must match manifest.file")
+                import hashlib
+                source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
+                if source_binding.get("sha256") != source_sha:
+                    issues.append("manifest.source_binding.sha256 does not match manifest.file")
+            if spec.get("framework") in ("lottie", "dotlottie") and source_path.suffix in (".json", ".lottie"):
+                validator = _load_validator()
+                issues.extend(validator.validate(source_path, spec, int(spec.get("performance", {}).get("max_layers", 80))))
 
-        candidate_path = scene_dir / "browser-review.json"
+            candidate_path = scene_dir / "browser-review.json"
         if not candidate_path.is_file():
             issues.append("missing browser-review.json; runtime render must hand off to the internal browser Agent")
         else:

@@ -52,3 +52,15 @@
 - [ ] Chặn `ready_for_pr`/`confirmed` nếu chưa có review approval hợp lệ.
 - [ ] Thêm test flow generate → render → browser review → fix hoặc confirm.
 - [ ] Cập nhật SKILL.md, Agent Card, README và báo cáo mẫu với browser-review contract.
+
+## Runtime and provenance upgrade
+
+- [x] Tạo `scripts/to-dotlottie.sh` với manifest/animation entry validation và checksum output.
+- [x] Thêm test đóng gói `.lottie`, giải nén, kiểm tra `manifest.json`, `initial.animation` và round-trip runtime load.
+- [x] Định nghĩa `source-binding` schema bắt buộc trong production `manifest.json` với source path, authority, license và checksum.
+- [x] Cập nhật analyzer, report, quality gate và fixture để reject manifest thiếu hoặc sai source binding.
+- [x] Xây runtime adapter test thật cho Rive: load `.riv`, state machine/input binding, reduced-motion và snapshot evidence.
+- [x] Xây runtime adapter test thật cho GSAP: execute scene trong browser harness, scrub deterministic timeline và snapshot evidence.
+- [x] Xây runtime adapter test thật cho Framer Motion: render React scene trong browser harness, reduced-motion và snapshot evidence.
+- [x] Chỉ nâng capability declarations từ `scaffold_only` lên `verified` sau khi adapter evidence và CI gate pass.
+- [x] Cập nhật SKILL.md, Agent Card, README, runtime capability reference và CI theo capability levels mới.

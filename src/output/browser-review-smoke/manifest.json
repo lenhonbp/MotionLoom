@@ -4,6 +4,15 @@
   "framework": "lottie",
   "category": "loading",
   "file": "animation.json",
+  "source_binding": {
+    "kind": "fixture",
+    "source_path": "animation.json",
+    "source_url": "https://github.com/animation-skill-kit/animation-skill-kit/tree/main/src/output/browser-review-smoke",
+    "authority": "animation-skill-kit browser-review smoke fixture",
+    "license": "MIT",
+    "attribution": "Generated fixture retained for deterministic runtime and browser-review tests.",
+    "sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a"
+  },
   "checks": [
     {"id": "runtime", "label": "Runtime render evidence exists", "detail": "Frames 0, 50 and 100 are produced by the Lottie runtime.", "pass": true},
     {"id": "timing", "label": "Timing matches motion spec", "detail": "Duration and FPS are bound to motion-spec.json.", "pass": true},

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation Skill Runtime Harness</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #111827; color: #f8fafc; font-family: system-ui, sans-serif; }
+      body { display: grid; place-items: center; }
+      #root { width: 512px; height: 512px; display: grid; place-items: center; }
+      .stage { position: relative; width: 420px; height: 420px; overflow: hidden; background: #f8fafc; border-radius: 12px; }
+      .stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; border: 1px solid rgba(15,23,42,.2); border-radius: inherit; }
+      .gsap-box, .motion-box { width: 96px; height: 96px; position: absolute; left: 40px; top: 160px; border-radius: 18px; background: #2563eb; transform-origin: center; }
+      .gsap-box::after, .motion-box::after { content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%; right: 14px; top: 14px; background: #f59e0b; }
+      canvas { width: 420px; height: 420px; display: block; }
+      #status { position: fixed; left: 12px; bottom: 12px; font: 12px ui-monospace, monospace; color: #fbbf24; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="status">loading</div>
+    <script type="module" src="/tests/runtime-harness/main.jsx"></script>
+  </body>
+</html>

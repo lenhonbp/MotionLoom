@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "intent": "Prove the MotionLoom browser-review-to-local-PR contract with a real runtime-backed candidate.",
+  "project_name": "MotionLoom",
+  "context_path": "artifacts/browser-review-smoke-task/project-context.json",
+  "context_hash": "",
+  "state": "ready_for_pr",
+  "browser_review": {
+    "required": true,
+    "status": "approved",
+    "candidate_id": "88a2f2f18ba45a07f56e",
+    "candidate_path": "browser-review.json",
+    "review_artifact": "review.json"
+  },
+  "owner_agent": "motionloom",
+  "created_at": "2026-08-12T17:41:44Z",
+  "updated_at": "2026-08-12T17:50:05Z"
+}

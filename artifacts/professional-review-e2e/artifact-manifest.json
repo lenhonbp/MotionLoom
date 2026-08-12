@@ -1,0 +1,55 @@
+{
+  "manifest_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "generated_at": "2026-08-12T17:50:05Z",
+  "artifacts": [
+    {
+      "path": "REPORT.md",
+      "type": "md",
+      "sha256": "eb817f5b7f72ff4aa2dbc5306ae8f80b9288ca34bdd1c0cdccd5972bfde1e88b",
+      "bytes": 1993
+    },
+    {
+      "path": "browser-observation.md",
+      "type": "md",
+      "sha256": "4161597a40ab9d924844a7d48e18093e1e5f6083643d4362163b6c7275bf4de0",
+      "bytes": 2213
+    },
+    {
+      "path": "browser-review.json",
+      "type": "json",
+      "sha256": "3a74b4aac673133c9e3cbda8e82fa8e147e0fc89204d60fd39912f8abd179948",
+      "bytes": 1005
+    },
+    {
+      "path": "handoff.json",
+      "type": "json",
+      "sha256": "1b913e12536232e7fea137df02225495921788ba2eb2a7f10353c0582e443ca9",
+      "bytes": 1212
+    },
+    {
+      "path": "issue-register.json",
+      "type": "json",
+      "sha256": "abe11ae8d5386db09c9a6dd0a989dea38d9714334afbcc765b8bcd1a074aba70",
+      "bytes": 79
+    },
+    {
+      "path": "quality-report.json",
+      "type": "json",
+      "sha256": "1fae971797329d3526240b8bb578ac1e8e809a132e7cbbb0b75604b1eba3a009",
+      "bytes": 583
+    },
+    {
+      "path": "review.json",
+      "type": "json",
+      "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
+      "bytes": 457
+    },
+    {
+      "path": "task.json",
+      "type": "json",
+      "sha256": "5bb09e7daf87cadb584b06ab1a166ab7f83e03832f72c796b98d512f5db52e63",
+      "bytes": 686
+    }
+  ]
+}

@@ -287,6 +287,49 @@ def test_deep_audit_contracts():
     check("runtime adapter rejects unsupported framework path", unsafe_runtime.returncode != 0 and "unsupported" in (unsafe_runtime.stderr + unsafe_runtime.stdout))
 
 
+def test_approved_browser_review_e2e_contract():
+    """Re-run the acceptance side of a real approved task from a clean copy."""
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "artifacts/professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+        shutil.copytree(ROOT / "src/output/browser-review-smoke", root / "src/output/browser-review-smoke")
+        shutil.copy(ROOT / "artifacts/browser-review-smoke-task/project-context.json", root / "project-context.json")
+
+        candidate_path = task_dir / "browser-review.json"
+        candidate = json.loads(candidate_path.read_text())
+        candidate["expires_at"] = "2099-01-01T00:00:00Z"
+        candidate_path.write_text(json.dumps(candidate, indent=2) + "\n")
+
+        review = json.loads((task_dir / "review.json").read_text())
+        task = json.loads((task_dir / "task.json").read_text())
+        check(
+            "e2e task binds approved candidate",
+            review.get("candidate_id") == candidate.get("candidate_id")
+            and candidate.get("task_id") == task.get("task_id")
+            and candidate.get("scene") == task.get("scene"),
+        )
+        check("e2e task is confirmed", task.get("state") == "confirmed")
+
+        review_hook = subprocess.run([
+            sys.executable, str(ROOT / "scripts/review-hook.py"), "validate",
+            "--task-dir", str(task_dir), "--require-approved",
+        ], capture_output=True, text=True)
+        check("e2e review hook accepts approved candidate", review_hook.returncode == 0, review_hook.stdout.strip())
+
+        quality = subprocess.run([
+            sys.executable, str(ROOT / "scripts/quality-gate.py"), "--root", str(root),
+            "--scene", "browser-review-smoke", "--context", str(root / "project-context.json"),
+            "--task-dir", str(task_dir), "--require-browser-review",
+        ], capture_output=True, text=True)
+        check("e2e quality gate accepts task evidence", quality.returncode == 0, quality.stdout.strip())
+
+        report_check = subprocess.run([
+            sys.executable, str(ROOT / "scripts/report.py"), "check", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("e2e report contract accepts confirmed task", report_check.returncode == 0, report_check.stdout.strip())
+
+
 def test_malformed_spec_is_rejected_cleanly():
     with tempfile.TemporaryDirectory() as td:
         bad = Path(td) / "bad.json"
@@ -417,6 +460,7 @@ if __name__ == "__main__":
     test_placeholder_is_not_runtime_evidence()
     test_runtime_evidence_binding()
     test_deep_audit_contracts()
+    test_approved_browser_review_e2e_contract()
     test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()

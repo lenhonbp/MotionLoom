@@ -1,0 +1,32 @@
+{
+  "handoff_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "from_agent": "motionloom",
+  "to_agent": "browser-review-agent",
+  "state": "review_required",
+  "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.",
+  "next_actions": [
+    {
+      "action": "Open internal Dev Lab candidate",
+      "kind": "browser_review",
+      "agent": "browser-review-agent",
+      "skill": "browser-review",
+      "url": "https://3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer/?scene=browser-review-smoke&task_id=professional-review-e2e&candidate_id=88a2f2f18ba45a07f56e&artifact_base=https%3A%2F%2F3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer%2Fscenes%2Fbrowser-review-smoke&task_base=https%3A%2F%2F3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer%2Ftasks%2Fprofessional-review-e2e",
+      "candidate_id": "88a2f2f18ba45a07f56e",
+      "requires_user_approval": true,
+      "evidence_needed": [
+        "review.json"
+      ],
+      "output_artifacts": [
+        "review.json"
+      ]
+    }
+  ],
+  "required_artifacts": [
+    "browser-review.json",
+    "execution-report.json",
+    "review.json",
+    "task.json"
+  ],
+  "blockers": []
+}

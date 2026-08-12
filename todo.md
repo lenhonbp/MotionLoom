@@ -83,3 +83,13 @@
 - [ ] Đánh giá Dev Lab có load candidate thật từ artifact bundle hay còn phụ thuộc catalog/demo data.
 - [ ] Bổ sung các test hoặc hardening có giá trị sau audit, ưu tiên lỗi có thể làm PR gate sai.
 - [ ] Tạo deep-audit report với mức độ rủi ro, bằng chứng, remediation và giới hạn còn lại.
+
+## Approved end-to-end browser review execution
+
+- [x] Tạo task bundle có scene, context, source binding, runtime snapshots và execution report đầy đủ.
+- [x] Chạy `review-hook.py prepare` để tạo candidate identity-bound, expiry-bound và URL có artifact/task base.
+- [x] Mở đúng candidate URL bằng Dev Lab browser nội bộ, kiểm tra frame 0/50/100, checklist và task evidence rail.
+- [x] Ghi `review.json` với reviewer, decision, timestamp, feedback và candidate/task identity khớp.
+- [x] Chạy `review-hook.py validate --require-approved` và `quality-gate.py --require-browser-review` trên cùng task bundle.
+- [x] Chạy `pr.sh` với `OPEN_PR=0`, xác nhận commit local-only và chứng minh không mở/push PR ngoài ý muốn.
+- [x] Lưu execution evidence, cập nhật report/handoff và bổ sung test tái lập flow từ clean task bundle.

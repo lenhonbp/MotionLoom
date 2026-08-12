@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "status": "pass",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "candidate_id": "88a2f2f18ba45a07f56e",
+  "checks": [
+    "context binding",
+    "source binding",
+    "runtime snapshots",
+    "browser review approval",
+    "candidate expiry and identity"
+  ],
+  "evidence": [
+    "browser-observation.md",
+    "browser-review.json",
+    "review.json",
+    "../browser-review-smoke-task/project-context.json",
+    "../../src/output/browser-review-smoke/browser-review.json"
+  ],
+  "generated_at": "2026-08-12T17:49:00Z"
+}

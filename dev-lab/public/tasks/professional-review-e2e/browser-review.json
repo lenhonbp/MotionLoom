@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "88a2f2f18ba45a07f56e",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "url": "https://3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer/?scene=browser-review-smoke&task_id=professional-review-e2e&candidate_id=88a2f2f18ba45a07f56e&artifact_base=https%3A%2F%2F3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer%2Fscenes%2Fbrowser-review-smoke&task_base=https%3A%2F%2F3300-i8isn2ocahcvfq0jk51ta-68c15abe.sg1.manus.computer%2Ftasks%2Fprofessional-review-e2e",
+  "status": "approved",
+  "context_sha256": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+  "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+  "runtime": "lottie",
+  "checkpoints": [
+    0,
+    50,
+    100
+  ],
+  "review_artifact": "review.json",
+  "requires_user_approval": true,
+  "prepared_at": "2026-08-12T17:42:31Z",
+  "expires_at": "2026-08-13T17:42:31Z",
+  "reviewed_at": "2026-08-12T17:48:54Z"
+}

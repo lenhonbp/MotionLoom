@@ -1,0 +1,12 @@
+{
+  "review_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "candidate_id": "88a2f2f18ba45a07f56e",
+  "decision": "approved",
+  "reviewer": "user",
+  "notes": "Approved after inspecting runtime checkpoints 0, 50 and 100 in the identity-bound Dev Lab candidate.",
+  "feedback": [
+    "All four checks passed: runtime evidence, timing/spec binding, reduced-motion policy and project-context binding."
+  ],
+  "reviewed_at": "2026-08-12T17:48:54Z"
+}

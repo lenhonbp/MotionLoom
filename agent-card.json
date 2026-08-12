@@ -1,7 +1,7 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification, semantic feedback, continuity checks, internal browser review and deterministic Agent handoff.",
   "capabilities": [
     "project.analyze",
@@ -19,6 +19,7 @@
     "replay.verify",
     "semantic-lint.build",
     "semantic-lint.validate",
+    "semantic-lint.benchmark",
     "continuity.build",
     "continuity.validate",
     "fix-plan.build",
@@ -64,6 +65,7 @@
     "motion-ir",
     "replay-bundle",
     "semantic-lint-report",
+    "semantic-lint-benchmark",
     "continuity-report",
     "fix-plan",
     "pr-patch"
@@ -123,9 +125,10 @@
     "intelligence_motion_ir": "python3 scripts/intelligence.py motion-ir build --task-dir artifacts/<task-id>",
     "intelligence_replay": "python3 scripts/intelligence.py replay capture --task-dir artifacts/<task-id>",
     "semantic_lint": "python3 scripts/intelligence.py semantic-lint build --task-dir artifacts/<task-id>",
+    "semantic_lint_benchmark": "python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500",
     "continuity": "python3 scripts/intelligence.py continuity build --task-dirs artifacts/<task-id>...",
     "fix_plan": "python3 scripts/intelligence.py fix-plan build --task-dir artifacts/<task-id> --reports semantic-lint-report.json continuity-report.json",
-    "quality_gate_p1": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1",
+    "quality_gate_p1": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1 --require-benchmark",
     "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
     "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
     "pr_prepare": "bash scripts/pr.sh <scene>"

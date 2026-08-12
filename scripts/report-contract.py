@@ -49,6 +49,7 @@ def main() -> int:
         "handoff.json",
         "issue-register.json",
         "semantic-lint-report.json",
+        "semantic-lint-benchmark.json",
         "continuity-report.json",
         "fix-plan.json",
     )

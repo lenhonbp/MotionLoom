@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.1",
+  "generated_at": "2026-08-12T14:29:03.385975Z",
+  "project_root": "/tmp/animation-review-host",
+  "name": "browser-review-fixture",
+  "description": "Fixture host for the mandatory internal browser review smoke test.",
+  "stack": {
+    "framework": "gsap",
+    "react": false,
+    "vue": false,
+    "react_native": false,
+    "native_web": false
+  },
+  "brand": {
+    "primary": "#2563EB",
+    "accent": "#F59E0B",
+    "palette": [],
+    "fonts": []
+  },
+  "motion_language": {
+    "easings_used": [],
+    "duration_patterns": [],
+    "recommendation": "ease-out"
+  },
+  "existing_animations": [],
+  "manifest_overrides": {
+    "name": "browser-review-fixture",
+    "description": "Fixture host for the mandatory internal browser review smoke test.",
+    "brand": {
+      "primary": "#2563EB",
+      "accent": "#F59E0B",
+      "palette": [
+        "#2563EB",
+        "#F59E0B",
+        "#0F172A"
+      ],
+      "fonts": [
+        "Inter"
+      ]
+    },
+    "motion_language": {
+      "easing": "ease-out",
+      "ui_duration_ms": 300
+    },
+    "stack": {
+      "framework": "lottie",
+      "react": false
+    },
+    "rules": {
+      "no_flash": true,
+      "reduced_motion_required": true,
+      "max_file_kb": 300
+    },
+    "asset_sources": {
+      "library": "assets/library/",
+      "project_svgs": []
+    }
+  },
+  "source_authority": "project-manifest.json then assets/library/, never invented geometry"
+}

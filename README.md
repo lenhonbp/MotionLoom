@@ -67,7 +67,7 @@ node scripts/runtime-adapters.mjs
 
 When these variables are supplied, `runtime-evidence.json` records `scene`, `source_sha256` and `manifest_sha256`; the quality gate rejects evidence copied from another scene or generated against an older manifest.
 
-### Intelligence Core v0.1 + P1 feedback intelligence
+### Intelligence Core v0.1 + P1 feedback intelligence + benchmark
 
 After render and before strict acceptance, build the task-bound Intelligence Core artifacts. They give an Agent a single relationship graph, step-level provenance, framework-neutral Motion IR, capability selection policy and deterministic replay inventory instead of requiring it to infer relationships from prose and unrelated files:
 
@@ -77,17 +77,19 @@ python3 scripts/intelligence.py graph build --task-dir artifacts/onboarding-wave
 python3 scripts/intelligence.py provenance build --task-dir artifacts/onboarding-wave
 python3 scripts/intelligence.py replay capture --root . --task-dir artifacts/onboarding-wave
 python3 scripts/intelligence.py semantic-lint build --task-dir artifacts/onboarding-wave
+python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/onboarding-wave \
+  --iterations 25 --threshold-ms 500
 python3 scripts/intelligence.py continuity build --task-dirs artifacts/onboarding-wave
 python3 scripts/intelligence.py fix-plan build --task-dir artifacts/onboarding-wave \
   --reports semantic-lint-report.json continuity-report.json
 python3 scripts/quality-gate.py --scene my-scene \
   --context /path/to/your/project/project-context.json \
   --task-dir artifacts/onboarding-wave \
-  --require-browser-review --require-intelligence --require-p1
+  --require-browser-review --require-intelligence --require-p1 --require-benchmark
 python3 scripts/eval-intelligence.py
 ```
 
-Semantic lint reports intent, timing, easing, accessibility and performance findings with severity, confidence and evidence. Continuity analysis checks context and transition drift across an ordered scene set. `fix-plan.json` converts those findings into root cause, affected artifacts, selective rerun scope and verification commands; it does not auto-approve a scene. The graph, provenance, replay and P1 reports are evidence contracts, not approval tokens. They cannot replace runtime assertions, Dev Lab review or user consent. See [Intelligence Core](references/intelligence-core.md) for failure semantics and [the 1.6.0 release note](docs/releases/1.6.0.md) for the verified scope.
+Semantic lint reports intent, timing, easing, accessibility and performance findings with severity, confidence and evidence. The 1.7.0 benchmark records rule coverage and p95 execution time against a 500 ms default threshold; it does not claim to measure human visual quality. Continuity analysis checks context and transition drift across an ordered scene set. `fix-plan.json` converts those findings into root cause, affected artifacts, selective rerun scope and verification commands; it does not auto-approve a scene. The graph, provenance, replay, P1 reports and benchmark are evidence contracts, not approval tokens. They cannot replace runtime assertions, Dev Lab review or user consent. See [Intelligence Core](references/intelligence-core.md) for failure semantics and [the 1.7.0 release note](docs/releases/1.7.0.md) for the verified scope.
 
 ## Pipeline
 
@@ -120,7 +122,7 @@ Semantic lint reports intent, timing, easing, accessibility and performance find
 
 ## The quality gate
 
-A scene is only "ready" when, together, the Dev Lab checklist passes, runtime snapshot frames exist at 0/50/100%, the context-bound JSON spec matches the implementation, brand tokens come from the target project's `project-context.json`, the required `source_binding` traces `manifest.file` to an authoritative source with a matching checksum, and the P1 reports have been validated. A warning may require human review and a selective fix; it is never silently converted into approval. CI reproduces these checks on every PR — see [CHECKLIST.md](docs/CHECKLIST.md).
+A scene is only "ready" when, together, the Dev Lab checklist passes, runtime snapshot frames exist at 0/50/100%, the context-bound JSON spec matches the implementation, brand tokens come from the target project's `project-context.json`, the required `source_binding` traces `manifest.file` to an authoritative source with a matching checksum, the P1 reports have been validated and the semantic-lint benchmark is below threshold. A warning may require human review and a selective fix; it is never silently converted into approval. CI reproduces these checks on every PR — see [CHECKLIST.md](docs/CHECKLIST.md).
 
 ## Transparent task reporting
 

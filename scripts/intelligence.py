@@ -11,7 +11,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import platform
+import time
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -22,7 +24,18 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SHA256_RE = "^[a-f0-9]{64}$"
 GENERATED_REPLAY = {"replay-bundle.json"}
-GENERATED_REPORTS = {"artifact-manifest.json", "execution-report.json", "REPORT.md", "decision-log.jsonl"}
+GENERATED_REPORTS = {"artifact-manifest.json", "execution-report.json", "REPORT.md", "decision-log.jsonl", "semantic-lint-benchmark.json"}
+UI_CONTEXT_CATEGORIES = {
+    "button", "dialog", "drawer", "dropdown", "form", "hero", "interaction", "loading", "menu",
+    "modal", "navigation", "notification", "popover", "scroll", "tooltip", "ui", "ui-micro",
+}
+SEMANTIC_RULE_IDS = (
+    "MOTION.TIMING.DURATION", "MOTION.TIMING.FPS", "MOTION.INTENT.PRESENT", "MOTION.INTENT.SPECIFIC",
+    "MOTION.EASING.KNOWN", "MOTION.PERCEPTUAL.EASING", "MOTION.A11Y.REDUCED_MOTION",
+    "MOTION.PERCEPTUAL.REDUCED_MOTION", "MOTION.A11Y.KEYBOARD_REVIEW", "MOTION.PERF.MAX_TRACKS",
+    "MOTION.PERF.ANIMATION_BUDGET", "MOTION.PERF.FRAME_RATE", "MOTION.PERF.TRACK_COUNT",
+    "MOTION.ACCEPTANCE.PRESENT",
+)
 
 
 def now() -> str:
@@ -633,6 +646,8 @@ def semantic_lint_data(task_dir: Path, task: dict[str, Any], ir: dict[str, Any],
     duration_s = float(spec.get("duration_s", 0) or 0)
     fps = float(spec.get("fps", 0) or 0)
     expected_duration_ms = round(duration_s * 1000)
+    category = str(spec.get("category") or task.get("category") or "").strip().lower()
+    ui_context = category in UI_CONTEXT_CATEGORIES or any(token in str(ir.get("intent", "")).lower() for token in ("ui", "button", "dialog", "loading", "menu"))
     if expected_duration_ms and ir.get("duration_ms") != expected_duration_ms:
         findings.append(finding(
             "timing-duration-mismatch", "MOTION.TIMING.DURATION", "timing", "error", 0.99, "deterministic",
@@ -646,6 +661,30 @@ def semantic_lint_data(task_dir: Path, task: dict[str, Any], ir: dict[str, Any],
             "Motion IR FPS does not match the source motion spec.", evidence_refs, ["motion-ir.json", "motion-spec.json"],
             "Rebuild Motion IR from the bound motion-spec.json before rendering.",
             f"Expected fps={fps}; received {ir.get('fps')}.", True,
+        ))
+
+    duration_ms = int(ir.get("duration_ms", 0) or 0)
+    if ui_context and duration_ms > 500:
+        findings.append(finding(
+            "perf-animation-budget", "MOTION.PERF.ANIMATION_BUDGET", "performance", "warning", 0.75, "heuristic",
+            "UI-context animation exceeds the default 500 ms interaction budget.", evidence_refs, ["motion-ir.json", "motion-spec.json"],
+            "Split the motion into a short interaction response and an optional secondary flourish, or document why the longer duration is intentional.",
+            f"UI category={category or 'unknown'}; duration_ms={duration_ms}; default_budget_ms=500.", False,
+        ))
+    if float(ir.get("fps", 0) or 0) < 30:
+        findings.append(finding(
+            "perf-frame-rate", "MOTION.PERF.FRAME_RATE", "performance", "warning", 0.85, "deterministic",
+            "Motion IR FPS is below the 30 FPS perceptual floor used by the lint contract.", ["motion-ir.json"], ["motion-ir.json"],
+            "Raise the authored frame rate to at least 30 FPS or attach runtime evidence explaining the lower rate.",
+            f"fps={ir.get('fps')}; minimum_fps=30.", False,
+        ))
+    track_count = len(ir.get("tracks", []))
+    if track_count > 10:
+        findings.append(finding(
+            "perf-track-count", "MOTION.PERF.TRACK_COUNT", "performance", "info", 0.70, "heuristic",
+            "Motion IR contains more than ten tracks and may require a runtime complexity review.", ["motion-ir.json"], ["motion-ir.json"],
+            "Confirm that the track count is justified by runtime evidence and does not cause unnecessary compositing work.",
+            f"track_count={track_count}; review_threshold=10.", False,
         ))
 
     intent = str(ir.get("intent", "")).strip().lower()
@@ -666,6 +705,7 @@ def semantic_lint_data(task_dir: Path, task: dict[str, Any], ir: dict[str, Any],
         ))
 
     known_easings = {"linear", "ease-in", "ease-out", "ease-in-out", "spring", "step-start", "step-end"}
+    linear_tracks: list[str] = []
     for track in ir.get("tracks", []):
         for index, keyframe in enumerate(track.get("keyframes", [])):
             easing = keyframe.get("easing")
@@ -676,15 +716,38 @@ def semantic_lint_data(task_dir: Path, task: dict[str, Any], ir: dict[str, Any],
                     "Map the easing to a canonical name or document the runtime-specific curve in the adapter contract.",
                     f"Unknown easing: {easing}.", False,
                 ))
+            if ui_context and str(easing).lower() == "linear" and str(track.get("id", "unnamed")) not in linear_tracks:
+                linear_tracks.append(str(track.get("id", "unnamed")))
+    if linear_tracks:
+        findings.append(finding(
+            "perceptual-easing-linear", "MOTION.PERCEPTUAL.EASING", "easing", "warning", 0.78, "heuristic",
+            "UI-context motion uses linear easing, which can read as mechanical rather than responsive.", ["motion-ir.json", "motion-spec.json"], ["motion-ir.json"],
+            "Prefer a documented ease-out, ease-in-out, spring or runtime-specific curve unless linear timing is part of the interaction intent.",
+            f"linear_tracks={linear_tracks}; category={category or 'unknown'}.", False,
+        ))
 
     accessibility = ir.get("accessibility") or {}
     reduced_motion = accessibility.get("reduced_motion")
-    if reduced_motion not in {"reduce", "replace", "freeze"}:
+    if reduced_motion is None:
         findings.append(finding(
             "accessibility-reduced-motion", "MOTION.A11Y.REDUCED_MOTION", "accessibility", "error", 0.98, "deterministic",
             "Motion IR does not declare a reduced-motion behavior that the runtime can enforce.", ["motion-ir.json", "motion-spec.json"], ["motion-ir.json", "motion-spec.json"],
             "Declare reduce, replace or freeze behavior and verify it in runtime evidence.",
             "A missing or none policy leaves high-motion behavior without an explicit fallback.", True,
+        ))
+    elif reduced_motion == "none":
+        findings.append(finding(
+            "perceptual-reduced-motion-missing", "MOTION.PERCEPTUAL.REDUCED_MOTION", "accessibility", "warning", 0.90, "deterministic",
+            "Motion IR explicitly disables reduced-motion handling for a user-facing animation.", ["motion-ir.json", "motion-spec.json"], ["motion-ir.json", "motion-spec.json"],
+            "Declare reduce, replace or freeze behavior and verify the fallback in runtime evidence.",
+            "The policy is structurally present but does not provide a reduced-motion outcome.", False,
+        ))
+    elif reduced_motion not in {"reduce", "replace", "freeze"}:
+        findings.append(finding(
+            "accessibility-reduced-motion", "MOTION.A11Y.REDUCED_MOTION", "accessibility", "error", 0.98, "deterministic",
+            "Motion IR declares a reduced-motion policy that is not supported by the canonical runtime contract.", ["motion-ir.json", "motion-spec.json"], ["motion-ir.json", "motion-spec.json"],
+            "Declare reduce, replace or freeze behavior and verify it in runtime evidence.",
+            f"Unsupported reduced_motion policy: {reduced_motion}.", True,
         ))
     if accessibility.get("keyboard_safe") is False:
         findings.append(finding(
@@ -721,7 +784,7 @@ def semantic_lint_data(task_dir: Path, task: dict[str, Any], ir: dict[str, Any],
         "task_id": task_id,
         "scene": scene,
         "status": "fail" if blocking else ("warn" if warnings else "pass"),
-        "ruleset": {"id": "motionloom.semantic-motion", "version": "0.1"},
+        "ruleset": {"id": "motionloom.semantic-motion", "version": "0.2"},
         "context_hash": task.get("context_hash") or ir.get("context_hash"),
         "motion_ir": {"path": "motion-ir.json", "sha256": digest_file(task_dir / "motion-ir.json")},
         "summary": {"total": len(findings), "errors": errors, "warnings": warnings, "infos": infos, "blocking": blocking},
@@ -747,6 +810,113 @@ def semantic_lint_validate_data(report: dict[str, Any]) -> list[str]:
         issues.append("summary.blocking does not match findings")
     if report.get("status") == "fail" and blocking == 0:
         issues.append("fail status requires at least one blocking finding")
+    return issues
+
+
+def semantic_lint_benchmark_data(
+    task_dir: Path,
+    task: dict[str, Any],
+    ir: dict[str, Any],
+    spec: dict[str, Any],
+    iterations: int,
+    threshold_ms: float,
+) -> dict[str, Any]:
+    if iterations < 1:
+        raise ValueError("benchmark iterations must be positive")
+    if threshold_ms <= 0:
+        raise ValueError("benchmark threshold_ms must be positive")
+    samples_ms: list[float] = []
+    representative: dict[str, Any] = {}
+    for _ in range(iterations):
+        started = time.perf_counter_ns()
+        representative = semantic_lint_data(task_dir, task, ir, spec)
+        samples_ms.append((time.perf_counter_ns() - started) / 1_000_000)
+    ordered = sorted(samples_ms)
+    p95_index = min(len(ordered) - 1, max(0, math.ceil(len(ordered) * 0.95) - 1))
+    p95_ms = ordered[p95_index]
+    average_ms = sum(samples_ms) / len(samples_ms)
+    return {
+        "schema_version": "0.1",
+        "benchmark_id": f"semantic-lint-benchmark-{task.get('task_id', task_dir.name)}-{task.get('scene', 'scene')}",
+        "task_id": str(task.get("task_id", task_dir.name)),
+        "scene": str(task.get("scene", ir.get("scene", "scene"))),
+        "operation": "semantic-lint-build",
+        "iterations": iterations,
+        "threshold_ms": round(float(threshold_ms), 3),
+        "samples_ms": [round(sample, 3) for sample in samples_ms],
+        "average_ms": round(average_ms, 3),
+        "p95_ms": round(p95_ms, 3),
+        "status": "pass" if p95_ms < threshold_ms else "fail",
+        "rule_count": len(SEMANTIC_RULE_IDS),
+        "rule_ids": list(SEMANTIC_RULE_IDS),
+        "lint_status": representative.get("status"),
+        "lint_finding_count": len(representative.get("findings", [])),
+        "generated_at": now(),
+    }
+
+
+def semantic_lint_benchmark_validate_data(report: dict[str, Any]) -> list[str]:
+    required = {
+        "schema_version", "benchmark_id", "task_id", "scene", "operation", "iterations",
+        "threshold_ms", "samples_ms", "average_ms", "p95_ms", "status", "rule_count", "rule_ids", "generated_at",
+    }
+    issues = [f"missing {field}" for field in sorted(required - set(report))]
+    if report.get("schema_version") != "0.1":
+        issues.append("schema_version must be 0.1")
+    if report.get("operation") != "semantic-lint-build":
+        issues.append("operation must be semantic-lint-build")
+    if not isinstance(report.get("iterations"), int) or report.get("iterations", 0) < 1:
+        issues.append("iterations must be a positive integer")
+    samples = report.get("samples_ms")
+    if not isinstance(samples, list) or len(samples) != report.get("iterations"):
+        issues.append("samples_ms length must match iterations")
+    if report.get("status") not in {"pass", "fail"}:
+        issues.append("status must be pass or fail")
+    if report.get("rule_count") != len(report.get("rule_ids", [])):
+        issues.append("rule_count must match rule_ids length")
+    return issues
+
+
+def semantic_lint_benchmark(args: argparse.Namespace) -> int:
+    task_dir = task_dir_from(args.task_dir)
+    task = read_json(task_dir / "task.json")
+    ir = read_json(task_dir / "motion-ir.json")
+    spec_path = motion_spec_path(task_dir, str(task.get("scene", "scene")), args.spec)
+    spec = read_json(spec_path)
+    report = semantic_lint_benchmark_data(task_dir, task, ir, spec, args.iterations, args.threshold_ms)
+    issues = semantic_lint_benchmark_validate_data(report)
+    if issues:
+        raise ValueError("semantic lint benchmark is invalid: " + "; ".join(issues))
+    output = Path(args.output).expanduser().resolve() if args.output else task_dir / "semantic-lint-benchmark.json"
+    write_json(output, report)
+    print(json.dumps({
+        "status": report["status"], "kind": "semantic-lint-benchmark", "task_id": report["task_id"],
+        "scene": report["scene"], "p95_ms": report["p95_ms"], "threshold_ms": report["threshold_ms"],
+        "rule_count": report["rule_count"], "path": str(output),
+    }, ensure_ascii=False))
+    return 0 if report["status"] == "pass" else 1
+
+
+def validate_task_benchmark(task_dir: Path, scene: str | None = None) -> list[str]:
+    """Validate an optional semantic-lint benchmark artifact without side effects."""
+    issues: list[str] = []
+    path = task_dir / "semantic-lint-benchmark.json"
+    if not path.is_file():
+        return ["missing semantic-lint-benchmark.json"]
+    try:
+        task = read_json(task_dir / "task.json")
+        report = read_json(path)
+        issues.extend(semantic_lint_benchmark_validate_data(report))
+        if report.get("task_id") != task.get("task_id"):
+            issues.append("semantic lint benchmark task_id does not match task.json")
+        if scene and report.get("scene") != scene:
+            issues.append("semantic lint benchmark scene does not match quality-gate scene")
+        if report.get("status") != "pass":
+            issues.append("semantic lint benchmark status must be pass")
+        if float(report.get("p95_ms", 0) or 0) >= float(report.get("threshold_ms", 0) or 0):
+            issues.append("semantic lint benchmark p95_ms must be below threshold_ms")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        issues.append(f"benchmark validation error: {exc}")
     return issues
 
 
@@ -1272,6 +1442,13 @@ def add_subcommands(parser: argparse.ArgumentParser) -> None:
     semantic_lint_validate_parser = semantic_lint_sub.add_parser("validate")
     semantic_lint_validate_parser.add_argument("--path", required=True)
     semantic_lint_validate_parser.set_defaults(func=semantic_lint_validate)
+    semantic_lint_benchmark_parser = semantic_lint_sub.add_parser("benchmark", help="benchmark semantic-lint-build execution")
+    semantic_lint_benchmark_parser.add_argument("--task-dir", required=True)
+    semantic_lint_benchmark_parser.add_argument("--spec")
+    semantic_lint_benchmark_parser.add_argument("--output")
+    semantic_lint_benchmark_parser.add_argument("--iterations", type=int, default=25)
+    semantic_lint_benchmark_parser.add_argument("--threshold-ms", type=float, default=500.0)
+    semantic_lint_benchmark_parser.set_defaults(func=semantic_lint_benchmark)
 
     continuity = sub.add_parser("continuity", help="build or validate continuity-report.json")
     continuity_sub = continuity.add_subparsers(dest="action", required=True)

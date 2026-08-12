@@ -92,6 +92,65 @@ def run_p1_cases(root: Path, task_dir: Path, results: list[dict[str, object]]) -
     record(results, "p1-fix-plan-selective-rerun", fix_plan_result.returncode == 0 and selective and synced, fix_plan_result.stdout + fix_plan_result.stderr)
 
 
+def run_performance_perceptual_cases(root: Path, task_dir: Path, results: list[dict[str, object]]) -> None:
+    """Exercise non-blocking performance/perceptual findings and the benchmark contract."""
+    duration_task = root / "p1-perf-duration-budget"
+    shutil.copytree(task_dir, duration_task)
+    duration_ir_path = duration_task / "motion-ir.json"
+    duration_ir = json.loads(duration_ir_path.read_text(encoding="utf-8"))
+    duration_ir["duration_ms"] = 600
+    duration_ir_path.write_text(json.dumps(duration_ir, indent=2) + "\n", encoding="utf-8")
+    duration_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(duration_task)])
+    duration_report = json.loads((duration_task / "semantic-lint-report.json").read_text(encoding="utf-8")) if (duration_task / "semantic-lint-report.json").is_file() else {}
+    duration_warning = any(item.get("id") == "perf-animation-budget" and item.get("severity") == "warning" and not item.get("approval_blocking") for item in duration_report.get("findings", []))
+    record(results, "p1-perf-duration-budget-warning", duration_result.returncode == 0 and duration_warning, duration_result.stdout + duration_result.stderr)
+
+    fps_task = root / "p1-perf-fps"
+    shutil.copytree(task_dir, fps_task)
+    fps_ir_path = fps_task / "motion-ir.json"
+    fps_ir = json.loads(fps_ir_path.read_text(encoding="utf-8"))
+    fps_ir["fps"] = 24
+    fps_ir_path.write_text(json.dumps(fps_ir, indent=2) + "\n", encoding="utf-8")
+    fps_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(fps_task)])
+    fps_report = json.loads((fps_task / "semantic-lint-report.json").read_text(encoding="utf-8")) if (fps_task / "semantic-lint-report.json").is_file() else {}
+    fps_warning = any(item.get("id") == "perf-frame-rate" and item.get("severity") == "warning" for item in fps_report.get("findings", []))
+    record(results, "p1-perf-fps-warning", fps_result.returncode == 0 and fps_warning, fps_result.stdout + fps_result.stderr)
+
+    easing_task = root / "p1-perceptual-easing"
+    shutil.copytree(task_dir, easing_task)
+    easing_ir_path = easing_task / "motion-ir.json"
+    easing_ir = json.loads(easing_ir_path.read_text(encoding="utf-8"))
+    for keyframe in easing_ir.get("tracks", [])[0].get("keyframes", []):
+        keyframe["easing"] = "linear"
+    easing_ir_path.write_text(json.dumps(easing_ir, indent=2) + "\n", encoding="utf-8")
+    easing_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(easing_task)])
+    easing_report = json.loads((easing_task / "semantic-lint-report.json").read_text(encoding="utf-8")) if (easing_task / "semantic-lint-report.json").is_file() else {}
+    easing_warning = any(item.get("id") == "perceptual-easing-linear" and item.get("severity") == "warning" for item in easing_report.get("findings", []))
+    record(results, "p1-perceptual-easing-linear-warning", easing_result.returncode == 0 and easing_warning, easing_result.stdout + easing_result.stderr)
+
+    reduced_task = root / "p1-perceptual-reduced-motion"
+    shutil.copytree(task_dir, reduced_task)
+    reduced_ir_path = reduced_task / "motion-ir.json"
+    reduced_ir = json.loads(reduced_ir_path.read_text(encoding="utf-8"))
+    reduced_ir.setdefault("accessibility", {})["reduced_motion"] = "none"
+    reduced_ir_path.write_text(json.dumps(reduced_ir, indent=2) + "\n", encoding="utf-8")
+    reduced_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(reduced_task)])
+    reduced_report = json.loads((reduced_task / "semantic-lint-report.json").read_text(encoding="utf-8")) if (reduced_task / "semantic-lint-report.json").is_file() else {}
+    reduced_warning = any(item.get("id") == "perceptual-reduced-motion-missing" and item.get("severity") == "warning" and not item.get("approval_blocking") for item in reduced_report.get("findings", []))
+    record(results, "p1-perceptual-reduced-motion-warning", reduced_result.returncode == 0 and reduced_warning, reduced_result.stdout + reduced_result.stderr)
+
+    benchmark_task = root / "p1-benchmark"
+    shutil.copytree(task_dir, benchmark_task)
+    benchmark_path = benchmark_task / "semantic-lint-benchmark.json"
+    benchmark_result = invoke([
+        str(INTELLIGENCE), "semantic-lint", "benchmark", "--task-dir", str(benchmark_task),
+        "--iterations", "10", "--threshold-ms", "500", "--output", str(benchmark_path),
+    ])
+    benchmark = json.loads(benchmark_path.read_text(encoding="utf-8")) if benchmark_path.is_file() else {}
+    benchmark_ok = benchmark.get("status") == "pass" and benchmark.get("p95_ms", 999999) < benchmark.get("threshold_ms", 0) and benchmark.get("rule_count", 0) >= 10
+    record(results, "p1-benchmark-execution-time", benchmark_result.returncode == 0 and benchmark_ok, benchmark_result.stdout + benchmark_result.stderr)
+
+
 def main() -> int:
     corpus = json.loads(CASES.read_text(encoding="utf-8"))
     expected = {case["id"] for case in corpus.get("cases", [])}
@@ -155,6 +214,7 @@ def main() -> int:
         record(results, "foreign-task-candidate", foreign.returncode != 0, foreign.stdout + foreign.stderr)
 
         run_p1_cases(root, task_dir, results)
+        run_performance_perceptual_cases(root, task_dir, results)
 
     missing = expected - {str(item["id"]) for item in results}
     for case_id in sorted(missing):

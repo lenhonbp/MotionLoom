@@ -56,6 +56,31 @@
       "id": "p1-fix-plan-selective-rerun",
       "class": "positive",
       "assertion": "A fix plan is handoff-bound and contains a selective rerun scope for its findings."
+    },
+    {
+      "id": "p1-perf-duration-budget-warning",
+      "class": "negative",
+      "assertion": "A UI-context animation over 500 ms produces a non-blocking performance budget warning."
+    },
+    {
+      "id": "p1-perf-fps-warning",
+      "class": "negative",
+      "assertion": "A Motion IR below 30 FPS produces a non-blocking frame-rate warning."
+    },
+    {
+      "id": "p1-perceptual-easing-linear-warning",
+      "class": "negative",
+      "assertion": "Linear easing in a UI-context track produces a non-blocking perceptual warning."
+    },
+    {
+      "id": "p1-perceptual-reduced-motion-warning",
+      "class": "negative",
+      "assertion": "An explicit none reduced-motion policy produces a non-blocking accessibility risk warning."
+    },
+    {
+      "id": "p1-benchmark-execution-time",
+      "class": "positive",
+      "assertion": "The semantic lint benchmark records rule coverage and passes when p95 execution remains below threshold."
     }
   ]
 }

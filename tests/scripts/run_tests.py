@@ -460,6 +460,68 @@ def test_p1_semantic_continuity_fix_plan():
         ], capture_output=True, text=True)
         check("P1 semantic lint validates report", lint_validate.returncode == 0)
 
+        duration_task = root / "duration-budget-task"
+        shutil.copytree(task_dir, duration_task)
+        duration_ir_path = duration_task / "motion-ir.json"
+        duration_ir = json.loads(duration_ir_path.read_text())
+        duration_ir["duration_ms"] = 600
+        duration_ir_path.write_text(json.dumps(duration_ir, indent=2) + "\n")
+        duration_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(duration_task),
+        ], capture_output=True, text=True)
+        duration_report = json.loads((duration_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on UI animation budget", duration_lint.returncode == 0 and any(item.get("id") == "perf-animation-budget" and item.get("severity") == "warning" and not item.get("approval_blocking") for item in duration_report.get("findings", [])))
+
+        fps_task = root / "fps-task"
+        shutil.copytree(task_dir, fps_task)
+        fps_ir_path = fps_task / "motion-ir.json"
+        fps_ir = json.loads(fps_ir_path.read_text())
+        fps_ir["fps"] = 24
+        fps_ir_path.write_text(json.dumps(fps_ir, indent=2) + "\n")
+        fps_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(fps_task),
+        ], capture_output=True, text=True)
+        fps_report = json.loads((fps_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns below 30 FPS", fps_lint.returncode == 0 and any(item.get("id") == "perf-frame-rate" for item in fps_report.get("findings", [])))
+
+        easing_task = root / "easing-task"
+        shutil.copytree(task_dir, easing_task)
+        easing_ir_path = easing_task / "motion-ir.json"
+        easing_ir = json.loads(easing_ir_path.read_text())
+        for keyframe in easing_ir.get("tracks", [])[0].get("keyframes", []):
+            keyframe["easing"] = "linear"
+        easing_ir_path.write_text(json.dumps(easing_ir, indent=2) + "\n")
+        easing_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(easing_task),
+        ], capture_output=True, text=True)
+        easing_report = json.loads((easing_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on linear UI easing", easing_lint.returncode == 0 and any(item.get("id") == "perceptual-easing-linear" and item.get("severity") == "warning" for item in easing_report.get("findings", [])))
+
+        reduced_task = root / "reduced-motion-task"
+        shutil.copytree(task_dir, reduced_task)
+        reduced_ir_path = reduced_task / "motion-ir.json"
+        reduced_ir = json.loads(reduced_ir_path.read_text())
+        reduced_ir.setdefault("accessibility", {})["reduced_motion"] = "none"
+        reduced_ir_path.write_text(json.dumps(reduced_ir, indent=2) + "\n")
+        reduced_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(reduced_task),
+        ], capture_output=True, text=True)
+        reduced_report = json.loads((reduced_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on absent reduced-motion fallback", reduced_lint.returncode == 0 and any(item.get("id") == "perceptual-reduced-motion-missing" and not item.get("approval_blocking") for item in reduced_report.get("findings", [])))
+
+        benchmark_path = task_dir / "semantic-lint-benchmark.json"
+        benchmark = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "benchmark", "--task-dir", str(task_dir),
+            "--iterations", "10", "--threshold-ms", "500", "--output", str(benchmark_path),
+        ], capture_output=True, text=True)
+        benchmark_data = json.loads(benchmark_path.read_text())
+        check("P1 semantic lint benchmark passes threshold", benchmark.returncode == 0 and benchmark_data.get("status") == "pass" and benchmark_data.get("p95_ms", 999999) < benchmark_data.get("threshold_ms", 0))
+        benchmark_validate = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "benchmark", "--task-dir", str(task_dir),
+            "--iterations", "2", "--threshold-ms", "500", "--output", str(task_dir / "semantic-lint-benchmark-2.json"),
+        ], capture_output=True, text=True)
+        check("P1 semantic lint benchmark is repeatable", benchmark_validate.returncode == 0)
+
         ir = json.loads((task_dir / "motion-ir.json").read_text())
         ir["intent"] = "motion"
         (task_dir / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
@@ -476,7 +538,7 @@ def test_p1_semantic_continuity_fix_plan():
         ], capture_output=True, text=True)
         plan = json.loads((task_dir / "fix-plan.json").read_text())
         check("P1 fix plan binds semantic report", fix_plan.returncode == 0 and plan.get("status") == "proposed", f"rc={fix_plan.returncode} stdout={fix_plan.stdout.strip()} stderr={fix_plan.stderr.strip()}")
-        check("P1 fix plan declares selective lint rerun", plan.get("issues", [{}])[0].get("rerun_scope") == ["lint"])
+        check("P1 fix plan declares selective lint rerun", any(issue.get("rerun_scope") == ["lint"] and "intent-low-specificity" in issue.get("finding_ref", "") for issue in plan.get("issues", []) if isinstance(issue, dict)))
         plan_validate = subprocess.run([
             sys.executable, str(intelligence), "fix-plan", "validate", "--path", str(task_dir / "fix-plan.json"),
         ], capture_output=True, text=True)

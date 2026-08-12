@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
 sys.path.insert(0, str(ROOT / "scripts"))
-from intelligence import validate_task_intelligence, validate_task_p1  # noqa: E402
+from intelligence import validate_task_benchmark, validate_task_intelligence, validate_task_p1  # noqa: E402
 sys.path.insert(0, str(ROOT / "src"))
 from core.spec import validate_spec  # noqa: E402
 
@@ -38,7 +38,7 @@ def _json(path: Path):
         raise ValueError(f"{path}: {exc}")
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -234,6 +234,11 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
             if not all((task_dir / name).is_file() for name in ("semantic-lint-report.json", "continuity-report.json", "fix-plan.json")):
                 p1_issues.append("P1 gate requires semantic-lint-report.json, continuity-report.json and fix-plan.json")
             issues.extend(p1_issues)
+    if require_benchmark:
+        if not task_dir:
+            issues.append("benchmark gate requires --task-dir")
+        else:
+            issues.extend(validate_task_benchmark(task_dir, scene_dir.name))
     return issues
 
 
@@ -248,6 +253,7 @@ def main() -> int:
     parser.add_argument("--require-browser-review", action="store_true")
     parser.add_argument("--require-intelligence", action="store_true")
     parser.add_argument("--require-p1", action="store_true")
+    parser.add_argument("--require-benchmark", action="store_true")
     args = parser.parse_args()
     if args.scene and (args.scene in {".", ".."} or not SAFE_SCENE.fullmatch(args.scene)):
         print("QUALITY GATE: unsafe scene identifier")
@@ -264,7 +270,7 @@ def main() -> int:
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")

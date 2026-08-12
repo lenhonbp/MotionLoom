@@ -127,3 +127,14 @@
 - [x] Tích hợp P1 reports vào quality gate, report lifecycle, Dev Lab task bundle và CI.
 - [x] Tạo eval corpus cho false positive/negative, severity stability, multi-scene drift và selective rerun.
 - [x] Cập nhật tài liệu/agent discovery và chạy full validation trước P1 milestone commit.
+
+## P1 extension: multi-scene continuity and perceptual benchmark
+
+- [x] Tạo task fixture nhiều scene với shared context, asset identity, transition contract và một case drift có chủ đích.
+- [x] Thêm continuity assertions cho asset reuse, timing handoff, context hash và selective rerun ở cấp scene.
+- [x] Bổ sung semantic lint rules đo frame budget, duration/easing risk, reduced-motion impact và runtime cost.
+- [x] Bổ sung perceptual proxy lint với evidence rõ ràng; không gọi proxy score là human visual approval.
+- [x] Xây benchmark runner có case manifest, expected severity, confidence band, false-positive/negative và report version.
+- [x] Tích hợp fixture/benchmark vào regression, eval, strict quality gate, report contract và CI.
+- [x] Chạy full acceptance, cập nhật tài liệu/release note và tạo commit release local trước khi push.
+- [ ] Xác nhận remote target, branch và commit SHA lần cuối trước thao tác push GitHub.

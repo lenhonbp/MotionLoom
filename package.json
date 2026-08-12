@@ -1,6 +1,6 @@
 {
   "name": "motionloom",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "type": "module",
   "description": "MotionLoom: project-aware animation Skill with graph, provenance, framework-neutral Motion IR, runtime validation and Dev Lab evidence.",
@@ -16,8 +16,9 @@
     "intelligence:registry": "python3 scripts/intelligence.py capabilities build --output capability-registry.json",
     "intelligence:registry:check": "python3 scripts/intelligence.py capabilities validate --path capability-registry.json",
     "intelligence:p1": "python3 scripts/intelligence.py",
-    "quality:p1": "python3 scripts/quality-gate.py --require-intelligence --require-p1",
+    "quality:p1": "python3 scripts/quality-gate.py --require-intelligence --require-p1 --require-benchmark",
     "eval:intelligence": "python3 scripts/eval-intelligence.py",
+    "benchmark:semantic": "python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/professional-review-e2e --iterations 25 --threshold-ms 500",
     "pack:dotlottie": "bash scripts/to-dotlottie.sh",
     "runtime:test": "node scripts/runtime-adapters.mjs"
   },

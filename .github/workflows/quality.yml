@@ -120,5 +120,5 @@ jobs:
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
-              --task-dir "$task_dir" --require-browser-review --require-intelligence
+              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1
           done < /tmp/changed-scenes

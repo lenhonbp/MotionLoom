@@ -4,7 +4,7 @@
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "task_dir": "artifacts/browser-review-smoke-task",
-  "generated_at": "2026-08-12T18:23:22Z",
+  "generated_at": "2026-08-12T20:02:30Z",
   "environment": {
     "python": "3.12.3",
     "node": "v22.13.0",
@@ -17,14 +17,24 @@
       "bytes": 740
     },
     {
+      "path": "artifacts/browser-review-smoke-task/continuity-report.json",
+      "sha256": "82e6ac64046170d8c4a98240634955b001661403ccf1ca8f0696ce8255ef351f",
+      "bytes": 744
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/fix-plan.json",
+      "sha256": "2dbf9523484086567438ac5628a87de7567193f2327506640e8a1263776e5917",
+      "bytes": 1709
+    },
+    {
       "path": "artifacts/browser-review-smoke-task/handoff.json",
-      "sha256": "70af7be27bef44c5476af0162b058c63e1fcb78a7bd2aba6912ca5d23b00e366",
-      "bytes": 832
+      "sha256": "bdcbab12aa3872551ec7a71dbd13e389a9aa465a4d2ac38d88e9ce18fbb4c203",
+      "bytes": 1810
     },
     {
       "path": "artifacts/browser-review-smoke-task/issue-register.json",
-      "sha256": "e657bf5b8036b391b6c186aa713f9ae08b35fa201ffb2deb8f58546b4f7d6ad9",
-      "bytes": 81
+      "sha256": "6046251cd5e8a8be6e9035b5080e1224bdc76c2088db7b42fb95cc64f9b8d46a",
+      "bytes": 766
     },
     {
       "path": "artifacts/browser-review-smoke-task/motion-ir.json",
@@ -55,6 +65,11 @@
       "path": "artifacts/browser-review-smoke-task/review.json",
       "sha256": "217a10e85522fb9f69ccc5bd5afe865fc779e96687cabc20138a54260817b736",
       "bytes": 303
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/semantic-lint-report.json",
+      "sha256": "4a2a4620b84a10ae240933b0aa80a253f0292a0aeb0338da04ce3c73fcca301b",
+      "bytes": 1399
     },
     {
       "path": "artifacts/browser-review-smoke-task/task.json",

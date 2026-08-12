@@ -36,6 +36,26 @@
       "id": "foreign-task-candidate",
       "class": "negative",
       "assertion": "A browser-review candidate belonging to another task is rejected."
+    },
+    {
+      "id": "p1-human-review-warning-preserved",
+      "class": "positive",
+      "assertion": "A human-review semantic warning remains visible and is not converted into approval."
+    },
+    {
+      "id": "p1-generic-intent-warning",
+      "class": "negative",
+      "assertion": "A generic Motion IR intent produces a deterministic low-specificity warning."
+    },
+    {
+      "id": "p1-continuity-context-drift",
+      "class": "negative",
+      "assertion": "A context hash change between adjacent scenes is reported as continuity drift."
+    },
+    {
+      "id": "p1-fix-plan-selective-rerun",
+      "class": "positive",
+      "assertion": "A fix plan is handoff-bound and contains a selective rerun scope for its findings."
     }
   ]
 }

@@ -1,13 +1,13 @@
 {
   "manifest_version": "1.0",
   "task_id": "professional-review-e2e",
-  "generated_at": "2026-08-12T18:23:22Z",
+  "generated_at": "2026-08-12T20:08:30Z",
   "artifacts": [
     {
       "path": "REPORT.md",
       "type": "md",
-      "sha256": "6166632554e5fb7f1ed62244a93aea67da90dbab593fc0934220bff66af1df91",
-      "bytes": 2800
+      "sha256": "338521ac5f7f665fe3b49de159aa9dbb353c55fe4062943105ac90f404f20827",
+      "bytes": 4145
     },
     {
       "path": "browser-observation.md",
@@ -22,16 +22,28 @@
       "bytes": 1005
     },
     {
+      "path": "continuity-report.json",
+      "type": "json",
+      "sha256": "e4998ea4350cc27462101f0ade52a2907cb7a6ea33421f8a72b332701a5260d3",
+      "bytes": 796
+    },
+    {
+      "path": "fix-plan.json",
+      "type": "json",
+      "sha256": "3016504cdd58ca578493ede22d5a61a7b0f357f0725cabf2555f835475b2b8c6",
+      "bytes": 1705
+    },
+    {
       "path": "handoff.json",
       "type": "json",
-      "sha256": "1b913e12536232e7fea137df02225495921788ba2eb2a7f10353c0582e443ca9",
-      "bytes": 1212
+      "sha256": "cf7da3c4ee4b49da41edbe8c14f22adbac0205089474b89728e47edb729dcda8",
+      "bytes": 2146
     },
     {
       "path": "issue-register.json",
       "type": "json",
-      "sha256": "abe11ae8d5386db09c9a6dd0a989dea38d9714334afbcc765b8bcd1a074aba70",
-      "bytes": 79
+      "sha256": "f8eaa14ab0e7f022b303a034060cb860290260cbb96b7ff3fdee93d2a4ecb58e",
+      "bytes": 762
     },
     {
       "path": "motion-ir.json",
@@ -60,14 +72,20 @@
     {
       "path": "replay-bundle.json",
       "type": "json",
-      "sha256": "f4cde276d376d30de303950e0c359cbbd7069087357a62b9af78fbff60e7e531",
-      "bytes": 2591
+      "sha256": "b0ed41569de4013a9ec8489423d1c2eac3cf84ddd4b94752d10210471fdc3656",
+      "bytes": 3158
     },
     {
       "path": "review.json",
       "type": "json",
       "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
       "bytes": 457
+    },
+    {
+      "path": "semantic-lint-report.json",
+      "type": "json",
+      "sha256": "ecdceac60765eb82636db029fb2c64bea24e29f5e8b10a93fc186ac447674c0c",
+      "bytes": 1395
     },
     {
       "path": "task.json",

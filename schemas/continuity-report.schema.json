@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/continuity-report.schema.json",
+  "title": "MotionLoom multi-scene continuity report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_id", "project_id", "status", "scenes", "transitions", "summary", "generated_at"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "report_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "project_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "status": {"type": "string", "enum": ["pass", "warn", "fail"]},
+    "scenes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/scene"}},
+    "transitions": {"type": "array", "items": {"$ref": "#/$defs/transition"}},
+    "summary": {"$ref": "#/$defs/summary"},
+    "generated_at": {"type": "string", "format": "date-time"}
+  },
+  "$defs": {
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene", "order", "motion_ir_path", "motion_ir_sha256", "context_hash", "intent"],
+      "properties": {
+        "scene": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$"},
+        "order": {"type": "integer", "minimum": 0},
+        "motion_ir_path": {"type": "string", "minLength": 1},
+        "motion_ir_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "context_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "intent": {"type": "string", "minLength": 1}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from_scene", "to_scene", "status", "checks"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+        "from_scene": {"type": "string", "minLength": 1},
+        "to_scene": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["pass", "warn", "fail"]},
+        "checks": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "findings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene_count", "transition_count", "errors", "warnings", "blocking"],
+      "properties": {"scene_count": {"type": "integer", "minimum": 1}, "transition_count": {"type": "integer", "minimum": 0}, "errors": {"type": "integer", "minimum": 0}, "warnings": {"type": "integer", "minimum": 0}, "blocking": {"type": "integer", "minimum": 0}}
+    }
+  }
+}

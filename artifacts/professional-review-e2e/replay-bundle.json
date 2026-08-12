@@ -4,7 +4,7 @@
   "task_id": "professional-review-e2e",
   "scene": "browser-review-smoke",
   "task_dir": "artifacts/professional-review-e2e",
-  "generated_at": "2026-08-12T18:23:22Z",
+  "generated_at": "2026-08-12T19:59:37Z",
   "environment": {
     "python": "3.12.3",
     "node": "v22.13.0",
@@ -22,14 +22,24 @@
       "bytes": 1005
     },
     {
+      "path": "artifacts/professional-review-e2e/continuity-report.json",
+      "sha256": "e4998ea4350cc27462101f0ade52a2907cb7a6ea33421f8a72b332701a5260d3",
+      "bytes": 796
+    },
+    {
+      "path": "artifacts/professional-review-e2e/fix-plan.json",
+      "sha256": "3016504cdd58ca578493ede22d5a61a7b0f357f0725cabf2555f835475b2b8c6",
+      "bytes": 1705
+    },
+    {
       "path": "artifacts/professional-review-e2e/handoff.json",
-      "sha256": "1b913e12536232e7fea137df02225495921788ba2eb2a7f10353c0582e443ca9",
-      "bytes": 1212
+      "sha256": "cf7da3c4ee4b49da41edbe8c14f22adbac0205089474b89728e47edb729dcda8",
+      "bytes": 2146
     },
     {
       "path": "artifacts/professional-review-e2e/issue-register.json",
-      "sha256": "abe11ae8d5386db09c9a6dd0a989dea38d9714334afbcc765b8bcd1a074aba70",
-      "bytes": 79
+      "sha256": "f8eaa14ab0e7f022b303a034060cb860290260cbb96b7ff3fdee93d2a4ecb58e",
+      "bytes": 762
     },
     {
       "path": "artifacts/professional-review-e2e/motion-ir.json",
@@ -55,6 +65,11 @@
       "path": "artifacts/professional-review-e2e/review.json",
       "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
       "bytes": 457
+    },
+    {
+      "path": "artifacts/professional-review-e2e/semantic-lint-report.json",
+      "sha256": "ecdceac60765eb82636db029fb2c64bea24e29f5e8b10a93fc186ac447674c0c",
+      "bytes": 1395
     },
     {
       "path": "artifacts/professional-review-e2e/task.json",

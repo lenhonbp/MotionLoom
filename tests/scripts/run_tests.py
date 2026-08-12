@@ -442,6 +442,75 @@ def test_malformed_spec_is_rejected_cleanly():
         check("malformed spec reports issues", "ISSUES:" in result.stdout and "duration_s" in result.stdout)
 
 
+def test_p1_semantic_continuity_fix_plan():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+        intelligence = ROOT / "scripts/intelligence.py"
+
+        lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        lint_data = json.loads((task_dir / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint builds report", lint.returncode == 0)
+        check("P1 semantic lint preserves human keyboard review", lint_data.get("status") == "warn" and any(item.get("id") == "accessibility-keyboard-review" and item.get("basis") == "human" for item in lint_data.get("findings", [])))
+        lint_validate = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "validate", "--path", str(task_dir / "semantic-lint-report.json"),
+        ], capture_output=True, text=True)
+        check("P1 semantic lint validates report", lint_validate.returncode == 0)
+
+        ir = json.loads((task_dir / "motion-ir.json").read_text())
+        ir["intent"] = "motion"
+        (task_dir / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
+        generic_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(task_dir),
+            "--output", str(task_dir / "generic-lint.json"),
+        ], capture_output=True, text=True)
+        generic_data = json.loads((task_dir / "generic-lint.json").read_text())
+        check("P1 semantic lint detects low-specificity intent", generic_lint.returncode == 0 and any(item.get("id") == "intent-low-specificity" for item in generic_data.get("findings", [])))
+
+        fix_plan = subprocess.run([
+            sys.executable, str(intelligence), "fix-plan", "build", "--task-dir", str(task_dir),
+            "--reports", "generic-lint.json",
+        ], capture_output=True, text=True)
+        plan = json.loads((task_dir / "fix-plan.json").read_text())
+        check("P1 fix plan binds semantic report", fix_plan.returncode == 0 and plan.get("status") == "proposed", f"rc={fix_plan.returncode} stdout={fix_plan.stdout.strip()} stderr={fix_plan.stderr.strip()}")
+        check("P1 fix plan declares selective lint rerun", plan.get("issues", [{}])[0].get("rerun_scope") == ["lint"])
+        plan_validate = subprocess.run([
+            sys.executable, str(intelligence), "fix-plan", "validate", "--path", str(task_dir / "fix-plan.json"),
+        ], capture_output=True, text=True)
+        check("P1 fix plan validates", plan_validate.returncode == 0)
+
+        first = root / "scene-a"
+        second = root / "scene-b"
+        shutil.copytree(task_dir, first)
+        shutil.copytree(task_dir, second)
+        for path, task_id, scene, order in ((first, "p1-scene-a", "scene-a", 0), (second, "p1-scene-b", "scene-b", 1)):
+            task = json.loads((path / "task.json").read_text())
+            task.update({"task_id": task_id, "scene": scene, "scene_order": order, "project_name": "p1-continuity"})
+            (path / "task.json").write_text(json.dumps(task, indent=2) + "\n")
+            ir = json.loads((path / "motion-ir.json").read_text())
+            ir.update({"task_id": task_id, "scene": scene, "context_hash": task.get("context_hash")})
+            (path / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
+
+        continuity = subprocess.run([
+            sys.executable, str(intelligence), "continuity", "build", "--task-dirs", str(first), str(second),
+        ], capture_output=True, text=True)
+        continuity_data = json.loads((first / "continuity-report.json").read_text())
+        check("P1 continuity builds multi-scene report", continuity.returncode == 0 and continuity_data.get("summary", {}).get("transition_count") == 1)
+        check("P1 continuity passes matching context", continuity_data.get("status") == "pass")
+
+        second_ir = json.loads((second / "motion-ir.json").read_text())
+        second_ir["context_hash"] = "f" * 64
+        (second / "motion-ir.json").write_text(json.dumps(second_ir, indent=2) + "\n")
+        drift = subprocess.run([
+            sys.executable, str(intelligence), "continuity", "build", "--task-dirs", str(first), str(second),
+        ], capture_output=True, text=True)
+        drift_data = json.loads((first / "continuity-report.json").read_text())
+        check("P1 continuity detects context drift", drift.returncode == 0 and drift_data.get("status") == "warn" and "context hash changes between adjacent scenes" in drift_data["transitions"][0].get("findings", []))
+
+
 def test_category_coverage():
     from src.core.analyzer import CATEGORIES  # noqa
     from docs import __file__ as _  # noqa: guard import path
@@ -565,6 +634,7 @@ if __name__ == "__main__":
     test_approved_browser_review_e2e_contract()
     test_intelligence_core_contracts()
     test_malformed_spec_is_rejected_cleanly()
+    test_p1_semantic_continuity_fix_plan()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()
     test_observability_contract()

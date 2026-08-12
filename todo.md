@@ -116,3 +116,14 @@
 - [x] Tạo eval corpus và adversarial fixtures cho context drift, stale evidence, tampering, unsupported runtime và cross-task contamination.
 - [x] Tích hợp các contract mới vào report lifecycle, quality gate, Skill Doctor, CI và smoke fixtures.
 - [x] Cập nhật SKILL.md/agent-card/references theo progressive disclosure và chạy full validation trước milestone commit.
+
+## Intelligence Core P1 implementation
+
+- [x] Thêm schema `semantic-lint-report`, `continuity-report` và `fix-plan` với severity, confidence, evidence và rerun scope.
+- [x] Xây semantic linter kiểm tra intent, timing, easing, accessibility, performance và anti-pattern nhưng không tự approve.
+- [x] Xây continuity analyzer cho nhiều scene với transition contract, shared context, asset identity và handoff constraints.
+- [x] Sinh `fix-plan.json` từ lint/continuity findings, có root cause, affected artifacts, patch scope, rerun scope và verification commands.
+- [x] Nối feedback Dev Lab/review vào structured issue register, fix plan và execution handoff.
+- [x] Tích hợp P1 reports vào quality gate, report lifecycle, Dev Lab task bundle và CI.
+- [x] Tạo eval corpus cho false positive/negative, severity stability, multi-scene drift và selective rerun.
+- [x] Cập nhật tài liệu/agent discovery và chạy full validation trước P1 milestone commit.

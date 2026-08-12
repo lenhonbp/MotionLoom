@@ -20,13 +20,46 @@
       "output_artifacts": [
         "review.json"
       ]
+    },
+    {
+      "id": "fix-plan-professional-review-e2e",
+      "action": "Resolve open findings in priority order, then rerun the declared scope.",
+      "kind": "p1_fix_plan",
+      "agent": "motionloom",
+      "skill": "motionloom",
+      "fix_plan": "fix-plan.json",
+      "requires_user_approval": true,
+      "evidence_needed": [
+        "fix-plan.json",
+        "semantic-lint-report.json",
+        "continuity-report.json",
+        "quality-report.json"
+      ]
     }
   ],
   "required_artifacts": [
     "browser-review.json",
     "execution-report.json",
     "review.json",
-    "task.json"
+    "task.json",
+    "fix-plan.json",
+    "semantic-lint-report.json",
+    "continuity-report.json",
+    "issue-register.json"
   ],
-  "blockers": []
+  "blockers": [
+    "fix-plan-professional-review-e2e:fix-accessibility-keyboard-review"
+  ],
+  "fix_plan": {
+    "path": "fix-plan.json",
+    "status": "proposed",
+    "issue_count": 1,
+    "requires_user_review": true
+  },
+  "feedback": {
+    "source": "semantic-lint/continuity",
+    "status": "proposed",
+    "issue_count": 1,
+    "fix_plan": "fix-plan.json"
+  }
 }

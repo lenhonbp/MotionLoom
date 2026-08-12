@@ -30,6 +30,68 @@ def record(results: list[dict[str, object]], case_id: str, passed: bool, detail:
     results.append({"id": case_id, "status": "pass" if passed else "fail", "detail": detail.strip()[-500:]})
 
 
+def run_p1_cases(root: Path, task_dir: Path, results: list[dict[str, object]]) -> None:
+    """Exercise P1 semantic, continuity and feedback contracts in isolated copies."""
+    lint_task = root / "p1-human-review"
+    shutil.copytree(task_dir, lint_task)
+    lint_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(lint_task)])
+    lint_data: dict[str, object] = {}
+    if (lint_task / "semantic-lint-report.json").is_file():
+        lint_data = json.loads((lint_task / "semantic-lint-report.json").read_text(encoding="utf-8"))
+    human_warning = any(
+        isinstance(item, dict) and item.get("basis") == "human" and not item.get("approval_blocking")
+        for item in lint_data.get("findings", []) if isinstance(lint_data.get("findings"), list)
+    )
+    record(results, "p1-human-review-warning-preserved", lint_result.returncode == 0 and human_warning, lint_result.stdout + lint_result.stderr)
+
+    generic_task = root / "p1-generic-intent"
+    shutil.copytree(task_dir, generic_task)
+    generic_ir_path = generic_task / "motion-ir.json"
+    generic_ir = json.loads(generic_ir_path.read_text(encoding="utf-8"))
+    generic_ir["intent"] = "motion"
+    generic_ir_path.write_text(json.dumps(generic_ir, indent=2) + "\n", encoding="utf-8")
+    generic_result = invoke([str(INTELLIGENCE), "semantic-lint", "build", "--task-dir", str(generic_task)])
+    generic_report = json.loads((generic_task / "semantic-lint-report.json").read_text(encoding="utf-8"))
+    generic_warning = any(item.get("id") == "intent-low-specificity" for item in generic_report.get("findings", []))
+    record(results, "p1-generic-intent-warning", generic_result.returncode == 0 and generic_warning and generic_report.get("status") == "warn", generic_result.stdout + generic_result.stderr)
+
+    continuity_a = root / "p1-continuity-a"
+    continuity_b = root / "p1-continuity-b"
+    shutil.copytree(task_dir, continuity_a)
+    shutil.copytree(task_dir, continuity_b)
+    task_b_path = continuity_b / "task.json"
+    task_b = json.loads(task_b_path.read_text(encoding="utf-8"))
+    task_b["task_id"] = "professional-review-followup"
+    task_b["scene"] = "browser-review-followup"
+    task_b["scene_order"] = 1
+    task_b_path.write_text(json.dumps(task_b, indent=2) + "\n", encoding="utf-8")
+    ir_b_path = continuity_b / "motion-ir.json"
+    ir_b = json.loads(ir_b_path.read_text(encoding="utf-8"))
+    ir_b["task_id"] = task_b["task_id"]
+    ir_b["scene"] = task_b["scene"]
+    ir_b["context_hash"] = "f" * 64
+    ir_b_path.write_text(json.dumps(ir_b, indent=2) + "\n", encoding="utf-8")
+    continuity_output = root / "p1-continuity-drift.json"
+    continuity_result = invoke([
+        str(INTELLIGENCE), "continuity", "build", "--task-dirs", str(continuity_a), str(continuity_b), "--output", str(continuity_output)
+    ])
+    continuity_report = json.loads(continuity_output.read_text(encoding="utf-8")) if continuity_output.is_file() else {}
+    transitions = continuity_report.get("transitions", []) if isinstance(continuity_report, dict) else []
+    drift_found = bool(transitions) and "context hash changes between adjacent scenes" in transitions[0].get("findings", [])
+    record(results, "p1-continuity-context-drift", continuity_result.returncode == 0 and continuity_report.get("status") == "warn" and drift_found, continuity_result.stdout + continuity_result.stderr)
+
+    fix_plan_path = task_dir / "fix-plan.json"
+    fix_plan_result = invoke([str(INTELLIGENCE), "fix-plan", "validate", "--path", str(fix_plan_path)])
+    fix_plan = json.loads(fix_plan_path.read_text(encoding="utf-8")) if fix_plan_path.is_file() else {}
+    selective = any(
+        isinstance(issue, dict) and "lint" in issue.get("rerun_scope", []) and issue.get("finding_ref")
+        for issue in fix_plan.get("issues", []) if isinstance(fix_plan.get("issues"), list)
+    )
+    handoff = json.loads((task_dir / "handoff.json").read_text(encoding="utf-8"))
+    synced = handoff.get("fix_plan", {}).get("path") == "fix-plan.json" and "semantic-lint-report.json" in handoff.get("required_artifacts", [])
+    record(results, "p1-fix-plan-selective-rerun", fix_plan_result.returncode == 0 and selective and synced, fix_plan_result.stdout + fix_plan_result.stderr)
+
+
 def main() -> int:
     corpus = json.loads(CASES.read_text(encoding="utf-8"))
     expected = {case["id"] for case in corpus.get("cases", [])}
@@ -91,6 +153,8 @@ def main() -> int:
         (foreign_task / "browser-review.json").write_text(json.dumps(candidate, indent=2) + "\n", encoding="utf-8")
         foreign = invoke([str(REPORT), "review", "--task-dir", str(foreign_task), "--candidate-id", str(candidate.get("candidate_id")), "--decision", "approved", "--reviewer", "eval"])
         record(results, "foreign-task-candidate", foreign.returncode != 0, foreign.stdout + foreign.stderr)
+
+        run_p1_cases(root, task_dir, results)
 
     missing = expected - {str(item["id"]) for item in results}
     for case_id in sorted(missing):

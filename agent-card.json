@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "1.5.0",
-  "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification, internal browser review and deterministic Agent handoff.",
+  "version": "1.6.0",
+  "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification, semantic feedback, continuity checks, internal browser review and deterministic Agent handoff.",
   "capabilities": [
     "project.analyze",
     "project.graph.build",
@@ -17,6 +17,13 @@
     "capability.select",
     "replay.capture",
     "replay.verify",
+    "semantic-lint.build",
+    "semantic-lint.validate",
+    "continuity.build",
+    "continuity.validate",
+    "fix-plan.build",
+    "fix-plan.validate",
+    "feedback.sync",
     "source-binding.validate",
     "rig.cutout",
     "runtime.render.lottie",
@@ -56,6 +63,9 @@
     "capability-registry",
     "motion-ir",
     "replay-bundle",
+    "semantic-lint-report",
+    "continuity-report",
+    "fix-plan",
     "pr-patch"
   ],
   "runtime_capabilities": {
@@ -112,6 +122,10 @@
     "intelligence_capabilities": "python3 scripts/intelligence.py capabilities build --output capability-registry.json",
     "intelligence_motion_ir": "python3 scripts/intelligence.py motion-ir build --task-dir artifacts/<task-id>",
     "intelligence_replay": "python3 scripts/intelligence.py replay capture --task-dir artifacts/<task-id>",
+    "semantic_lint": "python3 scripts/intelligence.py semantic-lint build --task-dir artifacts/<task-id>",
+    "continuity": "python3 scripts/intelligence.py continuity build --task-dirs artifacts/<task-id>...",
+    "fix_plan": "python3 scripts/intelligence.py fix-plan build --task-dir artifacts/<task-id> --reports semantic-lint-report.json continuity-report.json",
+    "quality_gate_p1": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1",
     "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
     "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
     "pr_prepare": "bash scripts/pr.sh <scene>"

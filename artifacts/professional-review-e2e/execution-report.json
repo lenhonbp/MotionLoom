@@ -35,7 +35,28 @@
     }
   ],
   "not_completed": [],
-  "problems": [],
+  "problems": [
+    {
+      "id": "fix-plan-professional-review-e2e:fix-accessibility-keyboard-review",
+      "summary": "The linter does not infer keyboard safety from animation data.",
+      "status": "open",
+      "severity": "warning",
+      "confidence": 0.97,
+      "evidence": [
+        "semantic-lint-report.json#accessibility-keyboard-review",
+        "fix-plan.json"
+      ],
+      "next_action": "Keep the human-required acceptance assertion and record the reviewer decision in review.json.",
+      "fix_plan": "fix-plan.json",
+      "rerun_scope": [
+        "lint",
+        "runtime",
+        "browser_review",
+        "quality_gate"
+      ],
+      "requires_user_review": true
+    }
+  ],
   "structure_review": {
     "missing_files": [],
     "broken_references": [],
@@ -67,7 +88,26 @@
         "review.json"
       ],
       "next_action": "Ask user to approve or request changes."
+    },
+    {
+      "id": "fix-plan-professional-review-e2e",
+      "agent": "motionloom",
+      "skill": "motionloom",
+      "action": "Resolve open findings in priority order, then rerun the declared scope.",
+      "status": "pending",
+      "evidence_needed": [
+        "fix-plan.json",
+        "semantic-lint-report.json",
+        "continuity-report.json",
+        "quality-report.json"
+      ]
     }
   ],
-  "generated_at": "2026-08-12T17:50:34Z"
+  "generated_at": "2026-08-12T19:58:07Z",
+  "p1_feedback": {
+    "fix_plan": "fix-plan.json",
+    "issue_count": 1,
+    "status": "proposed",
+    "generated_at": "2026-08-12T19:58:07Z"
+  }
 }

@@ -111,6 +111,7 @@ def generate_spec(args) -> dict:
     if args.interactivity:
         spec["interactivity"] = [i.strip() for i in args.interactivity.split(",")]
     out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
     print(f"motion-spec.json written -> {out}")
     return spec
@@ -142,27 +143,41 @@ def _sha256(path: Path) -> str:
 
 def validate_spec(path: str, context_path: str | None = None) -> list:
     issues = []
-    text = Path(path).read_text(encoding="utf-8")
-    spec = json.loads(text) if text.strip().startswith("{") else _parse_md_spec(text)
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+        spec = json.loads(text) if text.strip().startswith("{") else _parse_md_spec(text)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        return [f"invalid motion spec: {exc}"]
+    if not isinstance(spec, dict):
+        return ["motion spec root must be a JSON object"]
     category = spec.get("category")
     framework = spec.get("framework")
     if category not in FRAMEWORK_MATRIX:
         issues.append(f"unknown category '{category}'")
     elif framework not in FRAMEWORK_MATRIX[category]:
         issues.append(f"framework '{framework}' is not allowed for category '{category}'")
-    if spec.get("duration_s", 0) <= 0:
+    duration = spec.get("duration_s")
+    fps = spec.get("fps")
+    if not isinstance(duration, (int, float)) or isinstance(duration, bool):
+        issues.append("duration_s must be a number")
+        duration = 0
+    if not isinstance(fps, (int, float)) or isinstance(fps, bool):
+        issues.append("fps must be a number")
+        fps = 0
+    if duration <= 0:
         issues.append("duration_s must be greater than zero")
-    if spec.get("fps", 0) <= 0:
+    if fps <= 0:
         issues.append("fps must be greater than zero")
-    if spec.get("duration_s", 0) > PERF_BUDGET["max_duration_ui_s"] and category not in ("hero-scene", "character-body", "3d-scene"):
-        issues.append(f"duration {spec['duration_s']}s exceeds {PERF_BUDGET['max_duration_ui_s']}s budget for {spec['category']}")
-    if spec["fps"] not in (30, 60, 120):
-        issues.append(f"fps {spec['fps']} is non-standard; prefer 30/60/120")
-    expected_frames = round(spec.get("duration_s", 0) * spec.get("fps", 0))
+    if duration > PERF_BUDGET["max_duration_ui_s"] and category not in ("hero-scene", "character-body", "3d-scene"):
+        issues.append(f"duration {duration}s exceeds {PERF_BUDGET['max_duration_ui_s']}s budget for {category}")
+    if fps not in (30, 60, 120):
+        issues.append(f"fps {fps} is non-standard; prefer 30/60/120")
+    expected_frames = round(duration * fps)
     if spec.get("total_frames") != expected_frames:
         issues.append(f"total_frames {spec.get('total_frames')} does not equal duration_s × fps ({expected_frames})")
-    if spec["easing"] not in EASING_CANON:
-        issues.append(f"easing '{spec['easing']}' not in canonical list")
+    easing = spec.get("easing")
+    if easing not in EASING_CANON:
+        issues.append(f"easing '{easing}' not in canonical list")
     if not spec.get("theme", {}).get("primary"):
         issues.append("no brand primary color bound — run analyzer first")
     binding = spec.get("context_binding") or {}

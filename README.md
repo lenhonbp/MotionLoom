@@ -65,6 +65,10 @@ A scene is only "ready" when, together, the Dev Lab checklist passes, runtime sn
 
 `ALLOW_PLACEHOLDER=1 bash scripts/render.sh <scene>` is diagnostic only. It creates visibly marked placeholder frames and the quality gate rejects them. A PR cannot be confirmed until the official runtime or the Dev Lab browser renderer has produced `snapshot/.render-meta.json` with `mode: runtime`.
 
+## Standards basis
+
+The audit and templates are grounded in first-party references: [LottieFiles runtimes](https://docs.lottiefiles.com/en/runtimes), the [dotLottie v2 specification](https://dotlottie.io/spec/2.0/), [Rive state machines](https://rive.app/docs/runtimes/state-machines), and [GSAP accessibility guidance](https://gsap.com/resources/a11y/). The end-to-end runtime evidence currently covers **Lottie JSON plus SVG cutout rigs**. Rive, GSAP, Framer Motion, and Three.js have selection/templates but require framework-specific runtime adapters before they can claim the same CI evidence level.
+
 ## License
 
 MIT

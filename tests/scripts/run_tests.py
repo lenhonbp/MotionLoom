@@ -161,6 +161,16 @@ def test_placeholder_is_not_runtime_evidence():
         check("quality gate rejects placeholder evidence", result.returncode != 0)
 
 
+def test_malformed_spec_is_rejected_cleanly():
+    with tempfile.TemporaryDirectory() as td:
+        bad = Path(td) / "bad.json"
+        bad.write_text(json.dumps({"category": "loading", "framework": "lottie"}))
+        result = subprocess.run([sys.executable, str(ROOT / "src/core/spec.py"), "validate", str(bad)],
+                                capture_output=True, text=True)
+        check("malformed spec exits non-zero", result.returncode != 0)
+        check("malformed spec reports issues", "ISSUES:" in result.stdout and "duration_s" in result.stdout)
+
+
 def test_category_coverage():
     from src.core.analyzer import CATEGORIES  # noqa
     from docs import __file__ as _  # noqa: guard import path
@@ -177,6 +187,7 @@ if __name__ == "__main__":
     test_lottie_scaffold_valid()
     test_dotlottie_manifest_selection()
     test_placeholder_is_not_runtime_evidence()
+    test_malformed_spec_is_rejected_cleanly()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()
     print()

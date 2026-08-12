@@ -1,1 +1,0 @@
-{"name":"audit-lottie","description":"runtime smoke","category":"loading","framework":"lottie","file":"animation.json","license":"MIT-test-fixture","spec_hash":"015eba776bba7d512cfb533a5672f716a1c9eea691450cc5bb636c2c45220239","checks":[{"id":"motion","pass":true},{"id":"brand","pass":true},{"id":"reduced-motion","pass":true}]}

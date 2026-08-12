@@ -5,13 +5,18 @@
 # run the checklist and iterate fixes before confirming.
 #
 # Usage: bash scripts/devlab.sh <scene>
-set -uo pipefail
+set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(dirname "$SCRIPT_DIR")"
 SCENE="${1:?usage: bash scripts/devlab.sh <scene>}"
 MODE="${2:-serve}"
 SCENE_DIR="$REPO/src/output/$SCENE"
 LAB="$REPO/dev-lab"
+
+if [[ ! "$SCENE" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  echo "error: scene id contains unsafe path characters: $SCENE" >&2
+  exit 1
+fi
 
 if [ ! -d "$SCENE_DIR" ]; then
   echo "error: scene directory not found: $SCENE_DIR"

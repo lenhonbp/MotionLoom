@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 450">
+  <!-- Authoritative base art. Replace shapes below with licensed/owned character art.
+       Part names MUST match the bone list in src/rig/cutout_rig.py:
+       head, chest, l/r_upper_arm, l/r_forearm, l/r_thigh, l/r_shin, l/r_foot -->
+  <g id="parts">
+    <circle data-part="head" cx="250" cy="90" r="42" fill="#2d2d3a"/>
+    <rect data-part="chest" x="208" y="140" width="84" height="96" rx="22" fill="#2d2d3a"/>
+    <rect data-part="l_upper_arm" x="178" y="148" width="26" height="78" rx="13" fill="#45455a"/>
+    <rect data-part="r_upper_arm" x="296" y="148" width="26" height="78" rx="13" fill="#45455a"/>
+    <rect data-part="l_forearm" x="176" y="228" width="22" height="70" rx="11" fill="#45455a"/>
+    <rect data-part="r_forearm" x="302" y="228" width="22" height="70" rx="11" fill="#45455a"/>
+    <rect data-part="l_thigh" x="216" y="238" width="30" height="84" rx="15" fill="#37374a"/>
+    <rect data-part="r_thigh" x="254" y="238" width="30" height="84" rx="15" fill="#37374a"/>
+    <rect data-part="l_shin" x="218" y="324" width="26" height="80" rx="13" fill="#37374a"/>
+    <rect data-part="r_shin" x="256" y="324" width="26" height="80" rx="13" fill="#37374a"/>
+    <ellipse data-part="l_foot" cx="231" cy="408" rx="24" ry="10" fill="#1f1f2e"/>
+    <ellipse data-part="r_foot" cx="269" cy="408" rx="24" ry="10" fill="#1f1f2e"/>
+  </g>
+</svg>

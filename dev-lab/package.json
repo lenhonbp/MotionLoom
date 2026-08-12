@@ -1,0 +1,15 @@
+{
+  "name": "animation-dev-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The render + verify workbench for the animation-skill-kit pipeline. The static React build in dist/ shows scenes; scripts/ render deterministic snapshots for PR review.",
+  "scripts": {
+    "build": "vite build",
+    "snapshot": "node scripts/snapshot.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  },
+  "license": "MIT"
+}

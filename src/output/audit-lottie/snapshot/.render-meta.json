@@ -1,0 +1,10 @@
+{
+  "mode": "runtime",
+  "scene": "audit-lottie",
+  "framework": "lottie",
+  "progress": [
+    0,
+    50,
+    100
+  ]
+}

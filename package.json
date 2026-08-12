@@ -1,0 +1,19 @@
+{
+  "name": "animation-skill-kit",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Project-aware animation skill with runtime render validation and Dev Lab evidence.",
+  "scripts": {
+    "test": "python3 tests/scripts/run_tests.py",
+    "validate": "python3 scripts/quality-gate.py --all"
+  },
+  "dependencies": {
+    "@lottiefiles/dotlottie-web": "^0.79.0",
+    "@napi-rs/canvas": "^1.0.5"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  },
+  "license": "MIT"
+}

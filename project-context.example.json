@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.1",
+  "name": "host-project",
+  "project_root": "/absolute/path/to/host-project",
+  "stack": {
+    "framework": "framer-motion",
+    "react": true,
+    "vue": false,
+    "react_native": false,
+    "native_web": false
+  },
+  "brand": {
+    "primary": "#2563EB",
+    "accent": "#F59E0B",
+    "palette": [],
+    "fonts": []
+  },
+  "motion_language": {
+    "easings_used": [],
+    "duration_patterns": [],
+    "recommendation": "ease-out"
+  },
+  "existing_animations": [],
+  "manifest_overrides": {},
+  "source_authority": "project-manifest.json then assets/library/, never invented geometry"
+}

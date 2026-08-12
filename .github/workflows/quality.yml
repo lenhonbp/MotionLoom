@@ -1,0 +1,83 @@
+name: Animation Quality Gate
+
+on:
+  pull_request:
+    paths:
+      - "src/output/**"
+      - "src/core/**"
+      - "templates/**"
+      - "assets/library/**"
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install runtime and Dev Lab dependencies
+        run: |
+          npm install
+          cd dev-lab
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run engine tests
+        run: python3 tests/scripts/run_tests.py
+
+      - name: Resolve changed scenes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only "${{ github.event.pull_request.base.sha }}" "$GITHUB_SHA" \
+              | grep '^src/output/[^/]*' | cut -d/ -f3 | sort -u > /tmp/changed-scenes || true
+          else
+            git diff --name-only "$GITHUB_SHA^" "$GITHUB_SHA" \
+              | grep '^src/output/[^/]*' | cut -d/ -f3 | sort -u > /tmp/changed-scenes || true
+          fi
+          cat /tmp/changed-scenes
+
+      - name: Prepare Dev Lab scene artifacts
+        run: |
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            bash scripts/devlab.sh "$scene" --prepare-only
+          done < /tmp/changed-scenes
+
+      - name: Boot Dev Lab HTTP server
+        run: |
+          python3 -m http.server 3300 --directory dev-lab/public >/tmp/devlab.log 2>&1 &
+          echo $! >/tmp/devlab.pid
+
+      - name: Render runtime snapshot frames for changed scenes
+        env:
+          LAB_URL: http://localhost:3300
+        run: |
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            bash scripts/render.sh "$scene"
+          done < /tmp/changed-scenes
+
+      - name: Enforce context-bound quality gate
+        run: |
+          if [ ! -f project-context.json ]; then
+            if [ -s /tmp/changed-scenes ]; then
+              echo "FAIL: changed scenes require project-context.json at repository root"
+              exit 1
+            fi
+            echo "No scene outputs changed; context-bound scene gate is skipped."
+            exit 0
+          fi
+          python3 scripts/quality-gate.py --all --context project-context.json

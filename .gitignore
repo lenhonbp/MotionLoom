@@ -1,0 +1,7 @@
+node_modules/
+dev-lab/node_modules/
+__pycache__/
+*.py[cod]
+.DS_Store
+dist/
+src/output/*/lab-snapshot/

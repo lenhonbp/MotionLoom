@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animation Dev Lab</title>
+  <style>
+    :root { color-scheme: dark; --bg:#111218; --panel:#1b1d25; --line:#303440; --text:#e7e9ee; --muted:#8f96a6; --amber:#f59e0b; --good:#46d18c; --bad:#ff6b6b; }
+    * { box-sizing:border-box; } body { margin:0; background:radial-gradient(circle at 40% -10%,#2a2630 0,#111218 40%); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,sans-serif; }
+    header { height:58px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; border-bottom:1px solid var(--line); background:#15171e; }
+    header strong { letter-spacing:.12em; text-transform:uppercase; font-size:12px; } header span { color:var(--amber); font-family:ui-monospace,monospace; }
+    main { display:grid; grid-template-columns:minmax(0,1fr) 330px; min-height:calc(100vh - 58px); } .workbench { padding:24px; min-width:0; }
+    .stage { min-height:430px; display:flex; align-items:center; justify-content:center; border:1px solid #3b3f4c; background:repeating-conic-gradient(#181a22 0 25%,#15171e 0 50%) 50%/32px 32px; position:relative; overflow:hidden; }
+    .stage img { max-width:92%; max-height:390px; object-fit:contain; image-rendering:auto; filter:drop-shadow(0 18px 32px #0009); } .stage .empty { color:var(--muted); text-align:center; }
+    .stage-label { position:absolute; left:14px; top:12px; color:var(--muted); font:11px ui-monospace,monospace; letter-spacing:.08em; } .stage-mode { position:absolute; right:14px; top:12px; color:var(--amber); font:11px ui-monospace,monospace; }
+    .timeline { padding:18px 0 0; } input[type=range] { width:100%; accent-color:var(--amber); } .ticks { display:flex; justify-content:space-between; color:var(--muted); font:11px ui-monospace,monospace; }
+    .meta-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; } .pill { border:1px solid var(--line); background:#191b22; padding:8px 10px; color:var(--muted); } .pill b { color:var(--text); font-weight:600; }
+    aside { border-left:1px solid var(--line); background:#171920; padding:20px; } h1 { font-size:24px; margin:0 0 6px; } h2 { font-size:13px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:24px 0 10px; }
+    p { color:var(--muted); margin:0; } .check { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid #272a34; } .check input { accent-color:var(--good); } .check small { color:var(--muted); display:block; } textarea { width:100%; min-height:90px; resize:vertical; color:var(--text); background:#111218; border:1px solid var(--line); padding:10px; font:13px ui-monospace,monospace; }
+    button { border:0; padding:11px 14px; color:#17120b; background:var(--amber); font-weight:750; cursor:pointer; } button:hover { filter:brightness(1.08); } button:active { transform:scale(.98); } button.secondary { color:var(--text); background:#2a2d38; margin-left:8px; } #status { margin-top:10px; font:12px ui-monospace,monospace; } .ok { color:var(--good); } .warn { color:var(--bad); }
+    @media (max-width:800px) { main { grid-template-columns:1fr; } aside { border-left:0; border-top:1px solid var(--line); } .stage { min-height:330px; } }
+  </style>
+</head>
+<body>
+  <header><strong>Animation Dev Lab</strong><span id="timecode">00:00:00.000</span></header>
+  <main><section class="workbench"><div class="stage" id="stage" data-snapshot><div class="stage-label" id="stage-label">LOADING SCENE</div><div class="stage-mode" id="stage-mode"></div><div class="empty" id="empty">Loading evidence…</div><img id="frame" alt="Rendered animation snapshot" hidden /></div><div class="timeline"><input id="scrubber" type="range" min="0" max="100" value="0" aria-label="Animation progress" /><div class="ticks"><span>00%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div></div><div class="meta-row" id="meta"></div></section><aside><h1 id="title">Scene</h1><p id="description">Loading manifest and signed motion spec.</p><h2>Quality checklist</h2><div id="checks"></div><h2>Fix notes</h2><textarea id="notes" placeholder="Describe a fix request or confirmation for the PR…"></textarea><div style="margin-top:14px"><button id="confirm">Confirm review</button><button class="secondary" id="reset">Reset</button></div><div id="status"></div></aside></main>
+  <script>
+    const params = new URLSearchParams(location.search), scene = params.get('scene');
+    const base = `/scenes/${encodeURIComponent(scene || '')}`;
+    const $ = (id) => document.getElementById(id);
+    const frames = [0,50,100]; let manifest, spec, review;
+    function nearest(p) { return frames.reduce((a,b) => Math.abs(b-p)<Math.abs(a-p)?b:a, frames[0]); }
+    function showProgress(p) { const pct=Math.max(0,Math.min(1,p))*100, frame=nearest(pct); $('scrubber').value=pct; $('timecode').textContent=`00:00:${(Number(spec?.duration_s||0)*p).toFixed(3).padStart(6,'0')}`; $('frame').src=`${base}/snapshot/frame-${String(frame).padStart(2,'0')}.png`; $('frame').hidden=false; $('empty').hidden=true; window.__lab.lastProgress=p; }
+    window.__lab={seek:showProgress, ready:false};
+    async function load(){ if(!scene) throw Error('Missing ?scene= parameter'); [manifest,spec]=await Promise.all([fetch(`${base}/manifest.json`).then(r=>r.json()),fetch(`${base}/motion-spec.json`).then(r=>r.json())]); $('title').textContent=manifest.name||scene; $('description').textContent=manifest.description||'Evidence review for this animation scene.'; $('stage-label').textContent=`${scene.toUpperCase()} · ${spec.category||'animation'}`; $('stage-mode').textContent=`${spec.framework||'unknown'} · runtime evidence`; $('meta').innerHTML=[['FRAMEWORK',spec.framework],['DURATION',`${spec.duration_s}s`],['FPS',spec.fps],['EASING',spec.easing],['PRIMARY',spec.theme?.primary||'unbound']].map(([k,v])=>`<div class="pill"><b>${k}</b> ${v??'—'}</div>`).join(''); const saved=JSON.parse(localStorage.getItem(`devlab:${scene}`)||'null'); review=saved||{checks:(manifest.checks||[]).map(c=>({id:c.id,pass:!!c.pass})),notes:''}; $('checks').innerHTML=(manifest.checks||[]).map((c,i)=>`<label class="check"><input type="checkbox" data-check="${c.id}" ${review.checks.find(x=>x.id===c.id)?.pass?'checked':''}><span><b>${c.label||c.id}</b><small>${c.detail||''}</small></span></label>`).join(''); $('notes').value=review.notes||''; $('scrubber').addEventListener('input',e=>showProgress(Number(e.target.value)/100)); $('confirm').addEventListener('click',confirmReview); $('reset').addEventListener('click',()=>{localStorage.removeItem(`devlab:${scene}`);location.reload()}); window.__lab.ready=true; showProgress(0); }
+    function confirmReview(){ const checks=[...document.querySelectorAll('[data-check]')].map(el=>({id:el.dataset.check,pass:el.checked})); const payload={scene,confirmed_at:new Date().toISOString(),checks,notes:$('notes').value,spec:{framework:spec.framework,category:spec.category,context_binding:spec.context_binding}}; localStorage.setItem(`devlab:${scene}`,JSON.stringify({checks,notes:payload.notes})); const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${scene}-devlab-review.json`; a.click(); $('status').className=checks.every(c=>c.pass)?'ok':'warn'; $('status').textContent=checks.every(c=>c.pass)?'REVIEW CONFIRMED · attach the downloaded review to the PR':'CHECKLIST INCOMPLETE · resolve every item before PR'; }
+    load().catch(err=>{ $('status').className='warn'; $('status').textContent=`DEV LAB ERROR: ${err.message}`; $('empty').textContent='Unable to load scene evidence.'; });
+  </script>
+</body>
+</html>

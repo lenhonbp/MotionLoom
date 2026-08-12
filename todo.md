@@ -41,3 +41,14 @@
 - [x] Chọn phần nên reuse, adapter hóa hoặc tự xây; không duplicate skill ecosystem.
 - [x] Định nghĩa CI/release gate cho report completeness, schema validation và provenance.
 - [x] Đề xuất roadmap triển khai và metrics theo dõi giá trị thực tế.
+
+## Browser review lifecycle
+
+- [ ] Đưa `browser_review_required` vào lifecycle sau runtime render.
+- [ ] Định nghĩa candidate manifest gồm scene URL/path, runtime, frame checkpoints, context hash và evidence.
+- [ ] Định nghĩa Agent handoff action để kích hoạt hoặc đề xuất Web Agent mở Dev Lab nội bộ.
+- [ ] Buộc Dev Lab nạp đúng candidate output, không dùng demo scene khác nguồn.
+- [ ] Ghi review result, feedback, screenshot/evidence và user approval vào artifact bundle.
+- [ ] Chặn `ready_for_pr`/`confirmed` nếu chưa có review approval hợp lệ.
+- [ ] Thêm test flow generate → render → browser review → fix hoặc confirm.
+- [ ] Cập nhật SKILL.md, Agent Card, README và báo cáo mẫu với browser-review contract.

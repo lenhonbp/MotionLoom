@@ -32,7 +32,7 @@ def _json(path: Path):
         raise ValueError(f"{path}: {exc}")
 
 
-def validate_scene(scene_dir: Path, context_path: Path) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -102,6 +102,38 @@ def validate_scene(scene_dir: Path, context_path: Path) -> list[str]:
         elif spec.get("framework") in ("lottie", "dotlottie") and source_path.suffix in (".json", ".lottie"):
             validator = _load_validator()
             issues.extend(validator.validate(source_path, spec, int(spec.get("performance", {}).get("max_layers", 80))))
+
+        candidate_path = scene_dir / "browser-review.json"
+        if not candidate_path.is_file():
+            issues.append("missing browser-review.json; runtime render must hand off to the internal browser Agent")
+        else:
+            try:
+                candidate = _json(candidate_path)
+                import hashlib
+                source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
+                context_sha = hashlib.sha256(context_path.read_bytes()).hexdigest()
+                if candidate.get("scene") != scene_dir.name:
+                    issues.append("browser review candidate scene mismatch")
+                if candidate.get("source_sha256") != source_sha:
+                    issues.append("browser review candidate source_sha256 is stale")
+                if candidate.get("context_sha256") not in {context_sha, spec.get("context_binding", {}).get("context_sha256")}:
+                    issues.append("browser review candidate context_sha256 is stale")
+                if candidate.get("status") not in {"prepared", "opened", "reviewed", "approved"}:
+                    issues.append(f"browser review candidate status is not reviewable: {candidate.get('status')}")
+                if require_review:
+                    review_path = (task_dir / "review.json") if task_dir else (scene_dir / "review.json")
+                    if not review_path.is_file():
+                        issues.append("PR gate requires review.json captured by the browser Agent")
+                    else:
+                        review = _json(review_path)
+                        if review.get("decision") != "approved":
+                            issues.append("PR gate requires browser review decision=approved")
+                        if review.get("candidate_id") != candidate.get("candidate_id"):
+                            issues.append("browser review approves a different candidate")
+                        if candidate.get("status") != "approved":
+                            issues.append("PR gate requires browser-review.json status=approved")
+            except (ValueError, OSError) as exc:
+                issues.append(str(exc))
     return issues
 
 
@@ -112,26 +144,29 @@ def main() -> int:
     group.add_argument("--all", action="store_true")
     parser.add_argument("--root", default=str(ROOT))
     parser.add_argument("--context", default="project-context.json")
+    parser.add_argument("--task-dir")
+    parser.add_argument("--require-browser-review", action="store_true")
     args = parser.parse_args()
     root = Path(args.root).resolve()
     context = Path(args.context)
     if not context.is_absolute():
         context = root / context
     output_root = root / "src" / "output"
+    task_dir = Path(args.task_dir).resolve() if args.task_dir else None
     scenes = [root / "src" / "output" / args.scene] if args.scene else sorted(p for p in output_root.iterdir() if p.is_dir()) if output_root.exists() else []
     if not scenes:
         print("QUALITY GATE: no scene outputs found")
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")
             for issue in issues:
                 print(f"  - {issue}")
         else:
-            print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + checklist")
+            print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + browser-review candidate + checklist")
     return 1 if failed else 0
 
 

@@ -56,6 +56,7 @@ def init_task(args: argparse.Namespace) -> int:
         "context_path": args.context_path,
         "context_hash": args.context_hash,
         "state": "created",
+        "browser_review": {"required": True, "status": "not_prepared", "review_artifact": "review.json"},
         "owner_agent": args.agent,
         "created_at": timestamp,
         "updated_at": timestamp,
@@ -70,6 +71,7 @@ def init_task(args: argparse.Namespace) -> int:
         "not_completed": [{"id": "initial", "summary": "Task has not run yet.", "status": "pending"}],
         "problems": [],
         "structure_review": {"missing_files": [], "broken_references": [], "untracked_artifacts": []},
+        "browser_review": [],
         "next_agent": [{"agent": args.agent, "action": "Run project analysis and populate context before generation."}],
         "generated_at": timestamp,
     }
@@ -150,9 +152,24 @@ def add_item(args: argparse.Namespace) -> int:
 
 def record_review(args: argparse.Namespace) -> int:
     task_dir = Path(args.task_dir).resolve()
+    task = read_json(task_dir / "task.json")
+    candidate_path = task_dir / "browser-review.json"
+    candidate = read_json(candidate_path)
+    if not candidate:
+        print("browser-review.json is required before recording a review", file=sys.stderr)
+        return 2
+    if args.candidate_id and candidate.get("candidate_id") != args.candidate_id:
+        print("review candidate id does not match browser-review.json", file=sys.stderr)
+        return 2
+    scene_candidate_path = ROOT / "src" / "output" / str(task.get("scene", "")) / "browser-review.json"
+    scene_candidate = read_json(scene_candidate_path)
+    if scene_candidate_path.is_file() and scene_candidate.get("candidate_id") != candidate.get("candidate_id"):
+        print("task candidate does not match scene-level browser-review.json", file=sys.stderr)
+        return 2
     review = {
         "review_version": "1.0",
-        "task_id": read_json(task_dir / "task.json").get("task_id", task_dir.name),
+        "task_id": task.get("task_id", task_dir.name),
+        "candidate_id": candidate.get("candidate_id"),
         "decision": args.decision,
         "reviewer": args.reviewer,
         "notes": args.notes,
@@ -160,6 +177,28 @@ def record_review(args: argparse.Namespace) -> int:
         "reviewed_at": now(),
     }
     write_json(task_dir / "review.json", review)
+    candidate["status"] = {"pending": "reviewed", "approved": "approved", "changes_requested": "changes_requested", "rejected": "changes_requested"}[args.decision]
+    candidate["review_artifact"] = "review.json"
+    candidate["reviewed_at"] = review["reviewed_at"]
+    write_json(candidate_path, candidate)
+    if scene_candidate_path.is_file():
+        scene_candidate["status"] = candidate["status"]
+        scene_candidate["review_artifact"] = "review.json"
+        scene_candidate["reviewed_at"] = review["reviewed_at"]
+        write_json(scene_candidate_path, scene_candidate)
+    task["browser_review"] = {
+        "required": True,
+        "status": candidate["status"],
+        "candidate_id": candidate.get("candidate_id"),
+        "candidate_path": "browser-review.json",
+        "review_artifact": "review.json",
+    }
+    write_json(task_dir / "task.json", task)
+    report_path = task_dir / "execution-report.json"
+    report = read_json(report_path)
+    report["browser_review"] = [{"candidate_id": candidate.get("candidate_id"), "decision": args.decision, "reviewer": args.reviewer, "evidence": ["browser-review.json", "review.json"]}]
+    report["generated_at"] = now()
+    write_json(report_path, report)
     print(json.dumps({"status": "review-recorded", "decision": args.decision, "task_dir": str(task_dir)}, ensure_ascii=False))
     return 0
 
@@ -208,6 +247,14 @@ def check_report(args: argparse.Namespace) -> int:
         review = read_json(task_dir / "review.json")
         if review.get("decision") != "approved":
             errors.append("ready_for_pr-or-later task requires review.json decision=approved")
+        candidate = read_json(task_dir / "browser-review.json")
+        if not candidate.get("candidate_id") or review.get("candidate_id") != candidate.get("candidate_id"):
+            errors.append("review.json must approve the exact browser-review candidate")
+        if candidate.get("status") != "approved":
+            errors.append("ready_for_pr-or-later task requires browser-review.json status=approved")
+    if task.get("browser_review", {}).get("required") and state in {"review_required", "validated", "ready_for_pr", "confirmed"}:
+        if not (task_dir / "browser-review.json").is_file():
+            errors.append("task requires browser-review.json candidate")
     if state == "confirmed" and not (task.get("commit_sha") or task.get("pr_url")):
         errors.append("confirmed task requires commit_sha or pr_url")
     if errors:
@@ -235,6 +282,12 @@ def transition(args: argparse.Namespace) -> int:
     if target == "ready_for_pr" and not (task_dir / "review.json").is_file():
         print("ready_for_pr requires review.json", file=sys.stderr)
         return 2
+    if target == "ready_for_pr":
+        review = read_json(task_dir / "review.json")
+        candidate = read_json(task_dir / "browser-review.json")
+        if review.get("decision") != "approved" or not candidate.get("candidate_id") or review.get("candidate_id") != candidate.get("candidate_id") or candidate.get("status") != "approved":
+            print("ready_for_pr requires approved review.json for the exact browser-review candidate", file=sys.stderr)
+            return 2
     if target == "confirmed" and not (args.commit_sha or args.pr_url):
         print("confirmed requires --commit-sha or --pr-url", file=sys.stderr)
         return 2
@@ -297,6 +350,9 @@ def render(args: argparse.Namespace) -> int:
         f"- Artifact count: **{len(manifest.get('artifacts', []))}**",
         f"- Quality gate: **{quality.get('status', 'not-run')}**",
         "",
+        "## Browser review",
+        md_table(report.get("browser_review", []), [("Candidate", "candidate_id"), ("Decision", "decision"), ("Reviewer", "reviewer"), ("Evidence", "evidence")]),
+        "",
         "## Recommended next Agent / Skill",
         md_table(report.get("next_agent", handoff.get("next_actions", [])), [("Agent/Skill", "agent"), ("Action", "action"), ("Evidence needed", "evidence_needed")]),
         "## Evidence files",
@@ -356,6 +412,7 @@ def main() -> int:
     review_parser.add_argument("--reviewer", required=True)
     review_parser.add_argument("--notes", default="")
     review_parser.add_argument("--feedback", action="append", default=[])
+    review_parser.add_argument("--candidate-id")
     review_parser.set_defaults(func=record_review)
     structure_parser = sub.add_parser("structure", help="Record missing files, broken references or untracked artifacts")
     structure_parser.add_argument("--task-dir", required=True)

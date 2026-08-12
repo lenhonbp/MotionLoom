@@ -11,7 +11,7 @@
     "to_agent": {"type": "string"},
     "state": {"type": "string"},
     "summary": {"type": "string"},
-    "next_actions": {"type": "array", "items": {"type": "object", "required": ["action"], "properties": {"action": {"type": "string"}, "skill": {"type": "string"}, "evidence_needed": {"type": "array", "items": {"type": "string"}}}}},
+    "next_actions": {"type": "array", "items": {"type": "object", "required": ["action"], "properties": {"action": {"type": "string"}, "skill": {"type": "string"}, "agent": {"type": "string"}, "kind": {"type": "string"}, "url": {"type": "string", "format": "uri"}, "candidate_id": {"type": "string"}, "requires_user_approval": {"type": "boolean"}, "evidence_needed": {"type": "array", "items": {"type": "string"}}, "output_artifacts": {"type": "array", "items": {"type": "string"}}}}},
     "required_artifacts": {"type": "array", "items": {"type": "string"}},
     "blockers": {"type": "array", "items": {"type": "object"}}
   },

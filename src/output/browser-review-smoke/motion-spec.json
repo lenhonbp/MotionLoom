@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "category": "loading",
+  "framework": "lottie",
+  "duration_s": 1.0,
+  "fps": 60,
+  "total_frames": 60,
+  "loop": false,
+  "easing": "ease-out",
+  "camera": null,
+  "theme": {
+    "primary": "#2563EB",
+    "accent": "#F59E0B"
+  },
+  "performance": {
+    "max_file_kb": 300,
+    "max_layers": 80
+  },
+  "source_binding": "project-manifest.json then assets/library/, never invented geometry",
+  "context_binding": {
+    "name": "browser-review-fixture",
+    "project_root": "/tmp/animation-review-host",
+    "context_sha256": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa"
+  },
+  "accessibility": {
+    "reduced_motion": "respect-prefers-reduced-motion"
+  }
+}

@@ -3,11 +3,11 @@ name: animation-studio
 description: >-
   Project-aware animation production and verification for UI motion, Lottie/dotLottie,
   Rive, GSAP, Framer Motion, character body rigs, scene assets, runtime rendering,
-  Dev Lab review, and confirm-to-PR workflows. Use when an Agent must create, fix,
+  Dev Lab browser review, and confirm-to-PR workflows. Use when an Agent must create, fix,
   validate, review, or deliver animation inside an existing project.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   target_frameworks: "lottie,dotlottie,rive,gsap,framer-motion,spine,threejs"
   verified_runtimes: "lottie-json,svg-cutout-rig"
 ---
@@ -23,10 +23,11 @@ Treat every animation request as a production task, not as an isolated asset-gen
 3. **Source** — resolve an authoritative asset from the project or `assets/library/`. Record attribution, license and checksum. Do not promote an unknown or placeholder asset to production.
 4. **Generate** — use the matching template or rig implementation. For body animation, preserve named anatomy, pivot and parent-first hierarchy.
 5. **Render** — run `bash scripts/render.sh <scene>`. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
-6. **Review** — run `bash scripts/devlab.sh <scene>`, inspect the same scene output, persist `review.json`, and classify feedback as timing, easing, pose, brand, accessibility, performance or asset.
-7. **Validate** — run `python3 scripts/quality-gate.py --scene <scene> --context <context-path>` and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
-8. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, evidence and the recommended next Agent/Skill.
-9. **Confirm** — only after human review and a passing quality gate run `bash scripts/pr.sh <scene>`. Commit, push and open PR are explicit side effects.
+6. **Browser review handoff** — run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
+7. **Review capture** — the browser Agent calls `window.__lab.getReview()` after the user approves or requests changes, then persists it with `python3 scripts/report.py review --task-dir artifacts/<task-id> --candidate-id <id> --decision approved|changes_requested --reviewer user`. A change request returns to generation; no approval means no PR.
+8. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path>`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
+9. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, browser candidate/review evidence and the recommended next Agent/Skill.
+10. **Confirm** — only after approved browser review and a passing quality gate run `TASK_DIR=artifacts/<task-id> bash scripts/pr.sh <scene>`. Commit, push and open PR are explicit side effects.
 
 ## Progressive disclosure
 
@@ -39,7 +40,7 @@ Treat every animation request as a production task, not as an isolated asset-gen
 ## Non-negotiable contracts
 
 - Every task has a lifecycle state: `created`, `needs_context`, `planning`, `sourcing`, `generating`, `rendering`, `review_required`, `blocked`, `failed`, `validated`, `ready_for_pr`, or `confirmed`.
-- Every production scene has context, motion spec, manifest, source binding, runtime metadata, 0/50/100 snapshots, checklist result and review artifact.
+- Every production scene has context, motion spec, manifest, source binding, runtime metadata, 0/50/100 snapshots, browser-review candidate, checklist result and review artifact.
 - `scaffold` and `static-validated` are not equivalent to `runtime-verified` or `project-integrated`.
 - Never hide a missing dependency, failed render, missing license, context drift, incomplete review or unimplemented framework behind a successful prose response.
 - Use JSON output and stable exit codes for Agent-to-Agent composition; do not require another Agent to parse chat text.
@@ -62,6 +63,10 @@ python3 scripts/report.py add --task-dir artifacts/<task-id> \
 python3 scripts/report.py structure --task-dir artifacts/<task-id> \
   --missing-file <path> --broken-reference <path>
 python3 scripts/report.py collect --task-dir artifacts/<task-id>
+python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url http://127.0.0.1:3300
+# Browser Agent opens the emitted URL; user reviews; then persist the browser payload:
+python3 scripts/report.py review --task-dir artifacts/<task-id> \
+  --candidate-id <candidate-id> --decision approved --reviewer user
 python3 scripts/report.py check --task-dir artifacts/<task-id>
 python3 scripts/report.py render --task-dir artifacts/<task-id>
 ```

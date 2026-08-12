@@ -1,6 +1,6 @@
 {
   "name": "animation-skill-kit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Project-aware animation skill with runtime render validation and Dev Lab evidence.",
@@ -8,7 +8,8 @@
     "test": "python3 tests/scripts/run_tests.py",
     "validate": "python3 scripts/quality-gate.py --all",
     "doctor": "python3 scripts/skill-doctor.py --json",
-    "report": "python3 scripts/report.py"
+    "report": "python3 scripts/report.py",
+    "review": "python3 scripts/review-hook.py"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",

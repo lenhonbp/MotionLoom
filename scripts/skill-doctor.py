@@ -18,6 +18,7 @@ REQUIRED_SCHEMAS = [
     "execution-report.schema.json",
     "artifact-manifest.schema.json",
     "handoff.schema.json",
+    "browser-review-candidate.schema.json",
 ]
 
 
@@ -108,7 +109,7 @@ def run() -> int:
     package_path = ROOT / "package.json"
     try:
         package = json.loads(package_path.read_text(encoding="utf-8"))
-        for script in ("test", "validate", "doctor", "report"):
+        for script in ("test", "validate", "doctor", "report", "review"):
             if script not in package.get("scripts", {}):
                 warnings.append({"code": "missing_package_script", "message": f"package.json has no {script} script."})
     except (FileNotFoundError, json.JSONDecodeError) as exc:
@@ -135,4 +136,3 @@ def run() -> int:
 
 if __name__ == "__main__":
     sys.exit(run())
-

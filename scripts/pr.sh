@@ -11,6 +11,7 @@ SCENE="${1:?usage: bash scripts/pr.sh <scene> [title]}"
 TITLE="${2:-"animation: scene '$SCENE' (verified in Dev Lab)"}"
 SCENE_DIR="$REPO/src/output/$SCENE"
 CONTEXT_PATH="${CONTEXT_PATH:-$REPO/project-context.json}"
+TASK_DIR="${TASK_DIR:-}"
 
 cd "$REPO"
 
@@ -30,7 +31,15 @@ if [[ ! "$SCENE" =~ ^[A-Za-z0-9._-]+$ ]]; then
 fi
 
 echo "== running context-bound quality gate =="
-python3 "$REPO/scripts/quality-gate.py" --scene "$SCENE" --context "$CONTEXT_PATH"
+QUALITY_ARGS=(--scene "$SCENE" --context "$CONTEXT_PATH" --require-browser-review)
+if [ -n "$TASK_DIR" ]; then
+  QUALITY_ARGS+=(--task-dir "$TASK_DIR")
+else
+  echo "error: TASK_DIR is required; browser Agent must persist review.json before PR" >&2
+  exit 1
+fi
+python3 "$REPO/scripts/quality-gate.py" "${QUALITY_ARGS[@]}"
+python3 "$REPO/scripts/review-hook.py" validate --task-dir "$TASK_DIR"
 
 BRANCH="fix/$SCENE"
 git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"

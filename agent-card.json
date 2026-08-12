@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "animation-studio",
-  "version": "1.2.0",
-  "description": "Project-aware animation production, runtime verification and Agent handoff.",
+  "version": "1.3.0",
+  "description": "Project-aware animation production, runtime verification, internal browser review and Agent handoff.",
   "capabilities": [
     "project.analyze",
     "motion.plan",
@@ -10,6 +10,9 @@
     "rig.cutout",
     "runtime.render.lottie",
     "devlab.review",
+    "browser.review.prepare",
+    "browser.review.trigger",
+    "browser.review.capture",
     "quality.gate",
     "report.generate",
     "handoff.prepare",
@@ -28,6 +31,8 @@
     "evidence-bundle",
     "execution-report",
     "handoff",
+    "browser-review-candidate",
+    "browser-review",
     "pr-patch"
   ],
   "runtime_capabilities": {
@@ -41,6 +46,7 @@
     "git_commit": "explicit-confirmation",
     "git_push": "explicit-confirmation",
     "open_pull_request": "explicit-confirmation"
+    ,"open_internal_browser": "trigger-or-suggest-after-render; user-review-required"
   },
   "recommended_integrations": [
     {
@@ -75,10 +81,12 @@
     "report_render": "python3 scripts/report.py render --task-dir <dir>",
     "skill_doctor": "python3 scripts/skill-doctor.py --json",
     "quality_gate": "python3 scripts/quality-gate.py --scene <scene> --context <path>",
+    "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
+    "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
     "pr_prepare": "bash scripts/pr.sh <scene>"
   },
   "report_contract": {
-    "required_sections": ["completed", "verified", "not_completed", "problems", "structure_review", "next_agent"],
+    "required_sections": ["completed", "verified", "not_completed", "problems", "structure_review", "next_agent", "browser_review"],
     "artifact_root": "artifacts/<task-id>/"
   }
 }

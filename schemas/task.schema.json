@@ -19,6 +19,19 @@
     "owner_agent": {"type": "string"},
     "created_at": {"type": "string", "format": "date-time"},
     "updated_at": {"type": "string", "format": "date-time"},
+    "browser_review": {
+      "type": "object",
+      "required": ["required", "status"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "status": {"type": "string", "enum": ["not_prepared", "prepared", "opened", "reviewed", "approved", "changes_requested", "expired"]},
+        "candidate_id": {"type": "string"},
+        "candidate_path": {"type": "string"},
+        "review_artifact": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "review_candidate": {"$ref": "browser-review-candidate.schema.json"},
     "commit_sha": {"type": "string"},
     "pr_url": {"type": "string", "format": "uri"}
   },

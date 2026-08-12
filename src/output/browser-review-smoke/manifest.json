@@ -1,0 +1,13 @@
+{
+  "name": "Browser Review Smoke",
+  "description": "Runtime candidate used to verify the mandatory internal browser review handoff.",
+  "framework": "lottie",
+  "category": "loading",
+  "file": "animation.json",
+  "checks": [
+    {"id": "runtime", "label": "Runtime render evidence exists", "detail": "Frames 0, 50 and 100 are produced by the Lottie runtime.", "pass": true},
+    {"id": "timing", "label": "Timing matches motion spec", "detail": "Duration and FPS are bound to motion-spec.json.", "pass": true},
+    {"id": "reduced-motion", "label": "Reduced-motion policy is documented", "detail": "The motion spec contains the accessibility policy.", "pass": true},
+    {"id": "brand", "label": "Project context is bound", "detail": "Candidate context hash matches the generated spec.", "pass": true}
+  ]
+}

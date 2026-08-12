@@ -24,6 +24,11 @@ if [ ! -d "$SCENE_DIR" ]; then
   exit 1
 fi
 
+if [ ! -f "$SCENE_DIR/browser-review.json" ]; then
+  echo "error: browser-review.json is required; run scripts/review-hook.py prepare after runtime render" >&2
+  exit 1
+fi
+
 rm -rf "$LAB/public/scenes/$SCENE"
 mkdir -p "$LAB/public/scenes/$SCENE"
 cp -R "$SCENE_DIR"/. "$LAB/public/scenes/$SCENE/"
@@ -40,5 +45,5 @@ fi
 
 PORT="${PORT:-3300}"
 echo "== Dev Lab ready for scene: $SCENE =="
-echo "   http://localhost:${PORT}/?scene=$SCENE"
+echo "   http://localhost:${PORT}/?scene=$SCENE (use the candidate URL emitted by review-hook.py for task-bound review)"
 exec python3 -m http.server "$PORT" --directory "$LAB/public"

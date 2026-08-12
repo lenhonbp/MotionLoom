@@ -222,9 +222,17 @@ def test_observability_contract():
         subprocess.run([
             sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", "validated",
         ], check=True, capture_output=True)
+        (task_dir / "browser-review.json").write_text(json.dumps({
+            "schema_version": "1.0",
+            "candidate_id": "fixture-candidate",
+            "task_id": "fixture-task",
+            "scene": "wave",
+            "status": "prepared",
+            "requires_user_approval": True,
+        }))
         subprocess.run([
             sys.executable, str(report_script), "review", "--task-dir", str(task_dir),
-            "--decision", "approved", "--reviewer", "fixture", "--notes", "Evidence looks consistent.",
+            "--candidate-id", "fixture-candidate", "--decision", "approved", "--reviewer", "fixture", "--notes", "Evidence looks consistent.",
         ], check=True, capture_output=True)
         subprocess.run([
             sys.executable, str(report_script), "transition", "--task-dir", str(task_dir), "--state", "ready_for_pr",

@@ -1,0 +1,10 @@
+{
+  "mode": "runtime",
+  "scene": "browser-review-smoke",
+  "framework": "lottie",
+  "progress": [
+    0,
+    50,
+    100
+  ]
+}

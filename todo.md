@@ -67,8 +67,8 @@
 
 ## GitHub MotionLoom release
 
-- [ ] Kiểm tra GitHub remote, branch hiện tại, working tree và authentication.
-- [ ] Chuẩn hóa public branding thành MotionLoom nếu cần, không làm mất lịch sử hoặc contract runtime.
-- [ ] Chạy lại quality checks và xác nhận archive/release files trước khi push.
-- [ ] Cấu hình `https://github.com/lenhonbp/MotionLoom.git` làm origin và push branch chính.
-- [ ] Xác minh commit, branch, remote URL và repository contents sau khi push.
+- [x] Kiểm tra GitHub remote, branch hiện tại, working tree và authentication.
+- [x] Chuẩn hóa public branding thành MotionLoom nếu cần, không làm mất lịch sử hoặc contract runtime.
+- [x] Chạy lại quality checks và xác nhận archive/release files trước khi push.
+- [x] Cấu hình `https://github.com/lenhonbp/MotionLoom.git` làm origin và push branch chính.
+- [x] Xác minh commit, branch, remote URL và repository contents sau khi push.

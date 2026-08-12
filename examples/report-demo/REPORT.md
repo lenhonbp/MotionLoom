@@ -36,8 +36,8 @@
 ## Recommended next Agent / Skill
 | Agent/Skill | Action | Evidence needed |
 | --- | --- | --- |
-| animation-studio | Run project analysis and populate context before generation. |  |
-| animation-studio |  | ['snapshot/.render-meta.json', 'review.json'] |
+| motionloom | Run project analysis and populate context before generation. |  |
+| motionloom |  | ['snapshot/.render-meta.json', 'review.json'] |
 
 ## Evidence files
 | Path | Type | Bytes | SHA-256 |

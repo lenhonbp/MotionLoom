@@ -254,7 +254,7 @@ def test_observability_contract():
         subprocess.run([
             sys.executable, str(report_script), "add", "--task-dir", str(task_dir), "--section", "next_agent",
             "--id", "review", "--summary", "Review scene in Dev Lab", "--status", "pending",
-            "--agent", "animation-review-agent", "--skill", "animation-studio",
+            "--agent", "animation-review-agent", "--skill", "motionloom",
             "--evidence-needed", "review.json",
         ], check=True, capture_output=True)
         subprocess.run([
@@ -318,7 +318,7 @@ def test_observability_contract():
 
 
 if __name__ == "__main__":
-    print("== Animation Studio engine tests ==")
+    print("== MotionLoom engine tests ==")
     test_analyzer_on_fixture()
     test_spec_generate_and_validate()
     test_rig_build_and_pose()

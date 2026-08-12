@@ -1,4 +1,4 @@
-# Animation Studio Skill Kit
+# MotionLoom
 
 A coding-agent skill for professional animation development: motion, character body rigs and assets. It does not guess — it **understands the host project, plans from a signed motion spec, generates from vetted source assets, renders everything in the Dev Lab for live testing, and only then confirms into a pull request**.
 

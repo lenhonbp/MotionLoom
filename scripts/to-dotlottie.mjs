@@ -17,7 +17,7 @@ function arg(name, fallback = undefined) {
 
 const sceneDir = path.resolve(arg("--scene-dir", ""));
 const output = path.resolve(arg("--output", ""));
-const generator = arg("--generator", "animation-skill-kit/to-dotlottie");
+const generator = arg("--generator", "motionloom/to-dotlottie");
 if (!sceneDir || !output) throw new Error("--scene-dir and --output are required");
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));

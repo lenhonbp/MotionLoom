@@ -1,5 +1,5 @@
 ---
-name: animation-studio
+name: motionloom
 description: >-
   Project-aware animation production and verification for UI motion, Lottie/dotLottie,
   Rive, GSAP, Framer Motion, character body rigs, scene assets, runtime rendering,
@@ -12,7 +12,7 @@ metadata:
   verified_runtimes: "lottie-json,dotlottie-package,svg-cutout-rig,rive,gsap,framer-motion"
 ---
 
-# Animation Studio Skill
+# MotionLoom Skill
 
 Treat every animation request as a production task, not as an isolated asset-generation prompt. Always bind the work to the host project's context, emit machine-readable artifacts, render through the target runtime, expose review evidence in Dev Lab, and stop before commit when a required gate or user confirmation is missing.
 

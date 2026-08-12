@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/artifact-manifest.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/artifact-manifest.schema.json",
   "title": "Animation artifact manifest",
   "type": "object",
   "required": ["manifest_version", "task_id", "generated_at", "artifacts"],

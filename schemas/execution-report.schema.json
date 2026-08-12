@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/execution-report.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/execution-report.schema.json",
   "title": "Animation execution report",
   "type": "object",
   "required": ["report_version", "task_id", "status", "confidence", "completed", "verified", "not_completed", "problems", "structure_review", "next_agent", "generated_at"],

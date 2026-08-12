@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/handoff.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/handoff.schema.json",
   "title": "Animation Agent handoff",
   "type": "object",
   "required": ["handoff_version", "task_id", "from_agent", "state", "summary", "next_actions", "required_artifacts", "blockers"],

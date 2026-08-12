@@ -1,6 +1,6 @@
 # P0 Implementation Report — Observable Agent Workflow
 
-**Repository:** `animation-skill-kit`  
+**Repository:** `MotionLoom`
 **Baseline audit:** `89d40c4`  
 **Strategy baseline:** `926c5db`  
 **Implementation commit:** `06c3219`  
@@ -70,7 +70,7 @@ The following work is deliberately not claimed as complete:
 
 | Priority | Agent/Skill | Use it for | Do not delegate to it |
 |---|---|---|---|
-| P0 | **Animation Studio Skill** | Context analysis, motion spec, asset provenance, runtime evidence and task bundle | GitHub authentication or deciding user consent |
+| P0 | **MotionLoom Skill** | Context analysis, motion spec, asset provenance, runtime evidence and task bundle | GitHub authentication or deciding user consent |
 | P0 | **Skill Doctor / repository quality Agent** | Frontmatter, schemas, references, executable paths and report completeness | Judging visual quality from prose |
 | P1 | **Web/Dev Lab Agent** | Persist `review.json`, review notes, browser state and visual regression fixtures | Replacing runtime adapters |
 | P1 | **Runtime Adapter Agent** | Implement and test one Rive or GSAP adapter | Declaring unsupported runtimes production-ready |

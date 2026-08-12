@@ -22,4 +22,4 @@ fi
 node "$SCRIPT_DIR/to-dotlottie.mjs" \
   --scene-dir "$SCENE_DIR" \
   --output "$OUT" \
-  --generator "animation-skill-kit/to-dotlottie@1.0.0"
+  --generator "motionloom/to-dotlottie@1.0.0"

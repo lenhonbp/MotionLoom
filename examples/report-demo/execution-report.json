@@ -51,15 +51,15 @@
   },
   "next_agent": [
     {
-      "agent": "animation-studio",
+      "agent": "motionloom",
       "action": "Run project analysis and populate context before generation."
     },
     {
       "id": "render",
       "summary": "Continue with runtime render and Dev Lab review",
       "status": "pending",
-      "agent": "animation-studio",
-      "skill": "animation-studio",
+      "agent": "motionloom",
+      "skill": "motionloom",
       "evidence_needed": [
         "snapshot/.render-meta.json",
         "review.json"

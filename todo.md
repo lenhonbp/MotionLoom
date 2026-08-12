@@ -1,4 +1,4 @@
-# Audit checklist — animation-skill-kit
+# Audit checklist — MotionLoom
 
 - [x] Đọc skill-creator và xác định quy trình cập nhật skill an toàn.
 - [x] Kiểm tra cấu trúc repo, tài liệu, package/dependency và executable scripts.
@@ -64,3 +64,11 @@
 - [x] Xây runtime adapter test thật cho Framer Motion: render React scene trong browser harness, reduced-motion và snapshot evidence.
 - [x] Chỉ nâng capability declarations từ `scaffold_only` lên `verified` sau khi adapter evidence và CI gate pass.
 - [x] Cập nhật SKILL.md, Agent Card, README, runtime capability reference và CI theo capability levels mới.
+
+## GitHub MotionLoom release
+
+- [ ] Kiểm tra GitHub remote, branch hiện tại, working tree và authentication.
+- [ ] Chuẩn hóa public branding thành MotionLoom nếu cần, không làm mất lịch sử hoặc contract runtime.
+- [ ] Chạy lại quality checks và xác nhận archive/release files trước khi push.
+- [ ] Cấu hình `https://github.com/lenhonbp/MotionLoom.git` làm origin và push branch chính.
+- [ ] Xác minh commit, branch, remote URL và repository contents sau khi push.

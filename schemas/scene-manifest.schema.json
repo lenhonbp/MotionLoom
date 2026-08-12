@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/scene-manifest.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/scene-manifest.schema.json",
   "title": "Animation scene manifest",
   "type": "object",
   "required": ["name", "description", "framework", "category", "file", "source_binding", "checks"],

@@ -1,6 +1,6 @@
 {
   "card_version": "1.0",
-  "name": "animation-studio",
+  "name": "motionloom",
   "version": "1.4.0",
   "description": "Project-aware animation production, runtime verification, internal browser review and Agent handoff.",
   "capabilities": [

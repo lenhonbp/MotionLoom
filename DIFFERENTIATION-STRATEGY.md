@@ -124,7 +124,7 @@ Nên thêm `agent-card.json`:
 
 ```json
 {
-  "name": "animation-studio",
+  "name": "motionloom",
   "version": "2.0.0",
   "description": "Project-aware animation production and verification",
   "capabilities": [

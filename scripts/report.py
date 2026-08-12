@@ -79,10 +79,10 @@ def init_task(args: argparse.Namespace) -> int:
         "handoff_version": "1.0",
         "task_id": args.task_id,
         "from_agent": args.agent,
-        "to_agent": "animation-studio",
+        "to_agent": "motionloom",
         "state": "created",
         "summary": "New animation task initialized.",
-        "next_actions": [{"action": "Analyze host project context", "skill": "animation-studio", "evidence_needed": ["project-context.json"]}],
+        "next_actions": [{"action": "Analyze host project context", "skill": "motionloom", "evidence_needed": ["project-context.json"]}],
         "required_artifacts": ["task.json", "execution-report.json"],
         "blockers": [],
     }
@@ -376,7 +376,7 @@ def main() -> int:
     init.add_argument("--project-name", default="")
     init.add_argument("--context-path", default="")
     init.add_argument("--context-hash", default="")
-    init.add_argument("--agent", default="animation-studio")
+    init.add_argument("--agent", default="motionloom")
     init.add_argument("--output")
     init.set_defaults(func=init_task)
     collect_parser = sub.add_parser("collect")

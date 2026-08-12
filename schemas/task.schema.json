@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/task.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/task.schema.json",
   "title": "Animation task",
   "type": "object",
   "required": ["schema_version", "task_id", "scene", "intent", "state", "created_at", "updated_at"],

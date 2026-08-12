@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-analyzer.py — Step 1 of the Animation Studio pipeline: Project Understanding.
+analyzer.py — Step 1 of the MotionLoom pipeline: Project Understanding.
 
 Reads a project repository (package.json, tailwind config, design tokens,
 existing animation files, README) and emits `project-context.json`:

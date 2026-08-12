@@ -1,7 +1,7 @@
 # Animation Skill Kit — Audit Report
 
 **Audit date:** 2026-08-12  
-**Scope:** `animation-skill-kit` — project analysis, motion specification, source/rig generation, Lottie/dotLottie validation, runtime snapshot, Dev Lab, quality gate, and confirm-to-PR flow.  
+**Scope:** `MotionLoom` — project analysis, motion specification, source/rig generation, Lottie/dotLottie validation, runtime snapshot, Dev Lab, quality gate, and confirm-to-PR flow.
 **Verdict:** **PASS for the audited Lottie/body-rig path**, with explicit limits for Rive/GSAP/Framer Motion runtime coverage described below.
 
 ## Executive conclusion

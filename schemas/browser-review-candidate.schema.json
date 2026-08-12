@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://animation-skill-kit.dev/schemas/browser-review-candidate.schema.json",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/browser-review-candidate.schema.json",
   "title": "Animation browser review candidate",
   "type": "object",
   "required": ["schema_version", "candidate_id", "task_id", "scene", "url", "status", "context_sha256", "source_sha256", "review_artifact"],

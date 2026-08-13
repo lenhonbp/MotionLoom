@@ -18,9 +18,11 @@ Use this reference when an Agent needs to understand or extend MotionLoom's task
 
 ## Agent operating rules
 
-The Agent must build the graph, Motion IR, provenance, replay bundle, P1 feedback reports and semantic-lint benchmark after render and before the strict quality gate. It may use a verified capability only when the registry evidence is fresh, its hash matches the referenced file and the target environment is compatible. `scaffold_only` is a planning option, never a production acceptance result.
+The Agent must build the graph, Motion IR, provenance, replay bundle, P1 feedback reports and semantic-lint benchmark after render and before the strict quality gate. It must also run the report completeness contract for changed scenes; that contract selects one deterministic passing task bundle and fails on ambiguous ties. It may use a verified capability only when the registry evidence is fresh, its hash matches the referenced file and the target environment is compatible. `scaffold_only` is a planning option, never a production acceptance result.
 
 The graph and provenance are evidence indexes, not approval tokens. A valid graph cannot bypass source binding, runtime assertions, browser review, reviewer consent or the `OPEN_PR=0` default. A confidence or risk value can prioritize investigation but cannot replace a deterministic rule or human decision.
+
+All task-bound paths are resolved under their declared root and symlink traversal is rejected. Replay additionally binds `task_dir`, `task_id`, scene and every recorded file to the same task bundle. Browser-review and Dev Lab handoffs must use same-origin artifact/task bases and must agree on task, scene and candidate identity; expiry or mismatch is a review failure, not a warning to ignore.
 
 ## Strict validation
 
@@ -61,5 +63,8 @@ The replay policy excludes generated reports and manifests because `report.py co
 | `continuity report has drift` | Scene context, intent, asset or transition contract changed | Rerun only the affected scenes and transitions, then verify the updated continuity report. |
 | `fix-plan source report hash mismatch` | The plan no longer describes the reports that produced it | Regenerate the plan from current reports before proposing a patch. |
 | Browser review or approval failure | Candidate is not approved by the right reviewer/task | Return to Dev Lab review; never synthesize `review.json`. |
+| `artifact is missing or outside task bundle` | A graph, provenance or replay record attempts to escape its declared task root or traverse a symlink | Stop the task, inspect the path and rebuild the artifact from a clean task bundle. |
+| `ambiguous passing task bundles share the same state and updated_at` | More than one task bundle could supply evidence for the same changed scene | Resolve the duplicate explicitly and rerun the report contract; never merge evidence by filename order. |
+| `artifact_base must share the Dev Lab origin` or identity binding failure | Dev Lab query parameters would mix an external or foreign task/candidate bundle | Reject the handoff and regenerate the review URL from the canonical task bundle. |
 
 The public eval corpus is `tests/evals/intelligence-cases.json`. It covers positive verified selection plus scaffold-only, stale evidence, tampering, graph corruption, replay tamper and foreign-task candidate failures. P1 extends the acceptance surface with semantic warning preservation, generic-intent detection, multi-scene context drift, selective rerun binding, performance budget/frame-rate warnings, perceptual easing/reduced-motion warnings and benchmark execution time without weakening the v0.1 safety assertions.

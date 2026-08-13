@@ -16,12 +16,32 @@ def read_json(path: Path) -> dict:
         return {}
 
 
+def has_symlink_component(path: Path, root: Path) -> bool:
+    current = path
+    while True:
+        if current.is_symlink():
+            return True
+        if current == root:
+            return False
+        if current == current.parent:
+            return True
+        current = current.parent
+
+
 def task_dirs(root: Path, scene: str) -> list[Path]:
     artifacts = root / "artifacts"
-    if not artifacts.is_dir():
+    if not artifacts.is_dir() or artifacts.is_symlink():
         return []
+    resolved_artifacts = artifacts.resolve()
     matched = []
     for task_path in sorted(artifacts.glob("*/task.json")):
+        if has_symlink_component(task_path, root):
+            continue
+        try:
+            if not task_path.resolve().is_relative_to(resolved_artifacts):
+                continue
+        except (OSError, RuntimeError):
+            continue
         task = read_json(task_path)
         if task.get("scene") == scene:
             matched.append(task_path.parent)
@@ -42,6 +62,7 @@ def main() -> int:
         return 0
 
     missing: list[str] = []
+    selected: list[str] = []
     required = (
         "task.json",
         "execution-report.json",
@@ -62,7 +83,7 @@ def main() -> int:
         if not complete:
             missing.append(f"{scene}: incomplete task/report/P1 feedback bundle")
             continue
-        checked = False
+        passing: list[Path] = []
         for task_dir in complete:
             result = subprocess.run(
                 [sys.executable, str(report_script), "check", "--task-dir", str(task_dir)],
@@ -71,16 +92,41 @@ def main() -> int:
                 text=True,
             )
             if result.returncode == 0:
-                checked = True
-                break
-        if not checked:
+                passing.append(task_dir)
+        if not passing:
             missing.append(f"{scene}: semantic report check failed")
+            continue
+        state_rank = {"confirmed": 4, "ready_for_pr": 3, "validated": 2, "review_required": 1}
+        ranked = sorted(
+            passing,
+            key=lambda path: (
+                state_rank.get(str(read_json(path / "task.json").get("state")), 0),
+                str(read_json(path / "task.json").get("updated_at", "")),
+                str(read_json(path / "task.json").get("task_id", "")),
+            ),
+            reverse=True,
+        )
+        top_task = read_json(ranked[0] / "task.json")
+        top_key = (state_rank.get(str(top_task.get("state")), 0), str(top_task.get("updated_at", "")))
+        if sum(
+            1
+            for path in passing
+            if (
+                state_rank.get(str(read_json(path / "task.json").get("state")), 0),
+                str(read_json(path / "task.json").get("updated_at", "")),
+            )
+            == top_key
+        ) > 1:
+            missing.append(f"{scene}: ambiguous passing task bundles share the same state and updated_at")
+        else:
+            selected.append(f"{scene}={top_task.get('task_id', ranked[0].name)}")
 
     if missing:
         print("FAIL: report/handoff contract is incomplete:")
         print("\n".join(f" - {item}" for item in missing))
         return 1
-    print(f"Report contract passed for {len(scenes)} scene(s).")
+    suffix = f" Selected bundles: {', '.join(selected)}." if selected else ""
+    print(f"Report contract passed for {len(scenes)} scene(s).{suffix}")
     return 0
 
 

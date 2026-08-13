@@ -261,13 +261,48 @@ def test_deep_audit_contracts():
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", root / "artifacts/browser-review-smoke-task")
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", root / "artifacts/professional-review-e2e")
         scenes = root / "changed-scenes"
         scenes.write_text("browser-review-smoke\n")
         contract = subprocess.run([
             sys.executable, str(ROOT / "scripts/report-contract.py"),
             "--root", str(root), "--scenes-file", str(scenes),
         ], capture_output=True, text=True)
-        check("report contract accepts tracked smoke bundle", contract.returncode == 0, contract.stdout.strip())
+        check(
+            "report contract selects strongest duplicate scene bundle",
+            contract.returncode == 0 and "professional-review-e2e" in contract.stdout,
+            contract.stdout.strip(),
+        )
+
+        linked_target = root / "outside-task"
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", linked_target)
+        (root / "artifacts/linked-task").symlink_to(linked_target, target_is_directory=True)
+        contract_symlink = subprocess.run([
+            sys.executable, str(ROOT / "scripts/report-contract.py"),
+            "--root", str(root), "--scenes-file", str(scenes),
+        ], capture_output=True, text=True)
+        check(
+            "report contract ignores symlinked task bundle",
+            contract_symlink.returncode == 0 and "linked-task" not in contract_symlink.stdout,
+            contract_symlink.stdout.strip(),
+        )
+
+        approval_dir = root / "artifacts/approval-mismatch"
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", approval_dir)
+        approval_task = json.loads((approval_dir / "task.json").read_text())
+        approval_task["state"] = "ready_for_pr"
+        (approval_dir / "task.json").write_text(json.dumps(approval_task, indent=2) + "\n")
+        approval_review = json.loads((approval_dir / "review.json").read_text())
+        approval_review["candidate_id"] = "foreign-candidate"
+        (approval_dir / "review.json").write_text(json.dumps(approval_review, indent=2) + "\n")
+        approval_check = subprocess.run([
+            sys.executable, str(ROOT / "scripts/report.py"), "check", "--task-dir", str(approval_dir),
+        ], capture_output=True, text=True)
+        check(
+            "report check rejects review for foreign candidate",
+            approval_check.returncode != 0 and "exact browser-review candidate" in approval_check.stdout,
+            approval_check.stdout.strip(),
+        )
 
         candidate_path = root / "artifacts/browser-review-smoke-task/browser-review.json"
         candidate = json.loads(candidate_path.read_text())
@@ -430,6 +465,40 @@ def test_intelligence_core_contracts():
             "--root", str(root), "--bundle", str(task_dir / "replay-bundle.json"),
         ], capture_output=True, text=True)
         check("intelligence replay rejects tampered artifact", tampered.returncode != 0 and "hash_mismatch" in tampered.stdout)
+
+        other_task = root / "artifacts/other-task"
+        shutil.copytree(task_dir, other_task)
+        other_task_data = json.loads((other_task / "task.json").read_text())
+        other_task_data["task_id"] = "other-task"
+        (other_task / "task.json").write_text(json.dumps(other_task_data, indent=2) + "\n")
+        cross_bundle = json.loads((task_dir / "replay-bundle.json").read_text())
+        cross_bundle["task_dir"] = "artifacts/other-task"
+        cross_bundle_path = root / "cross-task-replay.json"
+        cross_bundle_path.write_text(json.dumps(cross_bundle, indent=2) + "\n")
+        cross_check = subprocess.run([
+            sys.executable, str(intelligence), "replay", "verify",
+            "--root", str(root), "--bundle", str(cross_bundle_path),
+        ], capture_output=True, text=True)
+        check("intelligence replay rejects cross-task bundle binding", cross_check.returncode != 0 and "missing" in cross_check.stdout)
+
+        outside = root / "outside-artifact.json"
+        outside.write_text("outside\n")
+        symlink_path = task_dir / "symlink-artifact.json"
+        symlink_path.symlink_to(outside)
+        symlink_replay = subprocess.run([
+            sys.executable, str(intelligence), "replay", "capture",
+            "--root", str(root), "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence replay rejects symlink artifact", symlink_replay.returncode != 0 and "symlinked" in (symlink_replay.stderr + symlink_replay.stdout))
+
+        external_evidence = root / "external-evidence.json"
+        external_evidence.write_text("external\n")
+        external_registry = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "build",
+            "--evidence", str(external_evidence), "--evidence-kind", "static",
+            "--output", str(root / "external-registry.json"),
+        ], capture_output=True, text=True)
+        check("intelligence blocks capability evidence outside repository", external_registry.returncode != 0 and "inside the repository" in (external_registry.stderr + external_registry.stdout))
 
 
 def test_malformed_spec_is_rejected_cleanly():

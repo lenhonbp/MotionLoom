@@ -7,7 +7,7 @@ description: >-
   validate, review, or deliver animation inside an existing project.
 license: MIT
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
   target_frameworks: "lottie,dotlottie,rive,gsap,framer-motion,spine,threejs"
   verified_runtimes: "lottie-json,dotlottie-package,svg-cutout-rig,rive,gsap,framer-motion"
 ---
@@ -24,9 +24,10 @@ Treat every animation request as a production task, not as an isolated asset-gen
 4. **Generate** — use the matching template or rig implementation. For body animation, preserve named anatomy, pivot and parent-first hierarchy.
 5. **Render** — run `bash scripts/render.sh <scene>` for scene output, or `node scripts/runtime-adapters.mjs` for the verified Rive/GSAP/Framer Motion adapter matrix. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
 6. **Bind Intelligence Core** — build a framework-neutral `motion-ir.json`, `project-graph.json`, `provenance.json`, `replay-bundle.json`, `semantic-lint-report.json` and `semantic-lint-benchmark.json` with `python3 scripts/intelligence.py`. Select only a capability registry entry whose status is `verified`, whose evidence is fresh and whose compatibility matches the target environment. A confidence score or benchmark result can prioritize investigation; neither can replace deterministic or human acceptance.
+6a. **Harden the trust boundary** — keep artifact and task bundles inside the repository/task root, reject symlinked evidence, bind replay to its exact `task_dir`, `task_id` and scene, select one deterministic report bundle per scene, and require browser candidate/review identity and expiry checks before readiness. The Dev Lab must reject cross-origin or identity-mismatched artifact bases; these checks expose risk and prevent evidence mixing, but do not turn heuristics into approval.
 7. **Browser review handoff** — run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
 8. **Review capture** — the browser Agent calls `window.__lab.getReview()` after the user approves or requests changes, then persists it with `python3 scripts/report.py review --task-dir artifacts/<task-id> --candidate-id <id> --decision approved|changes_requested --reviewer user`. A change request returns to generation; no approval means no PR.
-9. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
+9. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `python3 scripts/report-contract.py --root . --scenes-file <changed-scenes>`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
 10. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, browser candidate/review evidence and the recommended next Agent/Skill.
 11. **Confirm** — only after approved browser review and a passing quality gate run `TASK_DIR=artifacts/<task-id> bash scripts/pr.sh <scene>`. Commit, push and open PR are explicit side effects.
 
@@ -52,6 +53,8 @@ Treat every animation request as a production task, not as an isolated asset-gen
 - Destructive Git actions require explicit confirmation. Use `OPEN_PR=0` for local review-only runs.
 - Intelligence Core artifacts are task-bound: graph, provenance, Motion IR and replay evidence must not be reused across tasks without revalidation.
 - Provenance hashes materials and products; replay must fail on tampered or missing files; stale capability evidence must not be selected for production acceptance.
+- Browser-review candidates are single-use, time-bounded and bound to the exact task, scene and candidate identity; Dev Lab artifact/task bases must be same-origin and identity-consistent before staging a review decision.
+- Report completeness must select one deterministic passing task bundle per scene and fail on ambiguous ties; a valid artifact is never sufficient to bypass explicit user approval.
 
 ## Framework boundary
 

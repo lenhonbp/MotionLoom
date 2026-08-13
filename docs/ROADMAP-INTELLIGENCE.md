@@ -14,6 +14,12 @@ Milestone **Intelligence Core v0.1 đã được triển khai ở lớp trust co
 
 Phạm vi này chứng minh **artifact relationship, provenance, capability freshness/integrity và replay tamper detection**. Nó chưa phải semantic motion lint, chưa phải recommendation engine và chưa phải MCP server. Những phần đó được giữ ở P1/P2 để không biến heuristic thành acceptance truth trước khi có benchmark đủ mạnh.
 
+### 0.2 Trust-boundary hardening — 1.8.0
+
+Milestone **1.8.0 đã hoàn tất và được merge vào `main`**. Deep audit và regression coverage hiện bảo vệ browser-review lifecycle, report bundle selection, task-root/symlink boundaries, capability evidence paths, provenance attestation paths và deterministic replay binding. Dev Lab artifact intake cũng kiểm tra same-origin, task/scene/candidate identity và browser-review expiry trước khi cho phép staging review.
+
+Audit này không tuyên bố hệ thống đã có cryptographic trust anchor bên ngoài repository. Các guard hiện tại là deterministic repository/runtime checks; approval vẫn chỉ đến từ review artifact hợp lệ và user consent.
+
 ## 1. Baseline hiện tại và khoảng trống cần giải quyết
 
 | Lớp | Đã có | Khoảng trống chính | Hậu quả nếu chưa xử lý |
@@ -187,9 +193,9 @@ Không nên đưa toàn bộ runbook vào `SKILL.md`. Agent Skills khuyến ngh�
 
 ## 7. Việc nên làm ngay ở milestone kế tiếp
 
-Milestone kế tiếp nên là **MotionLoom Intelligence Core v0.1**, gồm `project-graph`, `provenance`, `capability registry v2`, `Motion IR`, `replay` và `eval corpus`. Đây là slice có giá trị cao nhất vì nó làm cho mọi runtime adapter, Dev Lab và Agent integration sau này dùng chung một ngôn ngữ và một chuỗi bằng chứng.
+Milestone kế tiếp nên là **Evidence interoperability và runtime observability**, không phải thêm framework theo số lượng. Ưu tiên là signed attestation/DSSE hoặc external verifier, runtime frame telemetry, asset-level visual comparison có dataset được gắn nhãn, và aggregate benchmark history theo project/context/framework.
 
-Trình tự triển khai cụ thể là: đóng schema trước; tạo fixture multi-scene và adversarial cases; build graph từ task hiện tại; emit provenance cho từng CLI step; thêm replay từ clean checkout; chạy eval baseline; rồi mới thay đổi SKILL.md để Agent sử dụng contract mới. Sau mỗi milestone cần lưu checkpoint, chạy regression và cập nhật `agent-card.json` chỉ bằng capability có evidence tương ứng.
+Trình tự triển khai cụ thể là: xác định trust anchor và threat model trước; version schema và verifier contract; tạo fixture clean-room cho attestation/telemetry/visual comparison; thêm adversarial evals; sau đó mới nâng capability trong `agent-card.json`. Mỗi milestone phải giữ nguyên nguyên tắc: evidence có hash và identity, failure có stable exit code, heuristic không tự thành approval, và side effect GitHub luôn cần explicit confirmation.
 
 ### References
 

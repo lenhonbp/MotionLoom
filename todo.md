@@ -146,3 +146,11 @@
 - [x] Chờ GitHub Actions/checks chạy và xử lý mọi blocker trước merge.
 - [x] Merge Pull Request vào `main` theo chính sách review/CI của repository.
 - [x] Xác minh `origin/main`, PR merge SHA, branch state và các artifact chính sau merge.
+
+## Roadmap hardening execution
+
+- [x] Tạo deep-audit report cho browser-review lifecycle, Dev Lab candidate binding, CLI/path safety, provenance/replay và quality-gate bypass.
+- [x] Bổ sung regression/adversarial tests cho candidate identity, approval replay/expiry, malformed input, path traversal, stale evidence và framework mismatch.
+- [x] Hardening các đường bypass có bằng chứng từ audit, ưu tiên các lỗi có thể biến heuristic hoặc artifact giả thành approval.
+- [x] Cập nhật SKILL.md, Agent Card, README và release note với audit findings, trust boundaries và remediation status.
+- [x] Chạy clean-checkout/CI/full acceptance, commit milestone roadmap và cập nhật trạng thái checklist sau khi xác minh.

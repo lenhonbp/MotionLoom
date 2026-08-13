@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "1.7.0",
-  "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification, semantic feedback, continuity checks, internal browser review and deterministic Agent handoff.",
+  "version": "1.8.0",
+  "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "project.analyze",
     "project.graph.build",
@@ -20,6 +20,7 @@
     "semantic-lint.build",
     "semantic-lint.validate",
     "semantic-lint.benchmark",
+    "trust-boundary.audit",
     "continuity.build",
     "continuity.validate",
     "fix-plan.build",
@@ -66,6 +67,7 @@
     "replay-bundle",
     "semantic-lint-report",
     "semantic-lint-benchmark",
+    "hardening-audit-report",
     "continuity-report",
     "fix-plan",
     "pr-patch"

@@ -44,12 +44,23 @@ def read_json(path: Path, default: dict | list | None = None):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def has_symlink_component(path: Path) -> bool:
+    current = path
+    while True:
+        if current.is_symlink():
+            return True
+        if current.parent == current:
+            return False
+        current = current.parent
+
+
 def candidate_expiry(candidate: dict) -> datetime | None:
     value = candidate.get("expires_at")
     if not value:
         return None
     try:
-        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return parsed.astimezone(timezone.utc) if parsed.tzinfo else None
     except (TypeError, ValueError):
         return None
 
@@ -117,6 +128,8 @@ def collect(args: argparse.Namespace) -> int:
     excluded = {"artifact-manifest.json", "execution-report.json", "decision-log.jsonl"}
     artifacts = []
     for path in sorted(task_dir.rglob("*")):
+        if has_symlink_component(path):
+            raise ValueError(f"task bundle cannot contain symlinked artifact: {path.relative_to(task_dir)}")
         if not path.is_file() or path.name in excluded:
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -288,6 +301,55 @@ def p1_contract_errors(task_dir: Path, task: dict) -> list[str]:
     return errors
 
 
+def approval_contract_errors(task_dir: Path, task: dict, require_current: bool) -> list[str]:
+    errors: list[str] = []
+    candidate_path = task_dir / "browser-review.json"
+    review_path = task_dir / "review.json"
+    candidate = read_json(candidate_path)
+    review = read_json(review_path)
+    if not candidate_path.is_file():
+        return ["ready-for-PR task requires browser-review.json"]
+    if not review_path.is_file():
+        return ["ready-for-PR task requires review.json"]
+    if candidate.get("task_id") != task.get("task_id"):
+        errors.append("browser-review candidate task_id does not match task.json")
+    if candidate.get("scene") != task.get("scene"):
+        errors.append("browser-review candidate scene does not match task.json")
+    task_review = task.get("browser_review") or {}
+    if task_review.get("candidate_id") != candidate.get("candidate_id"):
+        errors.append("task browser_review candidate_id does not match browser-review.json")
+    if task_review.get("status") != candidate.get("status"):
+        errors.append("task browser_review status does not match browser-review.json")
+    if review.get("task_id") != task.get("task_id"):
+        errors.append("review.json task_id does not match task.json")
+    if review.get("candidate_id") != candidate.get("candidate_id"):
+        errors.append("review.json must approve the exact browser-review candidate")
+    if review.get("decision") != "approved":
+        errors.append("ready-for-PR task requires review.json decision=approved")
+    if candidate.get("status") != "approved":
+        errors.append("ready-for-PR task requires browser-review.json status=approved")
+    if candidate.get("requires_user_approval") is not True:
+        errors.append("browser-review candidate must explicitly require user approval")
+    expiry = candidate_expiry(candidate)
+    if expiry is None:
+        errors.append("browser-review candidate expiry must be a timezone-aware timestamp")
+    elif require_current and datetime.now(timezone.utc) > expiry:
+        errors.append("browser-review candidate has expired before PR readiness")
+    reviewed_at_raw = review.get("reviewed_at")
+    if not reviewed_at_raw:
+        errors.append("review.json reviewed_at is required")
+    else:
+        try:
+            reviewed_at = datetime.fromisoformat(str(reviewed_at_raw).replace("Z", "+00:00"))
+            if reviewed_at.tzinfo is None:
+                raise ValueError("reviewed_at must include timezone")
+            if expiry is not None and reviewed_at.astimezone(timezone.utc) > expiry:
+                errors.append("review.json was recorded after candidate expiry")
+        except (TypeError, ValueError):
+            errors.append("review.json reviewed_at is invalid")
+    return errors
+
+
 def check_report(args: argparse.Namespace) -> int:
     task_dir = Path(args.task_dir).resolve()
     errors = []
@@ -315,14 +377,7 @@ def check_report(args: argparse.Namespace) -> int:
         if quality.get("status") != "pass":
             errors.append("validated-or-later task requires quality-report.json status=pass")
     if state in {"ready_for_pr", "confirmed"}:
-        review = read_json(task_dir / "review.json")
-        if review.get("decision") != "approved":
-            errors.append("ready_for_pr-or-later task requires review.json decision=approved")
-        candidate = read_json(task_dir / "browser-review.json")
-        if not candidate.get("candidate_id") or review.get("candidate_id") != candidate.get("candidate_id"):
-            errors.append("review.json must approve the exact browser-review candidate")
-        if candidate.get("status") != "approved":
-            errors.append("ready_for_pr-or-later task requires browser-review.json status=approved")
+        errors.extend(approval_contract_errors(task_dir, task, require_current=state == "ready_for_pr"))
     if task.get("browser_review", {}).get("required") and state in {"review_required", "validated", "ready_for_pr", "confirmed"}:
         if not (task_dir / "browser-review.json").is_file():
             errors.append("task requires browser-review.json candidate")

@@ -1,6 +1,6 @@
 {
   "name": "motionloom",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "type": "module",
   "description": "MotionLoom: project-aware animation Skill with graph, provenance, framework-neutral Motion IR, runtime validation and Dev Lab evidence.",

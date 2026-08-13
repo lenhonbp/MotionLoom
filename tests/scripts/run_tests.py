@@ -678,7 +678,7 @@ def test_p1_semantic_continuity_fix_plan():
             task.update({"task_id": task_id, "scene": scene, "scene_order": order, "project_name": "p1-continuity"})
             (path / "task.json").write_text(json.dumps(task, indent=2) + "\n")
             ir = json.loads((path / "motion-ir.json").read_text())
-            ir.update({"task_id": task_id, "scene": scene, "context_hash": task.get("context_hash")})
+            ir.update({"task_id": task_id, "scene": scene, "context_hash": task.get("context_hash") or ir.get("context_hash")})
             (path / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
 
         continuity = subprocess.run([

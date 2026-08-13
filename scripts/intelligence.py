@@ -824,11 +824,54 @@ def semantic_lint_validate_data(report: dict[str, Any]) -> list[str]:
         issues.append("schema_version must be 0.1")
     if report.get("status") not in {"pass", "warn", "fail"}:
         issues.append("status must be pass, warn or fail")
-    summary = report.get("summary") or {}
-    findings = report.get("findings") or []
+    for field in ("report_id", "task_id", "scene"):
+        if not isinstance(report.get(field), str) or not report.get(field).strip():
+            issues.append(f"{field} must be a non-empty string")
+    ruleset = report.get("ruleset")
+    if not isinstance(ruleset, dict) or not isinstance(ruleset.get("id"), str) or not ruleset.get("id").strip() or not isinstance(ruleset.get("version"), str) or not ruleset.get("version").strip():
+        issues.append("ruleset must contain non-empty id and version")
+    summary = report.get("summary") if isinstance(report.get("summary"), dict) else {}
+    summary_required = {"total", "errors", "warnings", "infos", "blocking"}
+    issues.extend(f"summary missing {field}" for field in sorted(summary_required - set(summary)))
+    findings = report.get("findings") if isinstance(report.get("findings"), list) else []
+    if not isinstance(report.get("findings"), list):
+        issues.append("findings must be an array")
     if summary.get("total") != len(findings):
         issues.append("summary.total does not match findings length")
-    blocking = sum(bool(item.get("approval_blocking")) for item in findings if isinstance(item, dict))
+    finding_required = {"id", "rule_id", "category", "severity", "confidence", "basis", "message", "evidence_refs", "affected_paths", "approval_blocking"}
+    categories = {"intent", "timing", "easing", "accessibility", "performance", "continuity", "anti_pattern"}
+    severities = {"info", "warning", "error"}
+    bases = {"deterministic", "runtime", "human", "heuristic"}
+    severity_counts = {"info": 0, "warning": 0, "error": 0}
+    blocking = 0
+    for index, item in enumerate(findings):
+        if not isinstance(item, dict):
+            issues.append(f"finding[{index}] must be an object")
+            continue
+        issues.extend(f"finding[{index}] missing {field}" for field in sorted(finding_required - set(item)))
+        if item.get("severity") not in severities:
+            issues.append(f"finding[{index}] severity is invalid")
+        else:
+            severity_counts[item["severity"]] += 1
+        if item.get("category") not in categories:
+            issues.append(f"finding[{index}] category is invalid")
+        if item.get("basis") not in bases:
+            issues.append(f"finding[{index}] basis is invalid")
+        if not isinstance(item.get("confidence"), (int, float)) or not 0 <= item.get("confidence", -1) <= 1:
+            issues.append(f"finding[{index}] confidence must be between 0 and 1")
+        if not isinstance(item.get("evidence_refs"), list) or not isinstance(item.get("affected_paths"), list):
+            issues.append(f"finding[{index}] evidence_refs and affected_paths must be arrays")
+        if item.get("approval_blocking") is True:
+            blocking += 1
+    for field in ("total", "errors", "warnings", "infos", "blocking"):
+        if not isinstance(summary.get(field), int) or summary.get(field) < 0:
+            issues.append(f"summary.{field} must be a non-negative integer")
+    if summary.get("errors") != severity_counts["error"]:
+        issues.append("summary.errors does not match findings")
+    if summary.get("warnings") != severity_counts["warning"]:
+        issues.append("summary.warnings does not match findings")
+    if summary.get("infos") != severity_counts["info"]:
+        issues.append("summary.infos does not match findings")
     if summary.get("blocking") != blocking:
         issues.append("summary.blocking does not match findings")
     if report.get("status") == "fail" and blocking == 0:
@@ -1040,15 +1083,72 @@ def continuity_report_data(task_dirs: list[Path], project_id: str | None = None)
 
 def continuity_validate_data(report: dict[str, Any]) -> list[str]:
     issues: list[str] = []
+    required = {"schema_version", "report_id", "project_id", "status", "scenes", "transitions", "summary", "generated_at"}
+    issues.extend(f"missing {field}" for field in sorted(required - set(report)))
     if report.get("schema_version") != "0.1":
         issues.append("schema_version must be 0.1")
-    scenes = report.get("scenes") or []
-    transitions = report.get("transitions") or []
+    if report.get("status") not in {"pass", "warn", "fail"}:
+        issues.append("status must be pass, warn or fail")
+    for field in ("report_id", "project_id"):
+        if not isinstance(report.get(field), str) or not report.get(field).strip():
+            issues.append(f"{field} must be a non-empty string")
+    scenes = report.get("scenes") if isinstance(report.get("scenes"), list) else []
+    transitions = report.get("transitions") if isinstance(report.get("transitions"), list) else []
+    if not isinstance(report.get("scenes"), list):
+        issues.append("scenes must be an array")
+    if not isinstance(report.get("transitions"), list):
+        issues.append("transitions must be an array")
     if not scenes:
         issues.append("continuity report requires at least one scene")
     if len(transitions) != max(0, len(scenes) - 1):
         issues.append("transition count must equal scene count minus one")
-    if report.get("summary", {}).get("scene_count") != len(scenes):
+    scene_names = set()
+    for index, scene in enumerate(scenes):
+        if not isinstance(scene, dict):
+            issues.append(f"scene[{index}] must be an object")
+            continue
+        scene_required = {"scene", "order", "motion_ir_path", "motion_ir_sha256", "context_hash", "intent"}
+        issues.extend(f"scene[{index}] missing {field}" for field in sorted(scene_required - set(scene)))
+        name = scene.get("scene")
+        if not isinstance(name, str) or not name.strip():
+            issues.append(f"scene[{index}].scene must be a non-empty string")
+        elif name in scene_names:
+            issues.append(f"duplicate scene name: {name}")
+        else:
+            scene_names.add(name)
+        if not isinstance(scene.get("order"), int) or scene.get("order", -1) < 0:
+            issues.append(f"scene[{index}].order must be a non-negative integer")
+        for field in ("motion_ir_path", "intent"):
+            if not isinstance(scene.get(field), str) or not scene.get(field).strip():
+                issues.append(f"scene[{index}].{field} must be a non-empty string")
+        for field in ("motion_ir_sha256", "context_hash"):
+            value = scene.get(field)
+            if not isinstance(value, str) or len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+                issues.append(f"scene[{index}].{field} must be a lowercase SHA-256 digest")
+    for index, transition in enumerate(transitions):
+        if not isinstance(transition, dict):
+            issues.append(f"transition[{index}] must be an object")
+            continue
+        transition_required = {"id", "from_scene", "to_scene", "status", "checks"}
+        issues.extend(f"transition[{index}] missing {field}" for field in sorted(transition_required - set(transition)))
+        if transition.get("status") not in {"pass", "warn", "fail"}:
+            issues.append(f"transition[{index}].status is invalid")
+        if transition.get("from_scene") not in scene_names or transition.get("to_scene") not in scene_names:
+            issues.append(f"transition[{index}] references unknown scene")
+        if not isinstance(transition.get("checks"), list) or any(not isinstance(item, str) or not item.strip() for item in transition.get("checks", [])):
+            issues.append(f"transition[{index}].checks must be a non-empty-string array")
+    summary = report.get("summary") if isinstance(report.get("summary"), dict) else {}
+    summary_required = {"scene_count", "transition_count", "errors", "warnings", "blocking"}
+    issues.extend(f"summary missing {field}" for field in sorted(summary_required - set(summary)))
+    if report.get("summary") is not None and not isinstance(report.get("summary"), dict):
+        issues.append("summary must be an object")
+    for field in ("scene_count", "transition_count", "errors", "warnings", "blocking"):
+        minimum = 1 if field == "scene_count" else 0
+        if not isinstance(summary.get(field), int) or summary.get(field) < minimum:
+            issues.append(f"summary.{field} must be a valid non-negative count")
+    if summary.get("transition_count") != len(transitions):
+        issues.append("summary.transition_count does not match transitions")
+    if summary.get("scene_count") != len(scenes):
         issues.append("summary.scene_count does not match scenes")
     return issues
 

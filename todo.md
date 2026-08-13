@@ -187,6 +187,18 @@
 - [x] Thêm `bin/motionloom.mjs`, explicit `files`, npm metadata, MIT license và install instructions.
 - [x] Thêm prepack cleanup để loại Python bytecode/local runtime state khỏi tarball.
 - [x] Chạy `npm publish --dry-run --access public`; tarball sạch, 260.3 kB, 111 files.
-- [ ] Commit và push npm packaging changes lên `origin/main` sau explicit confirmation.
-- [ ] Đăng nhập npm từ máy người dùng và chạy `npm publish --access public`.
-- [ ] Xác minh `npm view motionloom@2.0.0` và cài thử CLI từ registry.
+- [x] Commit và push npm packaging changes lên `origin/main` sau explicit confirmation.
+- [x] Đăng nhập npm từ máy người dùng và chạy `npm publish --access public`.
+- [x] Xác minh `npm view motionloom@2.0.0` và cài thử CLI từ registry.
+
+## Deep stress/evaluation audit
+
+- [x] Thiết kế ma trận 5.000+ vòng cho context binding, provenance, Motion IR, semantic lint, replay, continuity, telemetry, attestation, quality gate và handoff.
+- [x] Xây deterministic stress harness với fault injection, metamorphic variants và per-case result ledger.
+- [x] Chạy tối thiểu 5.000 vòng, ghi latency/error/false-positive/false-negative và phân loại theo contract.
+- [x] Đo tỷ lệ chặn stale/cross-task/tampered evidence và tỷ lệ giữ nguyên `approval=false`.
+- [x] Đo baseline khả năng bảo toàn fix-plan/handoff binding và xác định chưa có historical rerender-reduction metric.
+- [x] Phân tích failure cluster, race/flake, resource leak, non-determinism và blind spots chưa được test; harden semantic/continuity schema gap.
+- [x] Chạy full regression sau hardening, cập nhật audit report và đề xuất roadmap giảm vòng chỉnh sửa animation sai.
+- [ ] Thêm visual-comparison contract có fixture/frame provenance và pixel/perceptual diff.
+- [ ] Thêm multi-project/browser/device corpus và remediation ledger để đo first-pass acceptance, correction count và rerender avoidance.

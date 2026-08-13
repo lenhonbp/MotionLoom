@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.0",
+  "audit": "motionloom-deep-stress",
+  "generated_at": "2026-08-13T08:44:23.535422Z",
+  "seed": 20260813,
+  "requested_iterations": 5000,
+  "actual_iterations": 6900,
+  "fixture": {
+    "task_id": "browser-review-smoke-task",
+    "scene": "browser-review-smoke"
+  },
+  "summary": {
+    "passed": 6900,
+    "failed": 0,
+    "pass_rate": 1.0,
+    "false_positive": 0,
+    "false_negative": 0,
+    "clean_contracts_preserved": true,
+    "faults_rejected_without_false_negative": true,
+    "approval_false_invariant_preserved": true
+  },
+  "metrics": {
+    "canonical-json-metamorphic": {
+      "attempts": 600,
+      "passed": 600,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "equal": 600
+      },
+      "p50_ms": 0.018963,
+      "p95_ms": 0.027028,
+      "max_ms": 0.215561,
+      "pass_rate": 1.0
+    },
+    "dsse-ed25519-roundtrip": {
+      "attempts": 250,
+      "passed": 250,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "verified": 250
+      },
+      "p50_ms": 0.128048,
+      "p95_ms": 0.144034,
+      "max_ms": 0.163253,
+      "pass_rate": 1.0
+    },
+    "dsse-ed25519-tamper": {
+      "attempts": 250,
+      "passed": 250,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "invalid-signature": 250
+      },
+      "p50_ms": 0.130132,
+      "p95_ms": 0.140209,
+      "max_ms": 0.178904,
+      "pass_rate": 1.0
+    },
+    "statement-contract": {
+      "attempts": 600,
+      "passed": 600,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "valid": 200,
+        "rejected": 400
+      },
+      "p50_ms": 0.007181,
+      "p95_ms": 0.008413,
+      "max_ms": 0.059516,
+      "pass_rate": 1.0
+    },
+    "attestation-verifier-boundary": {
+      "attempts": 1500,
+      "passed": 1500,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "0": 375,
+        "11": 375,
+        "14": 375,
+        "13": 375
+      },
+      "p50_ms": 0.303064,
+      "p95_ms": 0.505011,
+      "max_ms": 0.842255,
+      "pass_rate": 1.0
+    },
+    "strict-quality-gate-clean": {
+      "attempts": 400,
+      "passed": 400,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "accepted": 400
+      },
+      "p50_ms": 24.511679,
+      "p95_ms": 29.717216,
+      "max_ms": 45.587579,
+      "pass_rate": 1.0
+    },
+    "intelligence-p1-clean": {
+      "attempts": 400,
+      "passed": 400,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "accepted": 400
+      },
+      "p50_ms": 17.860905,
+      "p95_ms": 21.976583,
+      "max_ms": 32.027403,
+      "pass_rate": 1.0
+    },
+    "replay-hash-clean": {
+      "attempts": 475,
+      "passed": 475,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "clean": 475
+      },
+      "p50_ms": 8.02739,
+      "p95_ms": 10.20982,
+      "max_ms": 13.31553,
+      "pass_rate": 1.0
+    },
+    "semantic-lint-clean": {
+      "attempts": 475,
+      "passed": 475,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "clean": 475
+      },
+      "p50_ms": 0.044806,
+      "p95_ms": 0.062948,
+      "max_ms": 0.120889,
+      "pass_rate": 1.0
+    },
+    "continuity-clean": {
+      "attempts": 475,
+      "passed": 475,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "clean": 475
+      },
+      "p50_ms": 0.036813,
+      "p95_ms": 0.053581,
+      "max_ms": 0.1014,
+      "pass_rate": 1.0
+    },
+    "approval-invariant": {
+      "attempts": 475,
+      "passed": 475,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "approval=false": 475
+      },
+      "p50_ms": 0.103737,
+      "p95_ms": 0.148545,
+      "max_ms": 0.202869,
+      "pass_rate": 1.0
+    },
+    "fault-graph-task-id": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 14.465091,
+      "p95_ms": 16.091659,
+      "max_ms": 16.891256,
+      "pass_rate": 1.0
+    },
+    "fault-motion-ir-scene": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 2.367015,
+      "p95_ms": 2.776738,
+      "max_ms": 3.812271,
+      "pass_rate": 1.0
+    },
+    "fault-provenance-task-id": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 0.913747,
+      "p95_ms": 1.226514,
+      "max_ms": 1.544532,
+      "pass_rate": 1.0
+    },
+    "fault-replay-path-escape": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 8.533108,
+      "p95_ms": 10.344097,
+      "max_ms": 11.235017,
+      "pass_rate": 1.0
+    },
+    "fault-p1-fix-plan-hash": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 0.827828,
+      "p95_ms": 1.029271,
+      "max_ms": 1.439878,
+      "pass_rate": 1.0
+    },
+    "fault-p1-wrong-scene": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 0.710469,
+      "p95_ms": 1.010883,
+      "max_ms": 1.146831,
+      "pass_rate": 1.0
+    },
+    "fault-continuity-structure": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 0.069471,
+      "p95_ms": 0.091397,
+      "max_ms": 0.11505,
+      "pass_rate": 1.0
+    },
+    "fault-semantic-structure": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "rejected": 100
+      },
+      "p50_ms": 0.068215,
+      "p95_ms": 0.095822,
+      "max_ms": 0.118719,
+      "pass_rate": 1.0
+    },
+    "fault-attestation-approval": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "10": 100
+      },
+      "p50_ms": 0.220256,
+      "p95_ms": 0.316655,
+      "max_ms": 0.349047,
+      "pass_rate": 1.0
+    },
+    "fault-attestation-payload": {
+      "attempts": 100,
+      "passed": 100,
+      "failed": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "codes": {
+        "11": 100
+      },
+      "p50_ms": 0.284957,
+      "p95_ms": 0.388469,
+      "max_ms": 0.452502,
+      "pass_rate": 1.0
+    }
+  },
+  "failures": [],
+  "interpretation": {
+    "logical_trials": "Each trial executes a real repository validator/helper against canonical fixture bytes or a controlled mutation; this is not a claim that 5,000 browser renders were performed.",
+    "false_positive": "A clean canonical case was rejected.",
+    "false_negative": "A controlled tamper, binding, revocation or invalid-contract case was accepted."
+  },
+  "wall_time_s": 25.883117
+}

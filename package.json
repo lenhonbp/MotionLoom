@@ -67,6 +67,7 @@
     "intelligence:p1": "python3 scripts/intelligence.py",
     "quality:p1": "python3 scripts/quality-gate.py --require-intelligence --require-p1 --require-benchmark",
     "eval:intelligence": "python3 scripts/eval-intelligence.py",
+    "audit:deep": "python3 tests/scripts/deep-stress.py --iterations 5000 --seed 20260813 --report docs/audits/data/deep-stress-latest.json",
     "benchmark:semantic": "python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/professional-review-e2e --iterations 25 --threshold-ms 500",
     "evidence:verify": "python3 scripts/evidence-verifier.py --scene-dir src/output/browser-review-smoke --task-dir artifacts/browser-review-smoke-task --runtime-evidence runtime-adapters/runtime-evidence.json --max-age-days 1 --output artifacts/browser-review-smoke-task/evidence-verifier-report.json",
     "attestation:build": "python3 scripts/attestation.py build",

@@ -14,6 +14,8 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
+> **Release posture:** the repository source and `package.json` are at **2.1.0**. The public npm registry currently serves **2.0.0** and no GitHub tag/Release for 2.1.0 exists yet; a maintainer must perform the protected manual release before the registry and GitHub release state change.
+
 ## Why MotionLoom
 
 Most animation helpers optimize for generating one asset quickly. That breaks down when an Agent has to work in a real product: it can lose the project's motion language, select an untraceable asset, render a placeholder instead of the target runtime, mix evidence from another task, or open a PR before the user has inspected the result.
@@ -118,12 +120,12 @@ Read the [Project Memory schema](schemas/project-memory.schema.json), [2.1.0 rel
 
 | Runtime or format | Capability level | Evidence path |
 |---|---:|---|
-| Lottie JSON | Verified | Runtime snapshot renderer and manifest validation |
-| dotLottie v2 | Verified | Node/`fflate` packaging, manifest entry and checksum validation |
-| SVG cutout body rig | Verified | Parent-first hierarchy, named anatomy and pose evidence |
-| Rive Canvas | Verified | Browser adapter, state-machine/input binding and snapshots |
-| GSAP | Verified | Browser adapter, deterministic timeline scrub and snapshots |
-| Framer Motion | Verified | Browser adapter, reduced-motion checks and snapshots |
+| Lottie JSON | Contract verified | Runtime snapshot renderer and manifest validation in repository fixtures |
+| dotLottie v2 | Contract verified | Node/`fflate` packaging, manifest entry and checksum validation |
+| SVG cutout body rig | Contract verified | Parent-first hierarchy, named anatomy and pose evidence in repository fixtures |
+| Rive Canvas | Fixture verified | Browser adapter, state-machine/input binding and representative snapshots |
+| GSAP | Fixture verified | Browser adapter, deterministic timeline scrub and representative snapshots |
+| Framer Motion | Fixture verified | Browser adapter, reduced-motion checks and representative snapshots |
 | Spine | Scaffold only | Requires a framework-specific runtime adapter and evidence |
 | Three.js | Scaffold only | Requires a framework-specific runtime adapter and evidence |
 
@@ -201,11 +203,11 @@ npm run audit:deep
 npm publish --dry-run --access public
 ```
 
-The GitHub Actions workflow runs the Project Memory and CLI contract on Ubuntu, macOS and Windows, then runs the full evidence-aware quality suite on Ubuntu. A package dry-run is part of release preparation. See [CONTRIBUTING.md](CONTRIBUTING.md) for the clean-checkout procedure and [CHANGELOG.md](CHANGELOG.md) for release discipline.
+The GitHub Actions workflow is designed to run the Project Memory and CLI contract on Ubuntu, macOS and Windows, then run the full evidence-aware quality suite on Ubuntu. Read the latest GitHub Actions run rather than treating this README or a historical audit as proof that the current checkout is green. A package dry-run is part of release preparation. See [CONTRIBUTING.md](CONTRIBUTING.md) for the clean-checkout procedure and [CHANGELOG.md](CHANGELOG.md) for release discipline.
 
 ## Automated CI/CD
 
-MotionLoom separates verification from publication. Pull requests and pushes to `main` run the quality, documentation, security and relevant Dev Lab workflows. A weekly Dependabot job proposes dependency updates for the root package, Dev Lab and GitHub Actions. The npm release workflow is manual only, protected by the `npm-release` environment, and requires the maintainer to choose the distribution tag; GitHub release creation is an explicit input rather than an automatic side effect.
+MotionLoom separates verification from publication. Pull requests and pushes to `main` trigger the quality, documentation, security and relevant Dev Lab workflows when their path filters match. A weekly Dependabot job proposes dependency updates for the root package, Dev Lab and GitHub Actions. The npm release workflow is manual only, protected by the `npm-release` environment, and requires the maintainer to choose the distribution tag; GitHub release creation is an explicit input rather than an automatic side effect.
 
 | Workflow | Trigger | Responsibility |
 |---|---|---|

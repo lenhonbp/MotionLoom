@@ -22,6 +22,22 @@ from pathlib import Path
 from typing import Any
 
 
+def configure_utf8_stdio() -> None:
+    """Keep JSON/errors printable for Unicode project paths on Windows."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="strict")
+        except (OSError, ValueError):
+            # Embedded callers may expose a non-reconfigurable stream.
+            pass
+
+
+configure_utf8_stdio()
+
+
 SCHEMA_VERSION = "1.0"
 EXIT_OK = 0
 EXIT_USAGE = 2

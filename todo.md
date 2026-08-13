@@ -252,3 +252,11 @@
 - [x] Tạo labeled external-project corpus manifest và paired evaluation harness; không seed review/testimonial claims.
 - [x] Thêm release verifier cho version–changelog–release-note chain và chạy full acceptance trước checkpoint; tag/GitHub Release/npm publish thật vẫn cần manual approved release.
 - [ ] Tạo commit local; chỉ push sau explicit user confirmation.
+
+## README and public-claims audit
+
+- [x] Đối chiếu README trên GitHub với local HEAD, package metadata, npm CLI, workflows, schemas và current status.
+- [x] Kiểm tra toàn bộ internal/external links, command snippets, version badges, workflow names, runtime capability claims và release instructions.
+- [x] Sửa README cùng tài liệu liên quan khi phát hiện documentation drift hoặc claim vượt evidence.
+- [x] Chạy docs audit, release verifier, Skill Doctor, regression và package dry-run sau chỉnh sửa.
+- [ ] Tạo commit local; chỉ push sau explicit user confirmation.

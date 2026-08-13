@@ -48,22 +48,53 @@ jobs:
 
       - name: Serve the static Dev Lab fixture
         run: |
+          rm -rf dev-lab/public/scenes/browser-review-smoke
+          mkdir -p dev-lab/public/scenes
+          cp -R src/output/browser-review-smoke dev-lab/public/scenes/browser-review-smoke
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("dev-lab/public/scenes/browser-review-smoke/browser-review.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          payload["expires_at"] = "2099-01-01T00:00:00Z"
+          path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+          print(f"fixture task_id={payload['task_id']} candidate_id={payload['candidate_id']}")
+          PY
           mkdir -p /tmp/motionloom-devlab-diagnostics
           python3 -m http.server 3300 --directory dev-lab/public >/tmp/motionloom-devlab-diagnostics/server.log 2>&1 &
           echo $! > /tmp/motionloom-devlab-diagnostics/server.pid
+
+      - name: Read fixture identity
+        id: fixture
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("dev-lab/public/scenes/browser-review-smoke/browser-review.json").read_text(encoding="utf-8"))
+          print(f"task_id={payload['task_id']}")
+          print(f"candidate_id={payload['candidate_id']}")
+          PY
 
       - name: Verify static Dev Lab health
         run: >-
           curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused
           http://127.0.0.1:3300/?scene=browser-review-smoke
           -o /tmp/motionloom-devlab-diagnostics/health.html
+          curl --fail --silent --show-error
+          http://127.0.0.1:3300/scenes/browser-review-smoke/manifest.json
+          -o /tmp/motionloom-devlab-diagnostics/manifest.json
+          curl --fail --silent --show-error
+          http://127.0.0.1:3300/scenes/browser-review-smoke/motion-spec.json
+          -o /tmp/motionloom-devlab-diagnostics/motion-spec.json
 
       - name: Capture deterministic browser review snapshots
         run: >-
           pnpm --dir dev-lab exec node scripts/snapshot.mjs
           --scene browser-review-smoke
-          --task-id browser-review-smoke-task
-          --candidate-id 956caeb2f56397430c4f
+          --task-id "${{ steps.fixture.outputs.task_id }}"
+          --candidate-id "${{ steps.fixture.outputs.candidate_id }}"
           --progress 0,50,100
           --out /tmp/motionloom-devlab-snapshot
           --diagnostics /tmp/motionloom-devlab-diagnostics

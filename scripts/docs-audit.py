@@ -69,6 +69,20 @@ for required in ["workflow_dispatch:", "environment: npm-release", "id-token: wr
     if required not in release:
         errors.append(f"release.yml: missing release safety control {required}")
 
+devlab = (workflow_dir / "devlab.yml").read_text(encoding="utf-8")
+for required in [
+    "cp -R src/output/browser-review-smoke dev-lab/public/scenes/browser-review-smoke",
+    "scenes/browser-review-smoke/manifest.json",
+    "scenes/browser-review-smoke/motion-spec.json",
+    "--diagnostics /tmp/motionloom-devlab-diagnostics",
+    "id: fixture",
+    "steps.fixture.outputs.task_id",
+    "steps.fixture.outputs.candidate_id",
+    'payload["expires_at"] = "2099-01-01T00:00:00Z"',
+]:
+    if required not in devlab:
+        errors.append(f"devlab.yml: missing fixture/readiness control {required}")
+
 if errors:
     print("Documentation/workflow audit: FAIL")
     print("\n".join(f"- {error}" for error in errors))

@@ -265,5 +265,5 @@
 
 - [x] Xác minh `origin/main`, package version, changelog, release note và npm registry.
 - [x] Chạy release verifier và kiểm tra tarball `motionloom@2.1.0`.
-- [ ] Tạo tag và GitHub Release 2.1.0 nếu mọi metadata khớp.
+- [x] Tạo tag và GitHub Release 2.1.0 nếu mọi metadata khớp; release đang ở trạng thái draft cho tới khi npm 2.1.0 được publish.
 - [ ] Hướng dẫn publish npm 2.1.0 từ workstation của user; không giả định sandbox có npm credentials.

@@ -138,6 +138,8 @@ MotionLoom keeps distinct layers distinct:
 | Layer | It proves | It does not prove |
 |---|---|---|
 | Runtime evidence | The selected runtime produced the declared snapshots and observed state | That the motion is aesthetically correct or user-approved |
+| Visual Truth Contract | Baseline/candidate frame identity, dimensions, provenance and review-required regions are bound to the scene | That a changed frame is acceptable or user-approved |
+| Remediation Learning | User-confirmed correction outcomes and deterministic benchmark history with first-pass metrics | That aggregate history can approve a new animation or replace review |
 | Provenance | Which source/material/product bytes were used and how they hash | That the source is appropriate beyond the declared authority/license contract |
 | Semantic lint and benchmark | Bounded rule findings, risk signals and performance measurements | Human visual quality or intent acceptance |
 | Signed attestation | A trusted signer signed the same task-bound hashes under the policy | Reviewer consent, accessibility approval or PR authorization |
@@ -162,6 +164,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 |---|---|
 | `SKILL.md` | Installable Agent Skill contract |
 | `agent-card.json` | Capability discovery and side-effect policy |
+| `agent-surfaces.json`, `.agents/`, `.claude/`, `.codex/` | Cross-Agent discovery aliases and portability contract |
 | `bin/motionloom.mjs` | Cross-platform npm CLI entrypoint |
 | `src/core/` | Analyzer, Motion Spec and runtime snapshot engine |
 | `src/rig/` | Character body rig and pose engine |
@@ -172,6 +175,8 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | `docs/` | Framework selection, checklists, audits and release notes |
 | `dev-lab/` | Self-contained browser review workbench and harness |
 | `artifacts/<task-id>/` | Per-task evidence, report and handoff bundle |
+| `schemas/visual-truth.schema.json`, `scripts/visual-truth.py` | Provenance-bound visual comparison and review explanation contract |
+| `schemas/remediation-history.schema.json`, `scripts/remediation-learning.py` | Append-only remediation/benchmark ledger and aggregate learning metrics |
 | `tests/` | Regression, adversarial and deep-stress evaluation harnesses |
 
 ## Documentation map
@@ -184,6 +189,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
 | Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
+| Validate visual truth before review/PR | `motionloom visual-truth build|validate` and [production checklist](docs/CHECKLIST.md) |
 | Check current evidence posture | [Current status](docs/STATUS.md), [external corpus evidence](docs/audits/external-project-corpus-2026-08-13.md) and [historical audit snapshot](AUDIT-REPORT.md) |
 | Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Report a vulnerability or request help | [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md) |

@@ -28,11 +28,12 @@ Treat every animation request as a production task, not as an isolated asset-gen
 6. **Bind Intelligence Core** — build a framework-neutral `motion-ir.json`, `project-graph.json`, `provenance.json`, `replay-bundle.json`, `semantic-lint-report.json` and `semantic-lint-benchmark.json` with `python3 scripts/intelligence.py`. Select only a capability registry entry whose status is `verified`, whose evidence is fresh and whose compatibility matches the target environment. A confidence score or benchmark result can prioritize investigation; neither can replace deterministic or human acceptance.
 6a. **Harden the trust boundary** — keep artifact and task bundles inside the repository/task root, reject symlinked evidence, bind replay to its exact `task_dir`, `task_id` and scene, select one deterministic report bundle per scene, and require browser candidate/review identity and expiry checks before readiness. The Dev Lab must reject cross-origin or identity-mismatched artifact bases. In strict runtime-observability runs, capture `runtime-telemetry.json` and a read-only `evidence-verifier-report.json`; verifier output must preserve `approval: false`. These checks expose risk and prevent evidence mixing, but do not turn heuristics or evidence integrity into approval.
 6b. **Attest** — derive a canonical statement from the exact scene/task hashes, sign it with an Ed25519 key through `scripts/attestation.py`, and verify it with the independent `scripts/attestation-verifier.py` against a fail-closed `trust-policy.json`. DSSE/SLSA-compatible attestation proves signer and binding integrity only; `approval` must remain `false` and never replaces user review.
-7. **Browser review handoff** — run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
+7. **Visual truth and browser review handoff** — after runtime rendering, build `visual-truth.json` from real baseline/candidate PNGs with `motionloom visual-truth build`. The contract records frame hashes, dimensions, runtime/source/manifest provenance and region-level review explanations; a changed frame means `review_required`, never automatic failure or approval. Then run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
 8. **Review capture** — the browser Agent calls `window.__lab.getReview()` after the user approves or requests changes, then persists it with `python3 scripts/report.py review --task-dir artifacts/<task-id> --candidate-id <id> --decision approved|changes_requested --reviewer user`. A change request returns to generation; no approval means no PR.
-9. **Validate** — run `motionloom review-hook validate --task-dir artifacts/<task-id>`, `motionloom intelligence semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `motionloom runtime-telemetry <scene> artifacts/<task-id>`, the independent attestation verifier, `motionloom report-contract --root . --scenes-file <changed-scenes> --require-attestation`, `motionloom quality-gate --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation`, and `motionloom doctor --json` when validating the Skill package itself.
+9. **Validate** — run `motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json --scene <scene> --task-id <task-id>`, `motionloom review-hook validate --task-dir artifacts/<task-id>`, `motionloom intelligence semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `motionloom runtime-telemetry <scene> artifacts/<task-id>`, the independent attestation verifier, `motionloom report-contract --root . --scenes-file <changed-scenes> --require-attestation`, `motionloom quality-gate --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-visual-truth`, and `motionloom doctor --json` when validating the Skill package itself.
 10. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, browser candidate/review evidence and the recommended next Agent/Skill.
-11. **Confirm** — only after approved browser review and a passing quality gate run the platform-neutral PR preparation command. Commit, push and open PR are explicit side effects.
+11. **Learn** — after a user-confirmed fix or a deterministic benchmark, record it with `motionloom remediation-learning record-outcome|record-benchmark`. Run `summary` to expose correction count, first-pass acceptance, success rate, issue-class outliers and benchmark pass rate. Only `--user-confirmed` outcomes contribute to remediation acceptance metrics.
+12. **Confirm** — only after approved browser review and a passing quality gate run the platform-neutral PR preparation command. Commit, push and open PR are explicit side effects.
 
 ## Durable Project Memory
 
@@ -61,6 +62,7 @@ Only user-confirmed decisions and outcomes may become durable remediation memory
 - Read `docs/ROADMAP-INTELLIGENCE.md` before extending graph, provenance, capability or replay behavior.
 - Read `references/intelligence-core.md` before building or validating Intelligence Core artifacts.
 - Read `docs/research/AGENT-PROTOCOL-FINDINGS.md` before exposing MotionLoom through Agent tools or MCP resources.
+- Read `references/agent-interoperability.md` when installing MotionLoom into Codex, Claude Code, Cursor, OpenCode or another Agent environment; run `motionloom discovery check --root <motionloom-checkout> --json` before relying on a surface.
 
 ## Non-negotiable contracts
 
@@ -75,6 +77,8 @@ Only user-confirmed decisions and outcomes may become durable remediation memory
 - Browser-review candidates are single-use, time-bounded and bound to the exact task, scene and candidate identity; Dev Lab artifact/task bases must be same-origin and identity-consistent before staging a review decision.
 - Report completeness must select one deterministic passing task bundle per scene and fail on ambiguous ties; a valid artifact is never sufficient to bypass explicit user approval.
 - Runtime telemetry must bind task, scene, source, manifest, Motion IR and deterministic scrub points; tampered, stale, missing or cross-task telemetry is a verification failure.
+- Visual Truth must bind baseline/candidate PNG hashes, dimensions, source, manifest, runtime evidence and Motion IR where available; it explains changed regions for review but never emits approval.
+- Remediation Learning history is append-only and hash-chained; correction counts and first-pass acceptance guide the next Agent but never approve an artifact or replace current-task evidence.
 - Signed attestation must bind the same task, scene, context, source, manifest, Motion IR and evidence hashes; unknown, expired or revoked signers fail closed. Attestation verification is an integrity result only and must preserve `approval: false`.
 
 ## Framework boundary
@@ -100,6 +104,25 @@ node scripts/runtime-adapters.mjs
 
 # Capture and verify runtime telemetry without Bash dependencies.
 motionloom runtime-telemetry <scene> artifacts/<task-id>
+
+# Build and validate a provenance-bound visual comparison from real runtime PNGs.
+motionloom visual-truth build --root . --scene <scene> \
+  --baseline src/output/<scene>/snapshot/frame-00.png \
+  --candidate src/output/<scene>/snapshot/frame-100.png \
+  --source src/output/<scene>/<source-file> \
+  --manifest src/output/<scene>/manifest.json \
+  --runtime-evidence artifacts/<task-id>/runtime-adapters/runtime-evidence.json \
+  --motion-ir artifacts/<task-id>/motion-ir.json --task-id <task-id> \
+  --output src/output/<scene>/visual-truth.json
+motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json \
+  --scene <scene> --task-id <task-id>
+
+# Record only a user-confirmed remediation outcome, then summarize durable learning.
+motionloom remediation-learning record-outcome --history artifacts/remediation-history.jsonl \
+  --event-id outcome-001 --issue-id easing-drift --summary "User accepted easing correction" \
+  --result pass --correction-count 1 --source-task-id <task-id> --user-confirmed --json
+motionloom remediation-learning summary --history artifacts/remediation-history.jsonl \
+  --output artifacts/remediation-summary.json --json
 
 # Build the task-bound Intelligence Core artifacts.
 python3 scripts/intelligence.py motion-ir build --task-dir artifacts/<task-id>

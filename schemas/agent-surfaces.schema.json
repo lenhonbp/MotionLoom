@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/agent-surfaces.schema.json",
+  "title": "MotionLoom Agent Surfaces",
+  "type": "object",
+  "required": ["schema_version", "name", "version", "canonical", "surfaces", "installations", "compatibility", "rules"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "name": {"const": "motionloom"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "canonical": {
+      "type": "object",
+      "required": ["skill", "agent_card", "cli"],
+      "properties": {
+        "skill": {"const": "SKILL.md"},
+        "agent_card": {"const": "agent-card.json"},
+        "cli": {"const": "bin/motionloom.mjs"}
+      },
+      "additionalProperties": false
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "path", "canonical", "load_mode", "agents"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "kind": {"type": "string", "enum": ["agent-skill", "agent-instructions", "repository-guide"]},
+          "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+          "canonical": {"const": "SKILL.md"},
+          "load_mode": {"type": "string", "enum": ["alias", "router"]},
+          "agents": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "installations": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "source_kind", "command", "verification", "provenance"],
+        "properties": {
+          "id": {"type": "string"},
+          "source_kind": {"type": "string", "enum": ["npm", "git", "local"]},
+          "command": {"type": "string"},
+          "verification": {"type": "string"},
+          "provenance": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["operating_systems", "node", "python", "agents"],
+      "properties": {
+        "operating_systems": {"type": "array", "items": {"type": "string"}},
+        "node": {"type": "string"},
+        "python": {"type": "string"},
+        "agents": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "rules": {
+      "type": "object",
+      "required": ["canonical_instruction_source", "no_surface_copy", "no_network_required_for_check", "approval_is_never_inferred"],
+      "properties": {
+        "canonical_instruction_source": {"const": "SKILL.md"},
+        "no_surface_copy": {"const": true},
+        "no_network_required_for_check": {"const": true},
+        "approval_is_never_inferred": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

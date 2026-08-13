@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/remediation-history.schema.json",
+  "title": "MotionLoom remediation and benchmark history event",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "event_id", "event_type", "recorded_at", "previous_event_sha256", "event_sha256"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "event_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "event_type": {"type": "string", "enum": ["remediation_outcome", "benchmark_run"]},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "previous_event_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "event_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "user_confirmed": {"type": "boolean"},
+    "first_pass_accepted": {"type": "boolean"},
+    "correction_count": {"type": "integer", "minimum": 0},
+    "result": {"type": "string", "enum": ["pass", "fail", "partial", "unknown"]},
+    "status": {"type": "string", "enum": ["pass", "fail"]},
+    "p95_ms": {"type": "number", "minimum": 0},
+    "threshold_ms": {"type": "number", "exclusiveMinimum": 0}
+  }
+}

@@ -34,6 +34,9 @@ const PYTHON_COMMANDS = {
   manifest: "scripts/manifest.py",
   test: "tests/scripts/run_tests.py",
   "deep-audit": "tests/scripts/deep-stress.py",
+  discovery: "scripts/discovery.py",
+  "visual-truth": "scripts/visual-truth.py",
+  "remediation-learning": "scripts/remediation-learning.py",
 };
 
 function printHelp() {
@@ -59,6 +62,9 @@ Commands:
   validate-lottie        Validate a Lottie animation
   manifest               Build or validate a production manifest
   eval-intelligence      Run adversarial Intelligence Core evaluation
+  discovery              Check Agent surfaces, source identity and install matrix
+  visual-truth           Build or validate provenance-bound visual comparisons
+  remediation-learning   Record or summarize user-confirmed remediation and benchmark history
 
 Cross-platform examples:
   motionloom analyze . --init-memory
@@ -66,6 +72,10 @@ Cross-platform examples:
   motionloom memory refresh --project-root . --json
   motionloom memory record-decision --project-root . --id ui-easing \\
     --status accepted --summary "Use ease-out for UI entry" --user-confirmed
+  motionloom discovery check --root . --json
+  motionloom discovery install-matrix --root . --json
+  motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json
+  motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --json
 
 The CLI never grants approval or opens a pull request by itself. User review
 and explicit repository side-effect confirmation remain separate gates.

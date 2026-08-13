@@ -1,5 +1,5 @@
 {
-  "run_id": "1786598203602-44370",
+  "run_id": "1786629946947-80738",
   "framework": "rive",
   "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=rive",
   "status": "pass",
@@ -82,12 +82,12 @@
   "console_errors": [],
   "telemetry": {
     "file": "rive/runtime-telemetry.json",
-    "sha256": "01b566f1bd01b36bd9d5ab184c6e1eb3b50156c1162b3e880a6cea06ef8344d6",
+    "sha256": "64f6dc5b0c45399e1e2baa0e6da56bda31d7eb90427e4dd8d5c0ec33dc25cb06",
     "metrics": {
       "sample_count": 3,
       "raf_interval_count": 9,
-      "max_raf_interval_ms": 16.799999999999955,
-      "p95_raf_interval_ms": 16.799999999999955
+      "max_raf_interval_ms": 16.700000000000045,
+      "p95_raf_interval_ms": 16.700000000000045
     }
   }
 }

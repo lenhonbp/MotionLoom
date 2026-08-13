@@ -47,6 +47,14 @@ def _load_attestation_verifier():
     return module
 
 
+def _load_visual_truth():
+    path = ROOT / "scripts" / "visual-truth.py"
+    loader = importlib.util.spec_from_file_location("visual_truth", path)
+    module = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(module)
+    return module
+
+
 def _json(path: Path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -66,7 +74,7 @@ def _telemetry_bundle_sha256(task_dir: Path) -> str:
     return hashlib.sha256(json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None, require_visual_truth: bool = False) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -326,6 +334,36 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                             issues.append(f"signed attestation required binding source is missing: {field}")
                 except (OSError, ValueError, json.JSONDecodeError) as exc:
                     issues.append(f"signed attestation contract: {exc}")
+    if require_visual_truth:
+        visual_name = manifest.get("visual_truth")
+        if not isinstance(visual_name, str) or not visual_name.strip():
+            issues.append("visual truth gate requires manifest.visual_truth")
+        else:
+            visual_path = (scene_dir / visual_name).resolve()
+            if not visual_path.is_file() or scene_dir.resolve() not in visual_path.parents:
+                issues.append("manifest.visual_truth must point to an existing file inside the scene directory")
+            else:
+                try:
+                    task_id = None
+                    motion_ir_hash = None
+                    if task_dir:
+                        task = _json(task_dir / "task.json")
+                        task_id = task.get("task_id")
+                        motion_ir = task_dir / "motion-ir.json"
+                        motion_ir_hash = _sha256_file(motion_ir) if motion_ir.is_file() else None
+                    visual_truth = _load_visual_truth()
+                    visual_issues = visual_truth.validate_report(
+                        visual_path,
+                        ROOT,
+                        scene_dir.name,
+                        task_id,
+                        source_sha_for_evidence,
+                        manifest_sha_for_evidence,
+                        motion_ir_hash,
+                    )
+                    issues.extend(f"visual truth: {issue}" for issue in visual_issues)
+                except (OSError, ValueError, json.JSONDecodeError) as exc:
+                    issues.append(f"visual truth contract: {exc}")
     return issues
 
 
@@ -343,6 +381,7 @@ def main() -> int:
     parser.add_argument("--require-benchmark", action="store_true")
     parser.add_argument("--require-telemetry", action="store_true")
     parser.add_argument("--require-attestation", action="store_true")
+    parser.add_argument("--require-visual-truth", action="store_true")
     parser.add_argument("--attestation")
     parser.add_argument("--trust-policy")
     args = parser.parse_args()
@@ -363,14 +402,15 @@ def main() -> int:
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path, args.require_visual_truth)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")
             for issue in issues:
                 print(f"  - {issue}")
         else:
-            print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + browser-review candidate + checklist")
+            suffix = " + visual-truth contract" if args.require_visual_truth else ""
+            print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + browser-review candidate + checklist{suffix}")
     return 1 if failed else 0
 
 

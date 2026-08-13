@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "contract": "motionloom-cross-platform-installation",
+  "supported_platforms": ["ubuntu", "macos", "windows"],
+  "runtimes": {
+    "node": ">=18",
+    "python": ">=3.11",
+    "package_manager": "pnpm@11.20.0"
+  },
+  "commands": [
+    {
+      "id": "npm-cli-help",
+      "command": ["node", "bin/motionloom.mjs", "--help"],
+      "purpose": "entrypoint can start without a POSIX shell"
+    },
+    {
+      "id": "discovery-check-python",
+      "command": ["python", "scripts/discovery.py", "check", "--root", ".", "--json"],
+      "purpose": "offline discovery contract works with native Python launcher"
+    },
+    {
+      "id": "discovery-check-npm",
+      "command": ["node", "bin/motionloom.mjs", "discovery", "check", "--root", ".", "--json"],
+      "purpose": "public npm entrypoint reaches the same discovery contract"
+    },
+    {
+      "id": "memory-contract",
+      "command": ["python", "tests/scripts/test_project_memory.py"],
+      "purpose": "durable memory remains relocatable and UTF-8 safe"
+    },
+    {
+      "id": "discovery-regression",
+      "command": ["python", "tests/scripts/test_discovery.py"],
+      "purpose": "surface paths, version binding and approval invariant remain stable"
+    }
+  ],
+  "portability_rules": [
+    "no-required-bash",
+    "no-hardcoded-posix-tmp",
+    "no-shell-true",
+    "pathlib-or-node-path",
+    "utf8-json-output",
+    "no-system-zip-or-unzip"
+  ]
+}

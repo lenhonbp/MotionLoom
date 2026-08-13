@@ -4,6 +4,7 @@
   "framework": "lottie",
   "category": "loading",
   "file": "animation.json",
+  "visual_truth": "visual-truth.json",
   "source_binding": {
     "kind": "fixture",
     "source_path": "animation.json",

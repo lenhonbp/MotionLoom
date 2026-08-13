@@ -4,6 +4,9 @@
   "version": "2.1.0",
   "description": "Project-aware animation production with durable Project Memory, graph, provenance, framework-neutral motion IR, runtime verification and telemetry, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
+    "agent.discovery.check",
+    "agent.discovery.source",
+    "agent.discovery.install-matrix",
     "project.analyze",
     "project.memory.init",
     "project.memory.inspect",
@@ -42,6 +45,12 @@
     "runtime.verify.framer-motion",
     "runtime.telemetry.capture",
     "runtime.telemetry.validate",
+    "visual-truth.build",
+    "visual-truth.validate",
+    "remediation-learning.record-outcome",
+    "remediation-learning.record-benchmark",
+    "remediation-learning.validate",
+    "remediation-learning.summary",
     "evidence.verify.external",
     "attestation.statement.build",
     "attestation.sign.ed25519",
@@ -63,6 +72,7 @@
     "source-asset"
   ],
   "output_artifacts": [
+    "agent-discovery-report",
     "project-context",
     "motion-spec",
     "runtime-scene",
@@ -86,6 +96,9 @@
     "replay-bundle",
     "semantic-lint-report",
     "semantic-lint-benchmark",
+    "visual-truth",
+    "remediation-history",
+    "remediation-summary",
     "hardening-audit-report",
     "project-memory",
     "continuity-report",
@@ -132,6 +145,9 @@
     }
   ],
   "entrypoints": {
+    "discovery_check": "motionloom discovery check --root <motionloom-checkout> --json",
+    "discovery_source": "motionloom discovery source --root <motionloom-checkout> --json",
+    "discovery_install_matrix": "motionloom discovery install-matrix --root <motionloom-checkout> --json",
     "analyze": "motionloom analyze <project-path> --init-memory",
     "memory_init": "motionloom memory init --project-root <project-path>",
     "memory_inspect": "motionloom memory inspect --project-root <project-path> --json",
@@ -165,6 +181,11 @@
     "attestation_verify": "python3 scripts/attestation-verifier.py --attestation artifacts/<task-id>/attestation.json --trust-policy artifacts/<task-id>/trust-policy.json --expected-task-id <task-id> --expected-scene <scene>",
     "attestation_report": "python3 scripts/attestation-verifier.py --attestation artifacts/<task-id>/attestation.json --trust-policy artifacts/<task-id>/trust-policy.json --expected-task-id <task-id> --expected-scene <scene> --output artifacts/<task-id>/attestation-verifier-report.json",
     "quality_gate_attestation": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation",
+    "visual_truth_build": "motionloom visual-truth build --root <project-path> --scene <scene> --baseline <baseline.png> --candidate <candidate.png> --output src/output/<scene>/visual-truth.json",
+    "visual_truth_validate": "motionloom visual-truth validate --root <project-path> --input src/output/<scene>/visual-truth.json --scene <scene> --task-id <task-id>",
+    "remediation_record_outcome": "motionloom remediation-learning record-outcome --history artifacts/remediation-history.jsonl --event-id <id> --issue-id <issue-id> --summary <summary> --result pass|fail|partial|unknown --correction-count <n> --user-confirmed",
+    "remediation_record_benchmark": "motionloom remediation-learning record-benchmark --history artifacts/remediation-history.jsonl --event-id <id> --operation <operation> --task-id <task-id> --scene <scene> --iterations <n> --p95-ms <ms> --threshold-ms <ms>",
+    "remediation_summary": "motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --output artifacts/remediation-summary.json --json",
     "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
     "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
     "pr_prepare": "node scripts/pr.mjs <scene>"

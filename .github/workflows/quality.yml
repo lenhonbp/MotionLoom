@@ -23,6 +23,13 @@ on:
       - ".github/**"
       - "docs/**"
       - "agent-card.json"
+      - "agent-surfaces.json"
+      - ".agents/**"
+      - ".claude/**"
+      - ".codex/**"
+      - "AGENTS.md"
+      - "examples/**"
+      - "tests/fixtures/**"
       - "artifacts/**"
       - "templates/**"
       - "assets/library/**"
@@ -74,6 +81,13 @@ jobs:
 
       - name: Check cross-platform CLI routing
         run: node bin/motionloom.mjs --help
+
+      - name: Check Agent discovery and installation matrix
+        run: |
+          python tests/scripts/test_discovery.py
+          python tests/scripts/test_consumer_fixtures.py
+          python tests/scripts/test_installation_matrix.py
+          node bin/motionloom.mjs discovery check --root . --json
 
       - name: Inspect npm tarball
         run: npm pack --dry-run --access public
@@ -263,7 +277,7 @@ jobs:
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
-              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
+              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-visual-truth
           done < /tmp/changed-scenes
 
   project-corpus:

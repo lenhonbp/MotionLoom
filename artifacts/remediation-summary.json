@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1",
+  "summary_id": "remediation-summary-remediation-history",
+  "status": "pass",
+  "history_path": "/home/ubuntu/animation-skill/artifacts/remediation-history.jsonl",
+  "history_sha256": "975efb1a72d66d134b745d4699cdc13d2fbfec2377e770ecc2cd3eece03c08e9",
+  "generated_at": "2026-08-13T14:00:20Z",
+  "ledger": {
+    "event_count": 1,
+    "outcomes": 0,
+    "confirmed_outcomes": 0,
+    "ignored_unconfirmed_outcomes": 0,
+    "benchmarks": 1
+  },
+  "remediation": {
+    "passes": 0,
+    "success_rate": null,
+    "first_pass_acceptances": 0,
+    "first_pass_acceptance_rate": null,
+    "average_correction_count": null,
+    "p95_correction_count": null,
+    "outlier_threshold": 3,
+    "outliers": [],
+    "by_issue_class": {}
+  },
+  "benchmarks_summary": {
+    "runs": 1,
+    "passes": 1,
+    "pass_rate": 1.0,
+    "operations": [
+      "semantic-lint-build"
+    ]
+  },
+  "approval": false
+}

@@ -1,24 +1,24 @@
 {
   "schema_version": "1.0",
-  "run_id": "1786598203602-44370",
-  "generated_at": "2026-08-13T05:16:45.633Z",
+  "run_id": "1786629946947-80738",
+  "generated_at": "2026-08-13T14:05:48.795Z",
   "mode": "runtime-telemetry",
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "framework": "rive",
   "runtime": "@rive-app/canvas@2.39.2",
   "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-  "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+  "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
   "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
   "samples": [
     {
       "sequence": 0,
       "percent": 0,
-      "captured_at_ms": 1262.800000011921,
+      "captured_at_ms": 1184.699999988079,
       "raf_intervals_ms": [
+        16.700000000000045,
         16.59999999999991,
-        16.799999999999955,
-        16.600000000000136
+        16.700000000000045
       ],
       "state_sha256": "4956d2082a89ab01af26259fe4ac5eeab5c8bbf8e20bf6106d74456338843baa",
       "state": {
@@ -45,11 +45,11 @@
     {
       "sequence": 1,
       "percent": 50,
-      "captured_at_ms": 1346.1000000238419,
+      "captured_at_ms": 1267.8999999761581,
       "raf_intervals_ms": [
-        16.600000000000136,
         16.700000000000045,
-        16.59999999999991
+        16.59999999999991,
+        16.700000000000045
       ],
       "state_sha256": "31926d8f0fa077ecee63a77304559230c6e8d3590e3329b1c1b3635f5070776e",
       "state": {
@@ -76,10 +76,10 @@
     {
       "sequence": 2,
       "percent": 100,
-      "captured_at_ms": 1429.5,
+      "captured_at_ms": 1351.300000011921,
       "raf_intervals_ms": [
         16.700000000000045,
-        16.700000000000045,
+        16.59999999999991,
         16.700000000000045
       ],
       "state_sha256": "32a6b7edf1c182006ea8d645d95085d92ecaa2da40eb9b702adb95469659e277",
@@ -108,8 +108,8 @@
   "metrics": {
     "sample_count": 3,
     "raf_interval_count": 9,
-    "max_raf_interval_ms": 16.799999999999955,
-    "p95_raf_interval_ms": 16.799999999999955
+    "max_raf_interval_ms": 16.700000000000045,
+    "p95_raf_interval_ms": 16.700000000000045
   },
   "status": "pass"
 }

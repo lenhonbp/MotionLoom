@@ -267,3 +267,23 @@
 - [x] Chạy release verifier và kiểm tra tarball `motionloom@2.1.0`.
 - [x] Tạo tag và GitHub Release 2.1.0 nếu mọi metadata khớp; release đang ở trạng thái draft cho tới khi npm 2.1.0 được publish.
 - [ ] Hướng dẫn publish npm 2.1.0 từ workstation của user; không giả định sandbox có npm credentials.
+
+## Related repository research
+- [x] Thu thập dữ liệu hiện tại từ các repo animation/runtime nổi tiếng và các repo Agent/skill có liên quan.
+- [x] Đọc README, architecture, governance, license và release posture của corpus đại diện.
+- [x] So sánh với MotionLoom theo capability, maturity, evidence, ecosystem fit và developer experience.
+- [x] Đề xuất roadmap học hỏi có thứ tự ưu tiên, không đồng nhất số sao với chất lượng sản phẩm.
+
+## Approved roadmap implementation: Agent interoperability, visual truth and remediation learning
+- [x] Khóa baseline local/remote, đọc contract hiện tại và xác định file/schema cần mở rộng; không thay đổi release version nếu chưa có release plan.
+- [x] Thêm canonical Agent discovery surfaces cho `.agents/skills`, `.claude` và `.codex`, cùng một nguồn instruction chuẩn và guard chống drift.
+- [x] Thêm installation/discovery contract cho npm, GitHub checkout và local source; ghi nhận source, version và capability compatibility.
+- [x] Bổ sung consumer examples/fixtures cho Lottie, GSAP, Framer Motion, Rive, body rig và continuity multi-scene.
+- [x] Bổ sung installation matrix và portability tests cho Ubuntu, macOS, Windows; lưu diagnostics/artifacts khi failure.
+- [x] Thiết kế và triển khai Visual Truth Contract với asset/frame hash, runtime provenance, perceptual metrics và region-level explanation.
+- [x] Nối Visual Truth Contract vào candidate manifest, Dev Lab evidence rail và review-first quality gate; không tự cấp approval.
+- [x] Thiết kế và triển khai benchmark history append-only với aggregate metrics, outlier detection và run provenance.
+- [x] Triển khai Remediation Learning cho correction count, first-pass acceptance, issue class và selective rerun scope.
+- [x] Cập nhật SKILL.md, Agent Card, README, schemas, references, CHANGELOG/ROADMAP và report contracts theo progressive disclosure.
+- [x] Chạy skill validation, docs/workflow audit, full regression, runtime/browser smoke, package dry-run và cross-platform-compatible checks.
+- [x] Kiểm tra GitHub Actions mainline mới nhất; tạo commit local và chỉ push/merge/open PR sau explicit user confirmation là bước handoff còn lại.

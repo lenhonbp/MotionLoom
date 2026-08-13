@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/visual-truth.schema.json",
+  "title": "MotionLoom Visual Truth Contract",
+  "type": "object",
+  "required": ["schema_version", "contract", "status", "scene", "frames", "comparison", "provenance", "review_boundary"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "contract": {"const": "motionloom-visual-truth"},
+    "status": {"enum": ["pass", "review_required"]},
+    "scene": {"type": "string", "minLength": 1},
+    "task_id": {"type": ["string", "null"]},
+    "frames": {
+      "type": "object",
+      "required": ["baseline", "candidate"],
+      "properties": {
+        "baseline": {"$ref": "#/$defs/frame"},
+        "candidate": {"$ref": "#/$defs/frame"}
+      },
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "required": ["metric", "same_dimensions", "byte_identical", "changed", "interpretation"],
+      "properties": {
+        "metric": {"type": "string"},
+        "same_dimensions": {"type": "boolean"},
+        "byte_identical": {"type": "boolean"},
+        "changed": {"type": "boolean"},
+        "distance": {"type": "number", "minimum": 0},
+        "threshold": {"type": "number", "minimum": 0},
+        "interpretation": {"enum": ["equal", "review_required"]}
+      },
+      "additionalProperties": true
+    },
+    "regions": {"type": "array"},
+    "provenance": {
+      "type": "object",
+      "required": ["source_path", "source_sha256", "manifest_path", "manifest_sha256"],
+      "properties": {
+        "source_path": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+        "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "manifest_path": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+        "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "runtime_evidence_path": {"type": ["string", "null"]},
+        "runtime_evidence_sha256": {"type": ["string", "null"]},
+        "motion_ir_path": {"type": ["string", "null"]},
+        "motion_ir_sha256": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "review_boundary": {
+      "type": "object",
+      "required": ["approval", "user_review_required", "decision"],
+      "properties": {
+        "approval": {"const": false},
+        "user_review_required": {"const": true},
+        "decision": {"const": "pending"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "frame": {
+      "type": "object",
+      "required": ["role", "percent", "path", "sha256", "bytes", "width", "height"],
+      "properties": {
+        "role": {"enum": ["baseline", "candidate"]},
+        "percent": {"type": "integer", "minimum": 0, "maximum": 100},
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

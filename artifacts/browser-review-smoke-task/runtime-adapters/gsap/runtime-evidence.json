@@ -1,5 +1,5 @@
 {
-  "run_id": "1786598203602-44370",
+  "run_id": "1786629946947-80738",
   "framework": "gsap",
   "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=gsap",
   "status": "pass",
@@ -37,12 +37,12 @@
   "console_errors": [],
   "telemetry": {
     "file": "gsap/runtime-telemetry.json",
-    "sha256": "9cf22c3b3f7f74a4494dc6397e0f6f71a3402bcdeeab460d53e9355f0aae8f7a",
+    "sha256": "5f55b11e030aeac6764ce16663dd8b08ee91ba04f6e768e41d7e412ea9daa7a7",
     "metrics": {
       "sample_count": 3,
       "raf_interval_count": 9,
-      "max_raf_interval_ms": 16.800000000000068,
-      "p95_raf_interval_ms": 16.800000000000068
+      "max_raf_interval_ms": 16.700000000000045,
+      "p95_raf_interval_ms": 16.700000000000045
     }
   }
 }

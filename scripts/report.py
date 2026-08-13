@@ -414,6 +414,8 @@ def check_report(args: argparse.Namespace) -> int:
     task = read_json(task_dir / "task.json")
     report = read_json(task_dir / "execution-report.json")
     manifest = read_json(task_dir / "artifact-manifest.json", {"artifacts": []})
+    scene_manifest_path = ROOT / "src" / "output" / str(task.get("scene", "")) / "manifest.json"
+    scene_manifest = read_json(scene_manifest_path, {})
     state = task.get("state")
     if not task.get("task_id") or not task.get("scene"):
         errors.append("task.json requires task_id and scene")
@@ -426,6 +428,11 @@ def check_report(args: argparse.Namespace) -> int:
             errors.append(f"artifact has invalid sha256: {artifact.get('path', '<unknown>')}")
         if not (task_dir / artifact.get("path", "")).is_file():
             errors.append(f"artifact path missing: {artifact.get('path', '<unknown>')}")
+    visual_truth_name = scene_manifest.get("visual_truth")
+    if visual_truth_name:
+        visual_truth_path = scene_manifest_path.parent / str(visual_truth_name)
+        if not visual_truth_path.is_file():
+            errors.append("scene manifest visual_truth points to a missing artifact")
     if state in {"validated", "ready_for_pr", "confirmed"}:
         quality = read_json(task_dir / "quality-report.json")
         if quality.get("status") != "pass":
@@ -517,6 +524,11 @@ def render(args: argparse.Namespace) -> int:
     lint = read_json(task_dir / "semantic-lint-report.json", {})
     continuity = read_json(task_dir / "continuity-report.json", {})
     fix_plan = read_json(task_dir / "fix-plan.json", {})
+    scene_manifest = read_json(ROOT / "src" / "output" / str(task.get("scene", "")) / "manifest.json", {})
+    visual_truth = read_json(
+        ROOT / "src" / "output" / str(task.get("scene", "")) / str(scene_manifest.get("visual_truth", "")),
+        {},
+    ) if scene_manifest.get("visual_truth") else {}
     lines = [
         f"# Animation Task Report — {task.get('task_id', task_dir.name)}",
         "",
@@ -543,6 +555,10 @@ def render(args: argparse.Namespace) -> int:
         "",
         "## Browser review",
         md_table(report.get("browser_review", []), [("Candidate", "candidate_id"), ("Decision", "decision"), ("Reviewer", "reviewer"), ("Evidence", "evidence")]),
+        "## Visual Truth",
+        f"- Status: **{visual_truth.get('status', 'not-run')}**; scene: `{visual_truth.get('scene', task.get('scene', ''))}`; approval: **{visual_truth.get('review_boundary', {}).get('approval', False)}**",
+        f"- Baseline: `{visual_truth.get('frames', {}).get('baseline', {}).get('path', '')}`; candidate: `{visual_truth.get('frames', {}).get('candidate', {}).get('path', '')}`",
+        f"- Changed pixels: **{visual_truth.get('comparison', {}).get('changed_pixels', 'not-run')}**; changed regions: **{len(visual_truth.get('comparison', {}).get('regions', []))}**",
         "## Semantic motion lint",
         f"- Status: **{lint.get('status', 'not-run')}**; errors: **{lint.get('summary', {}).get('errors', 0)}**; warnings: **{lint.get('summary', {}).get('warnings', 0)}**; blocking: **{lint.get('summary', {}).get('blocking', 0)}**",
         md_table(lint.get("findings", []), [("Rule", "rule_id"), ("Severity", "severity"), ("Confidence", "confidence"), ("Message", "message"), ("Basis", "basis")]),

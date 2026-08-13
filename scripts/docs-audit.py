@@ -23,7 +23,7 @@ for markdown in sorted(ROOT.rglob("*.md")):
         if not (markdown.parent / target).resolve().exists():
             errors.append(f"{markdown.relative_to(ROOT)} -> missing {target}")
 
-for relative in ["package.json", "agent-card.json", "project-context.example.json", "tests/evals/project-corpus.json"]:
+for relative in ["package.json", "agent-card.json", "agent-surfaces.json", "schemas/agent-surfaces.schema.json", "schemas/visual-truth.schema.json", "schemas/remediation-history.schema.json", "project-context.example.json", "tests/evals/project-corpus.json"]:
     path = ROOT / relative
     try:
         json.loads(path.read_text(encoding="utf-8"))
@@ -36,6 +36,22 @@ for required in ["author", "repository", "homepage", "bugs", "license", "engines
         errors.append(f"package.json: missing public metadata {required}")
 if package.get("packageManager") != "pnpm@11.20.0":
     errors.append("package.json: packageManager must pin pnpm@11.20.0")
+for required_surface in [".agents", ".claude", ".codex", "AGENTS.md", "agent-surfaces.json"]:
+    if required_surface not in package.get("files", []):
+        errors.append(f"package.json: files must include Agent surface {required_surface}")
+
+sys.path.insert(0, str(ROOT))
+try:
+    from scripts.discovery import validate as validate_discovery
+    discovery = validate_discovery(ROOT)
+    for discovery_error in discovery.get("errors", []):
+        errors.append(f"agent discovery: {discovery_error}")
+except Exception as exc:
+    errors.append(f"agent discovery: validator could not load: {exc}")
+
+for required_doc in ["docs/AGENT-INTEGRATION.md", "references/agent-interoperability.md"]:
+    if not (ROOT / required_doc).is_file():
+        errors.append(f"missing Agent interoperability document: {required_doc}")
 
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 for heading in ["Why MotionLoom", "Quick start", "Durable Project Memory", "Evidence, trust and review", "Documentation map"]:

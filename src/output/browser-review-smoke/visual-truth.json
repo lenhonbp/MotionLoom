@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "contract": "motionloom-visual-truth",
+  "generated_at": "2026-08-13T13:53:38.679496Z",
+  "status": "review_required",
+  "scene": "browser-review-smoke",
+  "task_id": "browser-review-smoke-task",
+  "frames": {
+    "baseline": {
+      "role": "baseline",
+      "percent": 100,
+      "path": "src/output/browser-review-smoke/snapshot/frame-00.png",
+      "sha256": "8a3bf18101d395ee00a6c6899c31910fbd2c405aee7e83143ce08832e740c5da",
+      "bytes": 3588,
+      "width": 512,
+      "height": 512
+    },
+    "candidate": {
+      "role": "candidate",
+      "percent": 100,
+      "path": "src/output/browser-review-smoke/snapshot/frame-100.png",
+      "sha256": "b3dac3308b0b7295ee3d5d4d87225017692b4d1f6d46828b482948cdd8979e2e",
+      "bytes": 4228,
+      "width": 512,
+      "height": 512
+    }
+  },
+  "comparison": {
+    "metric": "sha256-image-identity",
+    "method": "PNG metadata plus byte identity; no visual approval inferred",
+    "same_dimensions": true,
+    "byte_identical": false,
+    "changed": true,
+    "distance": 1.0,
+    "threshold": 0.0,
+    "interpretation": "review_required"
+  },
+  "regions": [
+    {
+      "id": "full-frame",
+      "label": "Full rendered frame",
+      "reason": "Baseline and candidate PNG identities differ; inspect the exact candidate in Dev Lab.",
+      "severity": "review",
+      "evidence": [
+        "src/output/browser-review-smoke/snapshot/frame-00.png",
+        "src/output/browser-review-smoke/snapshot/frame-100.png"
+      ]
+    }
+  ],
+  "provenance": {
+    "source_path": "src/output/browser-review-smoke/animation.json",
+    "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+    "manifest_path": "src/output/browser-review-smoke/manifest.json",
+    "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+    "runtime_evidence_path": "artifacts/browser-review-smoke-task/runtime-adapters/runtime-evidence.json",
+    "runtime_evidence_sha256": "2d51a37dbd1962c3f8539fed53fd5709448da55f2b00f2ceb37dfd8a55d0d716",
+    "motion_ir_path": "artifacts/browser-review-smoke-task/motion-ir.json",
+    "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+    "runtime_status": "pass",
+    "motion_ir_schema_version": "0.1"
+  },
+  "review_boundary": {
+    "approval": false,
+    "user_review_required": true,
+    "decision": "pending",
+    "pr_side_effects": "explicit-confirmation"
+  }
+}

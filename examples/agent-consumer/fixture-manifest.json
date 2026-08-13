@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "fixture_set": "agent-consumer-smoke",
+  "purpose": "Show Agents how to select an animation capability, locate evidence and preserve review boundaries.",
+  "repository_root": "..",
+  "cases": [
+    {
+      "id": "lottie-json-source-bound",
+      "framework": "lottie",
+      "category": "asset-runtime",
+      "source": "src/output/browser-review-smoke/animation.json",
+      "manifest": "src/output/browser-review-smoke/manifest.json",
+      "verification": "python3 scripts/validate-lottie.py src/output/browser-review-smoke/animation.json",
+      "evidence_level": "asset-contract",
+      "expected": "source_binding and Lottie structural validation; runtime acceptance still requires runtime evidence"
+    },
+    {
+      "id": "dotlottie-package",
+      "framework": "dotlottie",
+      "category": "asset-package",
+      "source": "src/output/browser-review-smoke/animation.json",
+      "manifest": "src/output/browser-review-smoke/manifest.json",
+      "verification": "node scripts/to-dotlottie.mjs --scene-dir src/output/browser-review-smoke --output <temporary-output>/animation.lottie",
+      "evidence_level": "package-contract",
+      "expected": "manifest.json selects the initial animation and the archive validates without system zip"
+    },
+    {
+      "id": "rive-runtime",
+      "framework": "rive",
+      "category": "browser-runtime",
+      "source": "tests/runtime-harness/main.jsx",
+      "evidence": "artifacts/runtime-adapters/rive/runtime-evidence.json",
+      "verification": "RUNTIME_FRAMEWORKS=rive npm run runtime:test",
+      "evidence_level": "runtime-verified-fixture",
+      "expected": "real browser adapter, ready=true, runtime state and 0/50/100 snapshots"
+    },
+    {
+      "id": "gsap-runtime",
+      "framework": "gsap",
+      "category": "browser-runtime",
+      "source": "tests/runtime-harness/main.jsx",
+      "evidence": "artifacts/runtime-adapters/gsap/runtime-evidence.json",
+      "verification": "RUNTIME_FRAMEWORKS=gsap npm run runtime:test",
+      "evidence_level": "runtime-verified-fixture",
+      "expected": "real browser adapter, ready=true, runtime state and 0/50/100 snapshots"
+    },
+    {
+      "id": "framer-motion-runtime",
+      "framework": "framer-motion",
+      "category": "browser-runtime",
+      "source": "tests/runtime-harness/main.jsx",
+      "evidence": "artifacts/runtime-adapters/framer-motion/runtime-evidence.json",
+      "verification": "RUNTIME_FRAMEWORKS=framer-motion npm run runtime:test",
+      "evidence_level": "runtime-verified-fixture",
+      "expected": "real browser adapter, ready=true, runtime state and 0/50/100 snapshots"
+    },
+    {
+      "id": "body-rig",
+      "framework": "svg-cutout-rig",
+      "category": "body-animation",
+      "source": "assets/library/avatar-base.svg",
+      "verification": "python3 src/rig/cutout_rig.py build --input assets/library/avatar-base.svg --output <temporary-output>/rigged.svg",
+      "evidence_level": "structure-verified-fixture",
+      "expected": "named anatomy, pivot markers and parent-first hierarchy remain inspectable"
+    },
+    {
+      "id": "continuity-multiscene",
+      "framework": "framework-neutral",
+      "category": "continuity",
+      "source": "tests/fixtures/continuity-multiscene",
+      "evidence": "tests/fixtures/continuity-multiscene/continuity-report.json",
+      "verification": "python3 scripts/intelligence.py continuity validate --report tests/fixtures/continuity-multiscene/continuity-report.json",
+      "evidence_level": "semantic-structure-fixture",
+      "expected": "scene-01 and scene-02 share continuity while scene-02-drift remains an explicit negative case"
+    }
+  ],
+  "review_boundary": {
+    "approval": false,
+    "user_review_required": true,
+    "pr_side_effects": "explicit-confirmation"
+  }
+}

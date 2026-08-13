@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "name": "motionloom",
+  "version": "2.1.0",
+  "canonical": {
+    "skill": "SKILL.md",
+    "agent_card": "agent-card.json",
+    "cli": "bin/motionloom.mjs"
+  },
+  "surfaces": [
+    {
+      "id": "agents-skills",
+      "kind": "agent-skill",
+      "path": ".agents/skills/motionloom/SKILL.md",
+      "canonical": "SKILL.md",
+      "load_mode": "alias",
+      "agents": ["codex", "claude-code", "cursor", "opencode"]
+    },
+    {
+      "id": "claude-code",
+      "kind": "agent-instructions",
+      "path": ".claude/skills/motionloom.md",
+      "canonical": "SKILL.md",
+      "load_mode": "alias",
+      "agents": ["claude-code"]
+    },
+    {
+      "id": "codex",
+      "kind": "agent-instructions",
+      "path": ".codex/skills/motionloom.md",
+      "canonical": "SKILL.md",
+      "load_mode": "alias",
+      "agents": ["codex"]
+    },
+    {
+      "id": "repository-agent-guide",
+      "kind": "repository-guide",
+      "path": "AGENTS.md",
+      "canonical": "SKILL.md",
+      "load_mode": "router",
+      "agents": ["codex", "claude-code", "cursor", "opencode"]
+    }
+  ],
+  "installations": [
+    {
+      "id": "npm-registry",
+      "source_kind": "npm",
+      "command": "npm install --save-dev motionloom",
+      "verification": "motionloom discovery check --root . --json",
+      "provenance": "package-lock-or-pnpm-lock"
+    },
+    {
+      "id": "github-checkout",
+      "source_kind": "git",
+      "command": "git clone https://github.com/lenhonbp/MotionLoom.git",
+      "verification": "node bin/motionloom.mjs discovery check --root . --json",
+      "provenance": "git-commit-and-remote"
+    },
+    {
+      "id": "local-source",
+      "source_kind": "local",
+      "command": "node <motionloom-checkout>/bin/motionloom.mjs discovery check --root <motionloom-checkout> --json",
+      "verification": "python3 scripts/discovery.py check --root . --json",
+      "provenance": "absolute-or-relative-source-path"
+    }
+  ],
+  "compatibility": {
+    "operating_systems": ["ubuntu", "macos", "windows"],
+    "node": ">=18",
+    "python": ">=3.11",
+    "agents": ["codex", "claude-code", "cursor", "opencode"]
+  },
+  "rules": {
+    "canonical_instruction_source": "SKILL.md",
+    "no_surface_copy": true,
+    "no_network_required_for_check": true,
+    "approval_is_never_inferred": true
+  }
+}

@@ -15,6 +15,8 @@ Use this reference when an Agent needs to understand or extend MotionLoom's task
 | `semantic-lint-benchmark.json` | `python3 scripts/intelligence.py semantic-lint benchmark --task-dir <task>` | Measures in-process semantic-lint execution, rule coverage and p95 against a deterministic threshold; it is a performance contract, not visual approval. |
 | `runtime-telemetry.json` | `motionloom runtime-telemetry <scene> artifacts/<task-id>` | Records deterministic scrub-point observations, RAF timing, runtime state hashes and source/manifest/Motion IR bindings from the real adapter harness. The npm CLI is the cross-platform entrypoint; the legacy `.sh` wrapper remains for Unix compatibility. |
 | `evidence-verifier-report.json` | `python3 scripts/evidence-verifier.py --scene-dir <scene-dir> --task-dir <task> --runtime-evidence <path>` | Read-only external verification result for task/scene/path/hash/age integrity; `approval` is always `false`. |
+| `visual-truth.json` | `motionloom visual-truth build|validate` | Baseline/candidate PNG hashes, dimensions, deterministic comparison signal, region-level review explanation and source/runtime/Motion IR provenance; `approval` is always `false`. |
+| `remediation-history.jsonl` | `motionloom remediation-learning record-outcome|record-benchmark|summary` | Append-only, hash-chained user-confirmed corrections and deterministic benchmark runs; first-pass metrics guide future work but `approval` is always `false`. |
 | `attestation-statement.json` | `python3 scripts/attestation.py statement --scene-dir <scene-dir> --task-dir <task> --context <context>` | Derives canonical task/scene/source/manifest/Motion IR/evidence hash bindings before signing. |
 | `attestation.json` | `python3 scripts/attestation.py build --statement <statement> --private-key <key> --key-id <id>` | DSSE-compatible Ed25519 envelope over the versioned statement; `approval` is always `false`. |
 | `trust-policy.json` | `python3 scripts/attestation.py validate-policy --path <policy>` | Declares trusted keys, validity, rotation and fail-closed revocation behavior. |
@@ -71,6 +73,8 @@ python3 scripts/quality-gate.py \
   --context <project-context.json> \
   --task-dir artifacts/<task-id> \
   --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
+python3 scripts/remediation-learning.py validate --history artifacts/remediation-history.jsonl --json
+python3 scripts/remediation-learning.py summary --history artifacts/remediation-history.jsonl --output artifacts/remediation-summary.json --json
 python3 scripts/eval-intelligence.py
 ```
 

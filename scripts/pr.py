@@ -94,6 +94,7 @@ def main() -> int:
         "--context", args.context or str(repo / "project-context.json"),
         "--task-dir", str(task_dir),
         "--require-browser-review",
+        "--require-visual-truth",
     ]
     print("== running context-bound quality gate ==")
     run(repo, [python, *quality_args])

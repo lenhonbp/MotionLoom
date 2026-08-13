@@ -2,6 +2,19 @@
 
 All notable MotionLoom changes are documented here. The project follows semantic versioning for the npm package and keeps major contract changes in dedicated release notes under [`docs/releases/`](docs/releases/).
 
+## [Unreleased]
+
+### Added
+
+- Canonical Agent interoperability surfaces for `.agents/skills`, `.claude`, `.codex`, source discovery and cross-platform installation checks.
+- Consumer fixtures for Lottie/dotLottie, Rive, GSAP, Framer Motion, body rigs and multi-scene continuity.
+- Visual Truth Contract with frame hashes, runtime/source provenance, deterministic perceptual signals, region explanations and review-required semantics.
+- Append-only, hash-chained Remediation Learning ledger for user-confirmed outcomes, correction counts, first-pass acceptance, issue-class outliers and benchmark provenance.
+
+### Boundary
+
+- These additions are local working-tree changes on top of the published `2.1.0` package. They do not change the published version and do not grant approval, push commits or open pull requests.
+
 ## [2.1.0] - 2026-08-13
 
 ### Added

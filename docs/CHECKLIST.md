@@ -23,9 +23,10 @@ A scene is only ready for the confirm-into-PR step when every item below passes.
 
 ## Source traceability
 - [ ] Every geometric asset references an authoritative source (`assets/library/` or the host project) — flagged if invented.
-- [ ] `manifest.json` records framework, source path, license note, spec hash, and completed checklist entries.
+- [ ] `manifest.json` records framework, source path, license note, spec hash, visual-truth path, and completed checklist entries.
 
 ## PR readiness
 - [ ] Snapshot PNGs exist for 0/50/100%.
+- [ ] `visual-truth.json` binds real baseline/candidate frames to source, manifest and available runtime/Motion IR hashes; `approval` remains `false`.
 - [ ] `motion-spec.json` is bound to the exact `project-context.json` hash (implements == planned).
 - [ ] Dev Lab URL tested on mobile viewport and desktop.

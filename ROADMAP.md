@@ -15,6 +15,10 @@ The current repository baseline includes project-aware analysis, durable Project
 | **2.4** | Runtime Scale | Multi-project, browser and device corpus with capability compatibility explanations | Planned |
 | **2.5** | Agent Interoperability | Versioned schemas, compatibility matrix and replayable task bundles across Agents | Planned |
 
+## Working-tree implementation status
+
+The current implementation pass has delivered the contracts behind the next milestones without changing the published `2.1.0` version: canonical Agent discovery/install surfaces, consumer fixtures and a Ubuntu/macOS/Windows matrix; Visual Truth is bound into scene manifests, Dev Lab handoff and the review-first quality gate; and Remediation Learning records hash-chained benchmark/outcome history. The remaining release work is full validation, CI observation, release-note review and an explicit user decision before commit/push.
+
 ## Product principles
 
 MotionLoom will remain project-bound, evidence-first and review-first. Heuristics may prioritize risk but cannot become approval. Attestations may prove signer and byte identity but cannot replace a user. Dev Lab remains a post-render handoff in the pipeline rather than a separate Skill with its own authority. Framework support will be promoted only after real adapter evidence and cross-platform checks pass.

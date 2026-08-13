@@ -19,7 +19,7 @@ TASK_ARTIFACTS = (
     "issue-register.json", "decision-log.jsonl", "project-memory.json",
     "project-graph.json", "provenance.json", "capability-registry.json",
     "motion-ir.json", "replay-bundle.json", "semantic-lint-report.json",
-    "continuity-report.json", "fix-plan.json", "browser-observation.md",
+    "continuity-report.json", "fix-plan.json", "visual-truth.json", "browser-observation.md",
 )
 
 

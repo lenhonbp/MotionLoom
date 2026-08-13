@@ -863,6 +863,52 @@ def test_observability_contract():
         "project memory recovery and cross-platform contract passes",
         memory_tests.returncode == 0 and "project memory contract tests: PASS" in memory_tests.stdout,
     )
+    discovery_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_discovery.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Agent discovery and installation contract passes",
+        discovery_tests.returncode == 0 and "discovery contract tests: PASS" in discovery_tests.stdout,
+    )
+    consumer_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_consumer_fixtures.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Agent consumer fixture contract passes",
+        consumer_tests.returncode == 0 and "consumer fixture tests: PASS" in consumer_tests.stdout,
+    )
+    matrix_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_installation_matrix.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "cross-platform installation matrix contract passes",
+        matrix_tests.returncode == 0 and "installation matrix tests: PASS" in matrix_tests.stdout,
+    )
+    visual_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_visual_truth.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Visual Truth contract preserves provenance and review boundary",
+        visual_tests.returncode == 0 and "visual truth contract tests: PASS" in visual_tests.stdout,
+    )
+    remediation_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_remediation_learning.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Remediation Learning preserves append-only history and first-pass metrics",
+        remediation_tests.returncode == 0 and "remediation learning tests: PASS" in remediation_tests.stdout,
+        remediation_tests.stdout.strip() or remediation_tests.stderr.strip(),
+    )
 
 
 if __name__ == "__main__":

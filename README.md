@@ -2,6 +2,18 @@
 
 A coding-agent skill for professional animation development: motion, character body rigs and assets. It does not guess — it **understands the host project, plans from a signed motion spec, generates from vetted source assets, renders everything in the Dev Lab for live testing, and only then confirms into a pull request**.
 
+## Install from npm
+
+MotionLoom is distributed as the `motionloom` npm package. The package ships the installable Skill contract, framework adapters, Intelligence Core schemas, evidence verifiers and a small CLI wrapper around the canonical Python scripts.
+
+```bash
+npm install --global motionloom
+motionloom doctor
+motionloom --help
+```
+
+The CLI requires **Node.js 18+** and **Python 3.11+**. Installation does not grant approval, commit changes or open a pull request; browser review and explicit repository-side-effect confirmation remain mandatory.
+
 ## Quick start
 
 ```bash

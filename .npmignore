@@ -1,0 +1,18 @@
+# Never publish generated Python bytecode or local runtime state.
+**/__pycache__/
+*.py[cod]
+*.pyo
+
+# Repository-only evidence and development surfaces are not part of the npm package.
+artifacts/
+dev-lab/
+.github/
+.git/
+.gitignore
+.manus-logs/
+node_modules/
+
+# Local scratch and editor files.
+*.log
+*.tmp
+.DS_Store

@@ -1,10 +1,59 @@
 {
   "name": "motionloom",
   "version": "2.0.0",
-  "private": true,
   "type": "module",
   "description": "MotionLoom: project-aware animation Skill with graph, provenance, Motion IR, runtime telemetry, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",
+  "bin": {
+    "motionloom": "bin/motionloom.mjs"
+  },
+  "files": [
+    "README.md",
+    "SKILL.md",
+    "LICENSE",
+    "agent-card.json",
+    "bin",
+    "scripts",
+    "src",
+    "templates",
+    "assets",
+    "schemas",
+    "references",
+    "docs",
+    "examples",
+    "project-context.example.json",
+    "tests/evals",
+    "tests/scripts/run_tests.py",
+    "tests/scripts/test_attestation.py"
+  ],
+  "keywords": [
+    "animation",
+    "agent-skill",
+    "motion-design",
+    "lottie",
+    "dotlottie",
+    "rive",
+    "gsap",
+    "framer-motion",
+    "runtime-evidence",
+    "developer-tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lenhonbp/MotionLoom.git"
+  },
+  "homepage": "https://github.com/lenhonbp/MotionLoom#readme",
+  "bugs": {
+    "url": "https://github.com/lenhonbp/MotionLoom/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18",
+    "python": ">=3.11"
+  },
   "scripts": {
+    "prepack": "find . -type d -name __pycache__ -prune -exec rm -rf {} + && find . -type f \\( -name '*.pyc' -o -name '*.pyo' \\) -delete",
     "test": "python3 tests/scripts/run_tests.py",
     "validate": "python3 scripts/quality-gate.py --all",
     "doctor": "python3 scripts/skill-doctor.py --json",

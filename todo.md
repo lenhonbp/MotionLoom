@@ -180,3 +180,13 @@
 - [ ] Bổ sung benchmark history schema, append-only run records, aggregate metrics và outlier detection.
 - [ ] Tích hợp visual comparison và benchmark history vào Dev Lab theo review-first flow.
 - [ ] Chạy full acceptance, tạo checkpoint/commit, push sau explicit confirmation và xác minh CI trên main.
+
+## npm package release via user workstation
+
+- [x] Chuyển package từ private repo metadata sang public npm package `motionloom@2.0.0`.
+- [x] Thêm `bin/motionloom.mjs`, explicit `files`, npm metadata, MIT license và install instructions.
+- [x] Thêm prepack cleanup để loại Python bytecode/local runtime state khỏi tarball.
+- [x] Chạy `npm publish --dry-run --access public`; tarball sạch, 260.3 kB, 111 files.
+- [ ] Commit và push npm packaging changes lên `origin/main` sau explicit confirmation.
+- [ ] Đăng nhập npm từ máy người dùng và chạy `npm publish --access public`.
+- [ ] Xác minh `npm view motionloom@2.0.0` và cài thử CLI từ registry.

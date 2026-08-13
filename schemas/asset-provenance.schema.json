@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/asset-provenance.schema.json",
+  "title": "MotionLoom asset provenance contract",
+  "description": "Asset-level origin, authority, readiness and human-governance contract. This schema never treats an Agent assertion as human approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provenance_id", "asset", "authority", "readiness", "files", "license", "provenance_chain", "created_at"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "provenance_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "type", "framework"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "type": {"type": "string", "minLength": 1},
+        "framework": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority": {
+      "type": "string",
+      "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"]
+    },
+    "readiness": {
+      "type": "string",
+      "enum": ["blocked", "runtime_ready", "review_required", "production_eligible", "production_approved"]
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "task_id", "source", "generated_at"],
+      "properties": {
+        "model": {"type": "string", "minLength": 1},
+        "task_id": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "prompt_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "agent": {"type": "string", "minLength": 1}
+      }
+    },
+    "human_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attestor", "attestor_type", "decision", "attested_at", "user_confirmed"],
+      "properties": {
+        "attestor": {"type": "string", "minLength": 1},
+        "attestor_type": {"type": "string", "enum": ["artist", "user"]},
+        "decision": {"type": "string", "enum": ["artist_authored", "accepted", "rejected"]},
+        "attested_at": {"type": "string", "format": "date-time"},
+        "user_confirmed": {"const": true},
+        "signature": {"type": "string", "minLength": 1}
+      }
+    },
+    "human_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer", "decision", "scope", "reviewed_at", "user_confirmed"],
+      "properties": {
+        "reviewer": {"type": "string", "minLength": 1},
+        "decision": {"type": "string", "enum": ["approved", "rejected", "changes_requested"]},
+        "scope": {"type": "string", "minLength": 1},
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "user_confirmed": {"const": true},
+        "notes": {"type": "string"}
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issued_by", "decision", "approved_at", "user_confirmed"],
+      "properties": {
+        "issued_by": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "type": {"type": "string", "enum": ["user", "artist"]}
+          }
+        },
+        "decision": {"const": "approved"},
+        "approved_at": {"type": "string", "format": "date-time"},
+        "user_confirmed": {"const": true},
+        "notes": {"type": "string"}
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spdx", "source", "attribution"],
+      "properties": {
+        "spdx": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1},
+        "attribution": {"type": "string", "minLength": 1}
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role", "sha256"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+          "role": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "bytes": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "provenance_chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step", "actor", "source", "timestamp"],
+        "properties": {
+          "step": {"type": "string", "minLength": 1},
+          "actor": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "minLength": 1},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "runtime_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "runtime", "tested_at"],
+      "properties": {
+        "status": {"type": "string", "enum": ["pass", "fail", "not_run"]},
+        "runtime": {"type": "string", "minLength": 1},
+        "tested_at": {"type": "string", "format": "date-time"},
+        "evidence_path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "full_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "quality_gate", "visual_truth", "license", "checked_at"],
+      "properties": {
+        "status": {"type": "string", "enum": ["pass", "fail", "not_run"]},
+        "quality_gate": {"const": "pass"},
+        "visual_truth": {"const": "pass"},
+        "license": {"const": "pass"},
+        "checked_at": {"type": "string", "format": "date-time"},
+        "report_path": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"required": ["authority"], "properties": {"authority": {"enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed"]}}},
+      "then": {"required": ["generator"]}
+    },
+    {
+      "if": {"required": ["authority"], "properties": {"authority": {"const": "artist_authored"}}},
+      "then": {"required": ["human_attestation"]}
+    },
+    {
+      "if": {"required": ["authority"], "properties": {"authority": {"const": "unknown"}}},
+      "then": {"properties": {"readiness": {"const": "blocked"}}}
+    },
+    {
+      "if": {"required": ["readiness"], "properties": {"readiness": {"const": "production_approved"}}},
+      "then": {"required": ["human_approval", "full_gate"]}
+    },
+    {
+      "if": {"required": ["readiness"], "properties": {"readiness": {"const": "production_eligible"}}},
+      "then": {"required": ["full_gate"]}
+    }
+  ]
+}

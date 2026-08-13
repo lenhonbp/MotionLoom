@@ -1,5 +1,5 @@
 {
-  "run_id": "1786629946947-80738",
+  "run_id": "1786641414714-93205",
   "framework": "framer-motion",
   "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=framer-motion",
   "status": "pass",
@@ -37,7 +37,7 @@
   "console_errors": [],
   "telemetry": {
     "file": "framer-motion/runtime-telemetry.json",
-    "sha256": "8046bfbbcac266a0ba022e35701ddf022a78d22ccc35d395f681bc3f6b2f0e39",
+    "sha256": "014894ebb48e1e8e9025e06847305e720fa6622c74e419c6dc42f00d360df2bb",
     "metrics": {
       "sample_count": 3,
       "raf_interval_count": 9,

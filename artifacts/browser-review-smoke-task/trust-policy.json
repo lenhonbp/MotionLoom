@@ -4,11 +4,11 @@
   "trust_domain": "https://motionloom.dev/trust/ci-ephemeral",
   "keys": [
     {
-      "key_id": "motionloom-ci-phase2",
+      "key_id": "ci-local-asset-provenance",
       "algorithm": "ed25519",
-      "public_key_base64": "+smohFxIgX7glDbL24cMMLlUQwe/4Y0Pd5UgGPrUzU0=",
+      "public_key_base64": "mfE4Ejm9KpGKLNfpX4Cihefi9GVOv9tOJbkj7t+Lf5A=",
       "status": "active",
-      "valid_from": "2026-08-13T14:08:09.313181Z"
+      "valid_from": "2026-08-13T17:17:37.953778Z"
     }
   ],
   "rotation": {

@@ -4,7 +4,7 @@
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "task_dir": "artifacts/browser-review-smoke-task",
-  "generated_at": "2026-08-13T14:08:32Z",
+  "generated_at": "2026-08-13T17:18:05Z",
   "environment": {
     "python": "3.12.3",
     "node": "v22.13.0",
@@ -13,18 +13,18 @@
   "files": [
     {
       "path": "artifacts/browser-review-smoke-task/attestation-statement.json",
-      "sha256": "238e3e76105d79c26597254e1152805e292ab5bbddec5c6015bde857b08c756e",
+      "sha256": "4eb1a56c399666f17240cd72b2ac7b1e65d9f5688d6896a8d4be937aea191149",
       "bytes": 1376
     },
     {
       "path": "artifacts/browser-review-smoke-task/attestation-verifier-report.json",
-      "sha256": "4c6abcebf66cdc80307c752c83b5158e5af8af3172839a2fc4f70bd120a11cd9",
-      "bytes": 730
+      "sha256": "cc77c5c365ddb978fbd57353df8d903ffba655d1d9788a36c2044507f3721893",
+      "bytes": 735
     },
     {
       "path": "artifacts/browser-review-smoke-task/attestation.json",
-      "sha256": "c988ae22ad93c5eb6c23baab64f141f13b6b3400c7a1ee9dd98efaba41bbd1d6",
-      "bytes": 3546
+      "sha256": "b7046592463eb9ed19a192db00840b150cb08c5952cacba5d35bca8a2c40e0cf",
+      "bytes": 3551
     },
     {
       "path": "artifacts/browser-review-smoke-task/browser-review.json",
@@ -38,7 +38,7 @@
     },
     {
       "path": "artifacts/browser-review-smoke-task/evidence-verifier-report.json",
-      "sha256": "e37cf3d8cbccbc27026a3b7962e4695c25def95aaeec26b8637985ca60d81f6d",
+      "sha256": "f019b9aff0e9f6e843b3e8734418448822790bb8063df6df9976589d6d9a143e",
       "bytes": 704
     },
     {
@@ -103,13 +103,13 @@
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/runtime-evidence.json",
-      "sha256": "1022ac389107490234c022b9648699512334fd3624ad9f8eedab0771b7a5f837",
+      "sha256": "fb86d2cf30b67ac918459cb4a211026da7e6354f3eec3c4644a64f6bd46c200b",
       "bytes": 1444
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/runtime-telemetry.json",
-      "sha256": "8046bfbbcac266a0ba022e35701ddf022a78d22ccc35d395f681bc3f6b2f0e39",
-      "bytes": 2123
+      "sha256": "014894ebb48e1e8e9025e06847305e720fa6622c74e419c6dc42f00d360df2bb",
+      "bytes": 2121
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-00.png",
@@ -128,13 +128,13 @@
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/runtime-evidence.json",
-      "sha256": "503fdd31fb13a307d56c0926e384d7b715ea6901ab81ced0875d594fb0d30706",
+      "sha256": "1059145b1cb7db61af5063bf25c467c6ec9ea8c30aa911ef2b805cfe3b05b5b2",
       "bytes": 1384
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/runtime-telemetry.json",
-      "sha256": "5f55b11e030aeac6764ce16663dd8b08ee91ba04f6e768e41d7e412ea9daa7a7",
-      "bytes": 2107
+      "sha256": "2ba00fd151cbbf78b485ce907de4e7002f34ee40910df2be11af7b8a5ca435e5",
+      "bytes": 2095
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/frame-00.png",
@@ -153,17 +153,17 @@
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/runtime-evidence.json",
-      "sha256": "4f6f08898670e2cd42996b3af3e554afb62e270f6ad96290318cbf59c6315ce3",
+      "sha256": "482d43bc8cf4684e8589ea323fb0b43a2bd7c7fa4778dc8270b3699cdd9b1dc4",
       "bytes": 2127
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/runtime-telemetry.json",
-      "sha256": "64f6dc5b0c45399e1e2baa0e6da56bda31d7eb90427e4dd8d5c0ec33dc25cb06",
-      "bytes": 2849
+      "sha256": "21fe0108892248e70510581b8e0389ff02119a6e8441d801f5e1fecfecb2f2f2",
+      "bytes": 2852
     },
     {
       "path": "artifacts/browser-review-smoke-task/runtime-adapters/runtime-evidence.json",
-      "sha256": "bada78e155274751df6a1fb8d749824a8f92ccc872ad9c2e640e885a47841038",
+      "sha256": "88194b8ed8e8eb9780a80bc55114b9cf52886c911b70a7f4331c18fa39a9b090",
       "bytes": 6269
     },
     {
@@ -178,8 +178,8 @@
     },
     {
       "path": "artifacts/browser-review-smoke-task/trust-policy.json",
-      "sha256": "9e25a7bde7c0b1900d6be9d5ff8e048c19fc7578ee8306e4be10943a552bb394",
-      "bytes": 617
+      "sha256": "f596710c226171ba0b607d0797b61e969eb2ad53319cf83e9be341ee451cc3af",
+      "bytes": 622
     }
   ],
   "policy": {

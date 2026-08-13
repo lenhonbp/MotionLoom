@@ -921,6 +921,16 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
         remediation_tests.returncode == 0 and "remediation learning tests: PASS" in remediation_tests.stdout,
         remediation_tests.stdout.strip() or remediation_tests.stderr.strip(),
     )
+    asset_provenance_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_asset_provenance.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Asset provenance preserves runtime-ready and human-governed production boundaries",
+        asset_provenance_tests.returncode == 0 and "asset provenance contract tests: PASS" in asset_provenance_tests.stdout,
+        asset_provenance_tests.stdout.strip() or asset_provenance_tests.stderr.strip(),
+    )
 
 
 if __name__ == "__main__":

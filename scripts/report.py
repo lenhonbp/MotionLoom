@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import shutil
 import sys
@@ -52,6 +53,32 @@ def read_json(path: Path, default: dict | list | None = None):
 
 def project_memory_path() -> Path:
     return ROOT / ".motionloom" / "project-memory.json"
+
+
+def asset_provenance_module():
+    path = ROOT / "scripts" / "asset-provenance.py"
+    loader = importlib.util.spec_from_file_location("motionloom_asset_provenance", path)
+    module = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(module)
+    return module
+
+
+def asset_provenance_result(scene_manifest_path: Path, scene_manifest: dict, mode: str = "runtime") -> dict:
+    name = scene_manifest.get("asset_provenance")
+    if not name:
+        return {"status": "not-run", "errors": ["scene manifest has no asset_provenance"]}
+    provenance_path = (scene_manifest_path.parent / str(name)).resolve()
+    if scene_manifest_path.parent.resolve() not in provenance_path.parents or not provenance_path.is_file():
+        return {"status": "fail", "errors": ["scene manifest asset_provenance points to a missing or unsafe artifact"]}
+    try:
+        return asset_provenance_module().evaluate(
+            provenance_path,
+            base=scene_manifest_path.parent,
+            mode=mode,
+            manifest=scene_manifest,
+        )
+    except (OSError, ValueError, AttributeError) as exc:
+        return {"status": "fail", "errors": [f"asset provenance contract: {exc}"]}
 
 
 def memory_summary() -> dict | None:
@@ -433,6 +460,21 @@ def check_report(args: argparse.Namespace) -> int:
         visual_truth_path = scene_manifest_path.parent / str(visual_truth_name)
         if not visual_truth_path.is_file():
             errors.append("scene manifest visual_truth points to a missing artifact")
+    provenance_mode = "production" if state in {"ready_for_pr", "confirmed"} else "runtime"
+    provenance = asset_provenance_result(scene_manifest_path, scene_manifest, provenance_mode)
+    if provenance.get("status") == "fail":
+        errors.extend(f"asset provenance: {error}" for error in provenance.get("errors", []))
+    # Legacy report-contract fixtures may exercise lifecycle/report behavior
+    # without materializing a scene manifest. Do not invent provenance for
+    # those synthetic tasks. Once a real scene manifest exists, readiness is
+    # fail-closed and its asset_provenance reference is mandatory for PR
+    # states; the production quality gate remains independently strict when
+    # --require-asset-provenance is supplied.
+    if state in {"ready_for_pr", "confirmed"} and scene_manifest_path.is_file():
+        if provenance.get("status") != "pass":
+            errors.append("ready-for-PR or confirmed task requires a passing asset provenance production check")
+        elif not provenance.get("summary", {}).get("production_eligible"):
+            errors.append("ready-for-PR or confirmed task requires asset provenance production_eligible")
     if state in {"validated", "ready_for_pr", "confirmed"}:
         quality = read_json(task_dir / "quality-report.json")
         if quality.get("status") != "pass":
@@ -529,6 +571,11 @@ def render(args: argparse.Namespace) -> int:
         ROOT / "src" / "output" / str(task.get("scene", "")) / str(scene_manifest.get("visual_truth", "")),
         {},
     ) if scene_manifest.get("visual_truth") else {}
+    provenance = asset_provenance_result(
+        ROOT / "src" / "output" / str(task.get("scene", "")) / "manifest.json",
+        scene_manifest,
+        "production" if task.get("state") in {"ready_for_pr", "confirmed"} else "runtime",
+    )
     lines = [
         f"# Animation Task Report — {task.get('task_id', task_dir.name)}",
         "",
@@ -559,6 +606,9 @@ def render(args: argparse.Namespace) -> int:
         f"- Status: **{visual_truth.get('status', 'not-run')}**; scene: `{visual_truth.get('scene', task.get('scene', ''))}`; approval: **{visual_truth.get('review_boundary', {}).get('approval', False)}**",
         f"- Baseline: `{visual_truth.get('frames', {}).get('baseline', {}).get('path', '')}`; candidate: `{visual_truth.get('frames', {}).get('candidate', {}).get('path', '')}`",
         f"- Changed pixels: **{visual_truth.get('comparison', {}).get('changed_pixels', 'not-run')}**; changed regions: **{len(visual_truth.get('comparison', {}).get('regions', []))}**",
+        "## Asset provenance",
+        f"- Status: **{provenance.get('status', 'not-run')}**; authority: **{provenance.get('summary', {}).get('authority', 'unknown')}**; declared readiness: **{provenance.get('summary', {}).get('declared_readiness', 'blocked')}**; effective readiness: **{provenance.get('summary', {}).get('effective_readiness', 'blocked')}**",
+        f"- Production eligible: **{provenance.get('summary', {}).get('production_eligible', False)}**; production approved: **{provenance.get('summary', {}).get('production_approved', False)}**; errors: **{len(provenance.get('errors', []))}**",
         "## Semantic motion lint",
         f"- Status: **{lint.get('status', 'not-run')}**; errors: **{lint.get('summary', {}).get('errors', 0)}**; warnings: **{lint.get('summary', {}).get('warnings', 0)}**; blocking: **{lint.get('summary', {}).get('blocking', 0)}**",
         md_table(lint.get("findings", []), [("Rule", "rule_id"), ("Severity", "severity"), ("Confidence", "confidence"), ("Message", "message"), ("Basis", "basis")]),

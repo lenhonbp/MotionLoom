@@ -28,6 +28,9 @@
     "references",
     "docs",
     "examples",
+    "scripts/asset-provenance.py",
+    "schemas/asset-provenance.schema.json",
+    "examples/agent-consumer/ai-generated-pilot-provenance.json",
     "project-context.example.json",
     "tests/evals",
     "tests/scripts/run_tests.py",
@@ -116,7 +119,9 @@
     "remediation:summary": "node bin/motionloom.mjs remediation-learning summary --history artifacts/remediation-history.jsonl --output artifacts/remediation-summary.json --json",
     "discovery:check": "node bin/motionloom.mjs discovery check --root . --json",
     "discovery:show": "node bin/motionloom.mjs discovery show --root . --json",
-    "install:matrix": "node bin/motionloom.mjs discovery install-matrix --root . --json"
+    "install:matrix": "node bin/motionloom.mjs discovery install-matrix --root . --json",
+    "asset-provenance:validate": "node bin/motionloom.mjs asset-provenance validate --input examples/agent-consumer/ai-generated-pilot-provenance.json --json",
+    "asset-provenance:check": "node bin/motionloom.mjs asset-provenance check --input examples/agent-consumer/ai-generated-pilot-provenance.json --root examples/agent-consumer --mode runtime --json"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",

@@ -23,7 +23,7 @@ for markdown in sorted(ROOT.rglob("*.md")):
         if not (markdown.parent / target).resolve().exists():
             errors.append(f"{markdown.relative_to(ROOT)} -> missing {target}")
 
-for relative in ["package.json", "agent-card.json", "agent-surfaces.json", "schemas/agent-surfaces.schema.json", "schemas/visual-truth.schema.json", "schemas/remediation-history.schema.json", "project-context.example.json", "tests/evals/project-corpus.json"]:
+for relative in ["package.json", "agent-card.json", "agent-surfaces.json", "schemas/agent-surfaces.schema.json", "schemas/provenance.schema.json", "schemas/asset-provenance.schema.json", "schemas/scene-manifest.schema.json", "schemas/visual-truth.schema.json", "schemas/remediation-history.schema.json", "project-context.example.json", "examples/agent-consumer/ai-generated-pilot-provenance.json", "tests/evals/project-corpus.json"]:
     path = ROOT / relative
     try:
         json.loads(path.read_text(encoding="utf-8"))
@@ -39,6 +39,9 @@ if package.get("packageManager") != "pnpm@11.20.0":
 for required_surface in [".agents", ".claude", ".codex", "AGENTS.md", "agent-surfaces.json"]:
     if required_surface not in package.get("files", []):
         errors.append(f"package.json: files must include Agent surface {required_surface}")
+for required_path in ["scripts/asset-provenance.py", "schemas/asset-provenance.schema.json", "examples/agent-consumer/ai-generated-pilot-provenance.json"]:
+    if required_path not in package.get("files", []):
+        errors.append(f"package.json: files must include asset provenance contract {required_path}")
 
 sys.path.insert(0, str(ROOT))
 try:
@@ -54,7 +57,7 @@ for required_doc in ["docs/AGENT-INTEGRATION.md", "references/agent-interoperabi
         errors.append(f"missing Agent interoperability document: {required_doc}")
 
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
-for heading in ["Why MotionLoom", "Quick start", "Durable Project Memory", "Evidence, trust and review", "Documentation map"]:
+for heading in ["Why MotionLoom", "Quick start", "Durable Project Memory", "Evidence, trust and review", "Asset provenance tiers", "Documentation map"]:
     if f"## {heading}" not in readme:
         errors.append(f"README.md: missing heading {heading}")
 
@@ -77,6 +80,8 @@ for workflow in sorted(workflow_dir.glob("*.yml")):
     for required in ["name:", "on:", "jobs:", "permissions:"]:
         if required not in text:
             errors.append(f"{workflow.relative_to(ROOT)}: missing {required}")
+if "--require-asset-provenance" not in (workflow_dir / "quality.yml").read_text(encoding="utf-8"):
+    errors.append("quality.yml: missing fail-closed asset provenance production gate")
     if "pull_request:" in text and "secrets." in text:
         errors.append(f"{workflow.relative_to(ROOT)}: secrets referenced in pull_request workflow")
 

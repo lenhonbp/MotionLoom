@@ -24,9 +24,14 @@ A scene is only ready for the confirm-into-PR step when every item below passes.
 ## Source traceability
 - [ ] Every geometric asset references an authoritative source (`assets/library/` or the host project) — flagged if invented.
 - [ ] `manifest.json` records framework, source path, license note, spec hash, visual-truth path, and completed checklist entries.
+- [ ] `asset-provenance.json` records origin/authority, generator or derivation chain, license/source, per-file SHA-256 and runtime evidence.
+- [ ] `ai_generated` assets may be runtime-ready but are not production-eligible; `unknown` assets are blocked.
+- [ ] `artist_authored` is backed by a verifiable human/artist record and is not merely an Agent-authored field.
 
 ## PR readiness
 - [ ] Snapshot PNGs exist for 0/50/100%.
 - [ ] `visual-truth.json` binds real baseline/candidate frames to source, manifest and available runtime/Motion IR hashes; `approval` remains `false`.
 - [ ] `motion-spec.json` is bound to the exact `project-context.json` hash (implements == planned).
 - [ ] Dev Lab URL tested on mobile viewport and desktop.
+- [ ] The production provenance check passes with `--mode production` and reports `production_eligible: true`.
+- [ ] `production_approved` and browser-review approval are recorded only from the user's explicit review; attestation approval remains `false`.

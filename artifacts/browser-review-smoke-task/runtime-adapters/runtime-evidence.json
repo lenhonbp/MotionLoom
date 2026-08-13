@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "run_id": "1786629946947-80738",
-  "generated_at": "2026-08-13T14:05:50.667Z",
+  "run_id": "1786641414714-93205",
+  "generated_at": "2026-08-13T17:16:58.408Z",
   "mode": "runtime",
   "harness": "tests/runtime-harness",
   "status": "pass",
   "frameworks": [
     {
-      "run_id": "1786629946947-80738",
+      "run_id": "1786641414714-93205",
       "framework": "rive",
       "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=rive",
       "status": "pass",
@@ -90,7 +90,7 @@
       "console_errors": [],
       "telemetry": {
         "file": "rive/runtime-telemetry.json",
-        "sha256": "64f6dc5b0c45399e1e2baa0e6da56bda31d7eb90427e4dd8d5c0ec33dc25cb06",
+        "sha256": "21fe0108892248e70510581b8e0389ff02119a6e8441d801f5e1fecfecb2f2f2",
         "metrics": {
           "sample_count": 3,
           "raf_interval_count": 9,
@@ -100,7 +100,7 @@
       }
     },
     {
-      "run_id": "1786629946947-80738",
+      "run_id": "1786641414714-93205",
       "framework": "gsap",
       "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=gsap",
       "status": "pass",
@@ -138,7 +138,7 @@
       "console_errors": [],
       "telemetry": {
         "file": "gsap/runtime-telemetry.json",
-        "sha256": "5f55b11e030aeac6764ce16663dd8b08ee91ba04f6e768e41d7e412ea9daa7a7",
+        "sha256": "2ba00fd151cbbf78b485ce907de4e7002f34ee40910df2be11af7b8a5ca435e5",
         "metrics": {
           "sample_count": 3,
           "raf_interval_count": 9,
@@ -148,7 +148,7 @@
       }
     },
     {
-      "run_id": "1786629946947-80738",
+      "run_id": "1786641414714-93205",
       "framework": "framer-motion",
       "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=framer-motion",
       "status": "pass",
@@ -186,7 +186,7 @@
       "console_errors": [],
       "telemetry": {
         "file": "framer-motion/runtime-telemetry.json",
-        "sha256": "8046bfbbcac266a0ba022e35701ddf022a78d22ccc35d395f681bc3f6b2f0e39",
+        "sha256": "014894ebb48e1e8e9025e06847305e720fa6622c74e419c6dc42f00d360df2bb",
         "metrics": {
           "sample_count": 3,
           "raf_interval_count": 9,
@@ -199,6 +199,6 @@
   "scene": "browser-review-smoke",
   "task_id": "browser-review-smoke-task",
   "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-  "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+  "manifest_sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623",
   "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f"
 }

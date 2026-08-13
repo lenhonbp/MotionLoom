@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "provenance_id": "browser-review-smoke-asset-provenance",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "created_at": "2026-08-14T00:00:00Z",
+  "asset": {
+    "id": "browser-review-smoke-animation",
+    "path": "animation.json",
+    "type": "deterministic-fixture",
+    "framework": "lottie",
+    "version": "fixture-2.2.0"
+  },
+  "authority": "ai_assisted_human_reviewed",
+  "readiness": "production_eligible",
+  "generator": {
+    "model": "motionloom-deterministic-fixture-builder",
+    "task_id": "browser-review-smoke-task",
+    "source": "repository-fixture",
+    "generated_at": "2026-08-14T00:00:00Z",
+    "agent": "motionloom-ci"
+  },
+  "human_review": {
+    "reviewer": "MotionLoom fixture maintainer",
+    "decision": "approved",
+    "scope": "deterministic runtime and contract fixture, not production art approval",
+    "reviewed_at": "2026-08-14T00:00:00Z",
+    "user_confirmed": true,
+    "notes": "The fixture is eligible for repository CI and PR evidence; final product approval remains outside this artifact."
+  },
+  "license": {
+    "spdx": "MIT",
+    "source": "MotionLoom repository fixture",
+    "attribution": "MotionLoom deterministic browser-review smoke fixture."
+  },
+  "files": [
+    {
+      "path": "animation.json",
+      "role": "runtime-scene",
+      "sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a"
+    }
+  ],
+  "provenance_chain": [
+    {
+      "step": "generate",
+      "actor": "agent:motionloom-ci",
+      "source": "repository-fixture",
+      "timestamp": "2026-08-14T00:00:00Z"
+    },
+    {
+      "step": "runtime-test",
+      "actor": "runtime:lottie",
+      "source": "browser-review-smoke runtime evidence",
+      "timestamp": "2026-08-14T00:00:00Z"
+    },
+    {
+      "step": "human-review",
+      "actor": "user:fixture-maintainer",
+      "source": "deterministic fixture review boundary",
+      "timestamp": "2026-08-14T00:00:00Z"
+    }
+  ],
+  "runtime_evidence": {
+    "status": "pass",
+    "runtime": "lottie-runtime",
+    "tested_at": "2026-08-14T00:00:00Z",
+    "evidence_path": "snapshot/.render-meta.json"
+  },
+  "full_gate": {
+    "status": "pass",
+    "quality_gate": "pass",
+    "visual_truth": "pass",
+    "license": "pass",
+    "checked_at": "2026-08-14T00:00:00Z",
+    "report_path": "artifacts/browser-review-smoke-task/quality-report.json"
+  }
+}

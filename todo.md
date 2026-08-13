@@ -301,4 +301,21 @@
 - [x] Cập nhật CHANGELOG, release note và ROADMAP; giữ ranh giới rõ giữa Unreleased/release candidate và bản đã publish.
 - [x] Chạy release verifier, full regression, docs/Skill validation, runtime/quality checks và npm tarball audit.
 - [x] Tạo commit `61edd2c` và local tag `v2.2.0-rc.1`; kiểm tra review boundary và working tree sạch.
-- [ ] Chỉ push/tag remote sau explicit user confirmation; chỉ publish npm sau confirmation release/publish riêng.
+- [x] Push/tag remote sau explicit user confirmation; publish npm sau confirmation release/publish riêng.
+
+## Approved official publication: 2.2.0
+
+- [x] Kiểm tra tag `v2.2.0-rc.1`, commit, ba CI workflow và registry trước publication.
+- [x] Tạo GitHub Release chính thức `v2.2.0` với release note đã kiểm chứng.
+- [x] Publish `motionloom@2.2.0` lên npm với dist-tag `latest`.
+- [x] Xác minh GitHub Release, npm metadata, tarball contents và release traceability end-to-end.
+
+## Approved Agent-created Asset Provenance Contract
+- [x] Audit production-hero preflight gate và khóa các authority/origin/readiness states mới.
+- [x] Thêm schema provenance đa tầng cho `ai_generated`, `ai_assisted`, `ai_assisted_human_reviewed`, `artist_authored` và `unknown`.
+- [x] Tách `runtime_ready`, `review_required`, `production_eligible` và `production_approved`; không để Agent tự cấp approval.
+- [x] Nối `ai_generated_pilot` vào hero preflight để cho phép runtime ingest/test nhưng fail-closed ở production gate.
+- [x] Bổ sung generator/model/task/source/license/SHA-256/derivation-chain và human-review metadata.
+- [x] Thêm fixture AI-generated pilot, report contract và regression chống self-asserted artist authority.
+- [x] Cập nhật SKILL.md, Agent Card, README, schema references và docs về AI-first human-governed asset workflow.
+- [x] Chạy full validation; commit local và chỉ push sau explicit user confirmation.

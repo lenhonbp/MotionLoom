@@ -95,6 +95,7 @@ def main() -> int:
         "--task-dir", str(task_dir),
         "--require-browser-review",
         "--require-visual-truth",
+        "--require-asset-provenance",
     ]
     print("== running context-bound quality gate ==")
     run(repo, [python, *quality_args])
@@ -121,6 +122,7 @@ def main() -> int:
         f"- snapshot frames: 0/50/100% in src/output/{args.scene}/snapshot/\n"
         "- context-bound quality gate: passed\n"
         f"- brand tokens bound from {args.context or 'project-context.json'}"
+        "\n- asset provenance: production_eligible (human approval remains separate)"
     )
     run(repo, ["git", "commit", "-m", commit_message])
 

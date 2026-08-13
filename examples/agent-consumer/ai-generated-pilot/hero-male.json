@@ -1,0 +1,10 @@
+{
+  "fixture": "ai-generated-pilot",
+  "asset_id": "hero-male-ai-pilot",
+  "framework": "body-rig",
+  "purpose": "Deterministic runtime-ingest fixture; not production art and not artist-authored.",
+  "bones": ["root", "pelvis", "chest", "head", "hand_r", "hand_l"],
+  "animations": ["idle", "attack", "hit", "death"],
+  "events": ["weapon_attach", "vfx_hit"],
+  "provenance_note": "This fixture demonstrates AI-generated origin and must remain outside production approval."
+}

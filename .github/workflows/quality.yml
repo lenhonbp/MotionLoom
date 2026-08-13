@@ -291,7 +291,7 @@ jobs:
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
-              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-visual-truth
+              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-visual-truth --require-asset-provenance
           done < /tmp/changed-scenes
 
   project-corpus:

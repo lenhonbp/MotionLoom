@@ -36,7 +36,19 @@ Support here means that the repository exposes a deterministic discovery contrac
 
 ## Required first-run sequence
 
-Run `motionloom discovery check --root <checkout> --json`, inspect `source`, then run project analysis with `motionloom analyze <project> --init-memory`. Load the project context and durable Project Memory before planning. After rendering, prepare a task-bound browser candidate and suggest or trigger the internal Dev Lab. Capture user feedback separately from runtime evidence. A valid signature, quality gate or screenshot is not a user approval.
+Run `motionloom discovery check --root <checkout> --json`, inspect `source`, then run project analysis with `motionloom analyze <project> --init-memory`. Load the project context and durable Project Memory before planning. After selecting or generating an asset, create `asset-provenance.json` and run the runtime-mode check before ingest. An AI-generated pilot may proceed to the real runtime and Dev Lab, but it must remain non-production-eligible. After rendering, prepare a task-bound browser candidate and suggest or trigger the internal Dev Lab. Capture user feedback separately from runtime evidence. A valid signature, quality gate or screenshot is not a user approval.
+
+## AI-first asset workflow
+
+The Agent must distinguish these transitions rather than collapsing them into one `approved` flag:
+
+| Transition | Allowed actor | Required evidence |
+|---|---|---|
+| `blocked` → `runtime_ready` | Agent or runtime validator | Safe paths, valid schema, license/source, file hashes and real runtime evidence |
+| `runtime_ready` → `production_eligible` | Contract gate plus human review where the authority tier requires it | Full quality/visual/runtime gate and valid authority record |
+| `production_eligible` → `production_approved` | User or designated human reviewer only | Explicit review decision persisted outside the Agent's self-assertion |
+
+Never rewrite `ai_generated` as `artist_authored`, never infer human review from a signature, and never set `production_approved` from `quality-gate`. Use `motionloom asset-provenance report` to show the boundary in a handoff.
 
 ## Portability policy
 

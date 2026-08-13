@@ -4,7 +4,14 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
-- No unreleased changes are currently tracked.
+### Added
+
+- AI-first, human-governed asset provenance contract with explicit authority/origin tiers, readiness states, generator/derivation metadata, per-file SHA-256, license/source records, runtime evidence and human-review boundaries.
+- Cross-platform `motionloom asset-provenance` commands for validation, classification, reporting and runtime/production checks, plus a transparent AI-generated pilot fixture.
+
+### Fixed
+
+- Production quality and PR preflight now fail closed when an asset is unknown, self-asserted as artist-authored, not production-eligible or missing a manifest-bound provenance record; `production_approved` remains human-only.
 
 ## [2.2.0] - 2026-08-13
 

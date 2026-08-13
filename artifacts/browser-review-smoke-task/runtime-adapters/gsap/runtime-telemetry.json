@@ -1,24 +1,24 @@
 {
   "schema_version": "1.0",
-  "run_id": "1786629946947-80738",
-  "generated_at": "2026-08-13T14:05:49.713Z",
+  "run_id": "1786641414714-93205",
+  "generated_at": "2026-08-13T17:16:57.470Z",
   "mode": "runtime-telemetry",
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "framework": "gsap",
   "runtime": "gsap@3.15.0",
   "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-  "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+  "manifest_sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623",
   "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
   "samples": [
     {
       "sequence": 0,
       "percent": 0,
-      "captured_at_ms": 690.8999999761581,
+      "captured_at_ms": 704.8000000119209,
       "raf_intervals_ms": [
-        16.59999999999991,
         16.700000000000045,
-        16.700000000000045
+        16.600000000000023,
+        16.59999999999991
       ],
       "state_sha256": "1689db87591c2372350f67bacbeb61ccbf9e4a8b5f8f19b10d9c0be0eef6f9a8",
       "state": {
@@ -30,11 +30,11 @@
     {
       "sequence": 1,
       "percent": 50,
-      "captured_at_ms": 774.3000000119209,
+      "captured_at_ms": 788.1000000238419,
       "raf_intervals_ms": [
-        16.600000000000023,
         16.699999999999932,
-        16.700000000000045
+        16.700000000000045,
+        16.600000000000023
       ],
       "state_sha256": "553a81c8ec75aee1891509b4b1381b715617d13de906965a6f95284f9e8bcd08",
       "state": {
@@ -46,11 +46,11 @@
     {
       "sequence": 2,
       "percent": 100,
-      "captured_at_ms": 857.6999999880791,
+      "captured_at_ms": 871.5,
       "raf_intervals_ms": [
-        16.600000000000023,
         16.700000000000045,
-        16.699999999999932
+        16.699999999999932,
+        16.600000000000023
       ],
       "state_sha256": "1cb06296dad7efa85ea1a7e9e8efcbbeb5f79cd83faa3a05afa08dbe69a442b0",
       "state": {

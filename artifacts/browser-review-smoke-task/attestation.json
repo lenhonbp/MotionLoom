@@ -2,13 +2,13 @@
   "schema_version": "1.0",
   "envelope": {
     "payload_type": "application/vnd.motionloom.attestation+json;version=1",
-    "payload_sha256": "03acad404c46ebaf1674e524cc0acb91eb25f66c929904c07f94aea922ecdd35",
-    "payload_base64": "eyJwcmVkaWNhdGUiOnsiYnVpbGRlciI6eyJuYW1lIjoibW90aW9ubG9vbS1hdHRlc3RhdGlvbi1idWlsZGVyIiwidmVyc2lvbiI6IjEuMC4wIn0sImNvbnRleHRfaGFzaCI6ImNiYmQ0M2E1M2EwZGRkNWNmNTQ1MmRmNWY2ZDUyMWYwNjgyOTQ2NWJkNThjNmQ3NjRhNTlkNTAxZWQxNzEwZmEiLCJldmlkZW5jZSI6eyJydW50aW1lX2V2aWRlbmNlX3NoYTI1NiI6ImJhZGE3OGUxNTUyNzQ3NTFkZjZhMWZiOGQ3NDk4MjRhOGY5MmNjYzg3MmFkOWMyZTY0MGU4ODVhNDc4NDEwMzgiLCJydW50aW1lX3RlbGVtZXRyeV9zaGEyNTYiOiI2NWNhYWI2ZDY2NmI5MjQ1M2VkNWI1MTUzMGYyZGFlZmFkYjg1MWJhOTlkMmVkMDJmOTY4OGY4MzNlNDBiNDRlIiwidmVyaWZpZXJfcmVwb3J0X3NoYTI1NiI6ImUzN2NmM2Q4Y2JjY2JjMjcwMjZhM2I3OTYyZTQ2OTVjMjVkZWY5NWFhZWVjMjZiODYzNzk4NWNhNjBkODFmNmQifSwiZ2VuZXJhdGVkX2F0IjoiMjAyNi0wOC0xM1QxNDowODowOS4yMDIzMzRaIiwibWFuaWZlc3Rfc2hhMjU2IjoiNDY3ZmVhMjU1YTE4ZWZiODY4N2U3OGExYTYwNjYyYWQzMGQ0ZmE2Zjc3ZDljM2YzODc4MTk2ZjNjNWU2NzBhZCIsIm1vdGlvbl9pcl9zaGEyNTYiOiJiZGIyMzA1NzM3ZTVkZWU5YjllZTA3OGRkNTY1N2E0YTU3MTdiZjQxODRmMTEyYTFkMDFhYzgyMzYxYzVhMjNmIiwicG9saWN5X3ZlcnNpb24iOiIxLjAiLCJwcm92ZW5hbmNlX2NoYWluX2hhc2giOiJjNmFhN2Q2NmM0YjAzM2JhNmNmMzMzMGFjNzhhNmNkMWVhYTU0MTk5Nzk2YmNlZGFmNjYxNzFkNzZlZmJhZDExIiwic2NlbmUiOiJicm93c2VyLXJldmlldy1zbW9rZSIsInNvdXJjZV9zaGEyNTYiOiJjNWFiMzEyNDI3Njc4YjE3YWU5MDNkMjgwZDg5ZGI5ZDIwMjY3MGYwMzFmMTBhZDZmZTc3NGZjOWFhZWNlZThhIiwidGFza19pZCI6ImJyb3dzZXItcmV2aWV3LXNtb2tlLXRhc2sifSwicHJlZGljYXRlX3R5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L3ByZWRpY2F0ZS9hbmltYXRpb24tZXZpZGVuY2UvdjEiLCJzdWJqZWN0IjpbeyJkaWdlc3QiOnsic2hhMjU2IjoiNDY3ZmVhMjU1YTE4ZWZiODY4N2U3OGExYTYwNjYyYWQzMGQ0ZmE2Zjc3ZDljM2YzODc4MTk2ZjNjNWU2NzBhZCJ9LCJuYW1lIjoiYnJvd3Nlci1yZXZpZXctc21va2UifV0sInR5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L2F0dGVzdGF0aW9uL3YxIn0=",
+    "payload_sha256": "07c9cf028479c21a83af3aed73630fef45a21a0fe329c71acd6a2ce05d0f652f",
+    "payload_base64": "eyJwcmVkaWNhdGUiOnsiYnVpbGRlciI6eyJuYW1lIjoibW90aW9ubG9vbS1hdHRlc3RhdGlvbi1idWlsZGVyIiwidmVyc2lvbiI6IjEuMC4wIn0sImNvbnRleHRfaGFzaCI6ImNiYmQ0M2E1M2EwZGRkNWNmNTQ1MmRmNWY2ZDUyMWYwNjgyOTQ2NWJkNThjNmQ3NjRhNTlkNTAxZWQxNzEwZmEiLCJldmlkZW5jZSI6eyJydW50aW1lX2V2aWRlbmNlX3NoYTI1NiI6Ijg4MTk0YjhlZDhlOGViOTc4MGE4MGJjNTUxMTRiOWNmNTI4ODZjOTExYjcwYTdmNDMzMWMxOGZhMzlhOWIwOTAiLCJydW50aW1lX3RlbGVtZXRyeV9zaGEyNTYiOiI5NmEwNTFlZGZhN2JkOTllNDI3NDU2OTZiNGUxYmE2OThlNGJiOTQ4ZjM1MTk3NWRmNTA2NWQyNjYyZWQzMTExIiwidmVyaWZpZXJfcmVwb3J0X3NoYTI1NiI6ImYwMTliOWFmZjBlOWY2ZTg0M2IzZTg3MzQ0MTg0NDg4MjI3OTBiYjgwNjNkZjZkZjk5NzY1ODlkNmQ5YTE0M2UifSwiZ2VuZXJhdGVkX2F0IjoiMjAyNi0wOC0xM1QxNzoxNzozOC4wNjU4NDJaIiwibWFuaWZlc3Rfc2hhMjU2IjoiOGQxZTA3YzgxZGJiY2JjYzA2MDQxNWFjNzFkZmNhZTdjZTg4ZjJlN2FhOTEzNDdiMjI2ZGJmNGY1NTRlNTYyMyIsIm1vdGlvbl9pcl9zaGEyNTYiOiJiZGIyMzA1NzM3ZTVkZWU5YjllZTA3OGRkNTY1N2E0YTU3MTdiZjQxODRmMTEyYTFkMDFhYzgyMzYxYzVhMjNmIiwicG9saWN5X3ZlcnNpb24iOiIxLjAiLCJwcm92ZW5hbmNlX2NoYWluX2hhc2giOiJjNmFhN2Q2NmM0YjAzM2JhNmNmMzMzMGFjNzhhNmNkMWVhYTU0MTk5Nzk2YmNlZGFmNjYxNzFkNzZlZmJhZDExIiwic2NlbmUiOiJicm93c2VyLXJldmlldy1zbW9rZSIsInNvdXJjZV9zaGEyNTYiOiJjNWFiMzEyNDI3Njc4YjE3YWU5MDNkMjgwZDg5ZGI5ZDIwMjY3MGYwMzFmMTBhZDZmZTc3NGZjOWFhZWNlZThhIiwidGFza19pZCI6ImJyb3dzZXItcmV2aWV3LXNtb2tlLXRhc2sifSwicHJlZGljYXRlX3R5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L3ByZWRpY2F0ZS9hbmltYXRpb24tZXZpZGVuY2UvdjEiLCJzdWJqZWN0IjpbeyJkaWdlc3QiOnsic2hhMjU2IjoiOGQxZTA3YzgxZGJiY2JjYzA2MDQxNWFjNzFkZmNhZTdjZTg4ZjJlN2FhOTEzNDdiMjI2ZGJmNGY1NTRlNTYyMyJ9LCJuYW1lIjoiYnJvd3Nlci1yZXZpZXctc21va2UifV0sInR5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L2F0dGVzdGF0aW9uL3YxIn0=",
     "signatures": [
       {
-        "key_id": "motionloom-ci-phase2",
+        "key_id": "ci-local-asset-provenance",
         "algorithm": "ed25519",
-        "signature_base64": "maO2bx433sg2beD5fTrvIwA5PRlYZtpmcxQZy7kwsln4aVCQsmFlg7LbHGGYT1FNAEcaOvPUNmhWxKoDERkUBg=="
+        "signature_base64": "ktlgxXkx9jJrVh2SeE7rV7nWup2BAMaeuFM5QG1CgZCh+9E6nroYyGZNHGveGnlmhz9yemgYwecxzFrptU10Cw=="
       }
     ]
   },
@@ -19,7 +19,7 @@
       {
         "name": "browser-review-smoke",
         "digest": {
-          "sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad"
+          "sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623"
         }
       }
     ],
@@ -28,16 +28,16 @@
       "scene": "browser-review-smoke",
       "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
       "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-      "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+      "manifest_sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623",
       "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
       "evidence": {
-        "runtime_evidence_sha256": "bada78e155274751df6a1fb8d749824a8f92ccc872ad9c2e640e885a47841038",
-        "runtime_telemetry_sha256": "65caab6d666b92453ed5b51530f2daefadb851ba99d2ed02f9688f833e40b44e",
-        "verifier_report_sha256": "e37cf3d8cbccbc27026a3b7962e4695c25def95aaeec26b8637985ca60d81f6d"
+        "runtime_evidence_sha256": "88194b8ed8e8eb9780a80bc55114b9cf52886c911b70a7f4331c18fa39a9b090",
+        "runtime_telemetry_sha256": "96a051edfa7bd99e42745696b4e1ba698e4bb948f351975df5065d2662ed3111",
+        "verifier_report_sha256": "f019b9aff0e9f6e843b3e8734418448822790bb8063df6df9976589d6d9a143e"
       },
       "provenance_chain_hash": "c6aa7d66c4b033ba6cf3330ac78a6cd1eaa54199796bcedaf66171d76efbad11",
       "policy_version": "1.0",
-      "generated_at": "2026-08-13T14:08:09.202334Z",
+      "generated_at": "2026-08-13T17:17:38.065842Z",
       "builder": {
         "name": "motionloom-attestation-builder",
         "version": "1.0.0"

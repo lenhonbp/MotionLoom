@@ -1,22 +1,22 @@
 {
   "schema_version": "1.0",
-  "run_id": "1786629946947-80738",
-  "generated_at": "2026-08-13T14:05:50.646Z",
+  "run_id": "1786641414714-93205",
+  "generated_at": "2026-08-13T17:16:58.387Z",
   "mode": "runtime-telemetry",
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "framework": "framer-motion",
   "runtime": "framer-motion@13.1.0",
   "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-  "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+  "manifest_sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623",
   "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
   "samples": [
     {
       "sequence": 0,
       "percent": 0,
-      "captured_at_ms": 705.7000000476837,
+      "captured_at_ms": 692.1999999880791,
       "raf_intervals_ms": [
-        16.600000000000023,
+        16.700000000000045,
         16.700000000000045,
         16.699999999999932
       ],
@@ -30,9 +30,9 @@
     {
       "sequence": 1,
       "percent": 50,
-      "captured_at_ms": 789.1000000238419,
+      "captured_at_ms": 775.5999999642372,
       "raf_intervals_ms": [
-        16.699999999999932,
+        16.59999999999991,
         16.700000000000045,
         16.600000000000023
       ],
@@ -46,11 +46,11 @@
     {
       "sequence": 2,
       "percent": 100,
-      "captured_at_ms": 872.4000000357628,
+      "captured_at_ms": 858.8999999761581,
       "raf_intervals_ms": [
         16.700000000000045,
-        16.699999999999932,
-        16.600000000000023
+        16.59999999999991,
+        16.700000000000045
       ],
       "state_sha256": "1cb06296dad7efa85ea1a7e9e8efcbbeb5f79cd83faa3a05afa08dbe69a442b0",
       "state": {

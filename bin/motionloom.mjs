@@ -37,6 +37,7 @@ const PYTHON_COMMANDS = {
   discovery: "scripts/discovery.py",
   "visual-truth": "scripts/visual-truth.py",
   "remediation-learning": "scripts/remediation-learning.py",
+  "asset-provenance": "scripts/asset-provenance.py",
 };
 
 function printHelp() {
@@ -65,6 +66,7 @@ Commands:
   discovery              Check Agent surfaces, source identity and install matrix
   visual-truth           Build or validate provenance-bound visual comparisons
   remediation-learning   Record or summarize user-confirmed remediation and benchmark history
+  asset-provenance       Validate, classify or report asset origin and production readiness
 
 Cross-platform examples:
   motionloom analyze . --init-memory
@@ -76,6 +78,7 @@ Cross-platform examples:
   motionloom discovery install-matrix --root . --json
   motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json
   motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --json
+  motionloom asset-provenance check --input <asset-provenance.json> --root <scene-dir> --mode runtime --json
 
 The CLI never grants approval or opens a pull request by itself. User review
 and explicit repository side-effect confirmation remain separate gates.

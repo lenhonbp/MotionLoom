@@ -6,7 +6,7 @@
   "issues": [],
   "signers": [
     {
-      "key_id": "motionloom-ci-phase2",
+      "key_id": "ci-local-asset-provenance",
       "status": "verified",
       "algorithm": "ed25519"
     }
@@ -16,7 +16,7 @@
     "scene": "browser-review-smoke",
     "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
     "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
-    "manifest_sha256": "467fea255a18efb8687e78a1a60662ad30d4fa6f77d9c3f3878196f3c5e670ad",
+    "manifest_sha256": "8d1e07c81dbbcbcc060415ac71dfcae7ce88f2e7aa91347b226dbf4f554e5623",
     "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f"
   }
 }

@@ -14,7 +14,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** the repository source and `package.json` are at **2.1.0**. The public npm registry currently serves **2.0.0** and no GitHub tag/Release for 2.1.0 exists yet; a maintainer must perform the protected manual release before the registry and GitHub release state change.
+> **Release posture:** `motionloom@2.2.0` is the current public npm release and GitHub release baseline. The asset provenance tier contract in this working tree is tracked as an unreleased contract change until its validation and maintainer release process completes.
 
 ## Why MotionLoom
 
@@ -88,11 +88,11 @@ motionloom render loading
 motionloom devlab loading
 
 # Validate the exact task bundle before any Git side effect.
-motionloom quality-gate --scene loading \
+  motionloom quality-gate --scene loading \
   --context project-context.json \
   --task-dir artifacts/loading-task \
   --require-browser-review --require-intelligence --require-p1 \
-  --require-benchmark --require-telemetry --require-attestation
+  --require-benchmark --require-telemetry --require-attestation --require-asset-provenance
 
 # Local-only by default. A user must review and explicitly authorize side effects.
 motionloom pr loading --task-dir artifacts/loading-task
@@ -147,6 +147,32 @@ MotionLoom keeps distinct layers distinct:
 
 `approval` remains `false` in attestation and verifier artifacts. The default PR mode is local-only (`OPEN_PR=0`); commit, push and pull-request operations remain explicit side effects.
 
+## Asset provenance tiers
+
+MotionLoom separates **asset origin**, **runtime readiness**, **production eligibility** and **human approval**. This is essential for AI-first workflows: an Agent may create a valid pilot, ingest it into the real runtime and expose it in Dev Lab without being allowed to call that pilot artist-authored or approved for production.
+
+| Authority / origin | Runtime behavior | Production behavior |
+|---|---|---|
+| `ai_generated` | `runtime_ready` when hashes, license metadata and runtime evidence pass | Never `production_eligible` |
+| `ai_assisted` | `runtime_ready` after contract validation | Eligible only after recorded human sign-off and full gate |
+| `ai_assisted_human_reviewed` | `runtime_ready` | `review_required` until the declared production gate is complete; no automatic approval |
+| `artist_authored` | Runtime-testable when the package is valid | Eligible after verified authority, license, runtime and quality checks; not from Agent self-assertion |
+| `unknown` | `blocked` | Blocked |
+
+The readiness value `production_approved` is reserved for a human decision and is not minted by `asset-provenance`, `quality-gate`, attestation or any Agent. Use the following commands against the exact scene artifact:
+
+```bash
+motionloom asset-provenance validate --input src/output/<scene>/asset-provenance.json --json
+motionloom asset-provenance check --input src/output/<scene>/asset-provenance.json \
+  --root src/output/<scene> --mode runtime \
+  --manifest src/output/<scene>/manifest.json --json
+motionloom asset-provenance check --input src/output/<scene>/asset-provenance.json \
+  --root src/output/<scene> --mode production \
+  --manifest src/output/<scene>/manifest.json --json
+```
+
+The [AI-generated pilot fixture](examples/agent-consumer/ai-generated-pilot-provenance.json) demonstrates the intended boundary: it is transparent and runtime-ingestible, but it cannot pass a production gate merely because an Agent declared it complete.
+
 ## How an Agent uses the Skill
 
 The public integration surfaces are intentionally small and inspectable:
@@ -177,6 +203,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | `artifacts/<task-id>/` | Per-task evidence, report and handoff bundle |
 | `schemas/visual-truth.schema.json`, `scripts/visual-truth.py` | Provenance-bound visual comparison and review explanation contract |
 | `schemas/remediation-history.schema.json`, `scripts/remediation-learning.py` | Append-only remediation/benchmark ledger and aggregate learning metrics |
+| `schemas/asset-provenance.schema.json`, `scripts/asset-provenance.py` | Tiered origin, authority, readiness, license, hash and human-review gate for asset candidates |
 | `tests/` | Regression, adversarial and deep-stress evaluation harnesses |
 
 ## Documentation map
@@ -189,6 +216,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
 | Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
+| Classify AI-generated or assisted assets | [Asset provenance tiers](schemas/asset-provenance.schema.json), `motionloom asset-provenance`, and the [production checklist](docs/CHECKLIST.md) |
 | Validate visual truth before review/PR | `motionloom visual-truth build|validate` and [production checklist](docs/CHECKLIST.md) |
 | Check current evidence posture | [Current status](docs/STATUS.md), [external corpus evidence](docs/audits/external-project-corpus-2026-08-13.md) and [historical audit snapshot](AUDIT-REPORT.md) |
 | Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |

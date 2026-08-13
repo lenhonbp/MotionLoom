@@ -12,6 +12,7 @@
     "file": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
     "runtime_evidence": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
     "visual_truth": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "asset_provenance": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
     "source_binding": {
       "type": "object",
       "required": ["kind", "source_path", "authority", "license", "sha256"],

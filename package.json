@@ -2,6 +2,7 @@
   "name": "motionloom",
   "version": "2.1.0",
   "type": "module",
+  "packageManager": "pnpm@11.20.0",
   "description": "MotionLoom: project-aware animation Skill with graph, provenance, Motion IR, runtime telemetry, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",
   "author": "lenhonbp",
   "bin": {
@@ -71,6 +72,7 @@
     "test": "node bin/motionloom.mjs test",
     "validate": "node bin/motionloom.mjs quality-gate --all",
     "doctor": "node bin/motionloom.mjs doctor --json",
+    "docs:check": "python3 scripts/docs-audit.py",
     "report": "node bin/motionloom.mjs report",
     "report:check": "node bin/motionloom.mjs report-contract",
     "review": "node bin/motionloom.mjs review-hook",

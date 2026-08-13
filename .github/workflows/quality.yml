@@ -1,5 +1,7 @@
 name: Animation Quality Gate
 
+name: MotionLoom Quality
+
 on:
   pull_request:
     paths:
@@ -28,6 +30,14 @@ on:
       - "assets/library/**"
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   cross-platform-memory:
@@ -42,6 +52,11 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -51,10 +66,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
+          cache: pnpm
 
       - name: Install package dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run Project Memory recovery contract
         run: python tests/scripts/test_project_memory.py
@@ -72,6 +87,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -84,13 +104,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: pnpm
 
       - name: Install runtime and Dev Lab dependencies
         run: |
-          npm install
+          pnpm install --frozen-lockfile
           npx playwright install --with-deps chromium
           cd dev-lab
-          npm install
+          pnpm install --frozen-lockfile
 
       - name: Run engine tests
         run: python3 tests/scripts/run_tests.py

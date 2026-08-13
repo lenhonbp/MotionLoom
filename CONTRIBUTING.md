@@ -36,6 +36,12 @@ npm publish --dry-run --access public
 
 For changes to a scene or evidence contract, also run the appropriate report contract, browser-review validation, quality gate and `npm run audit:deep`. Keep generated local runtime state and temporary project memory out of the commit.
 
+## GitHub Actions and release environments
+
+Every pull request should pass the quality and documentation workflows. Security analysis may be skipped for an untrusted fork when GitHub cannot grant security-event permissions; the maintainer must review the resulting status before merge. Dev Lab changes produce a retained build artifact for inspection.
+
+The `release.yml` workflow is deliberately `workflow_dispatch`-only. Maintainers must configure the protected `npm-release` environment and its required reviewers before using it. The workflow accepts either an `NPM_TOKEN` environment secret or npm trusted publishing through GitHub OIDC (`id-token: write`). Never put an npm token in repository variables, source files or pull-request logs. Creating a GitHub release is an explicit dispatch input.
+
 ## Pull request expectations
 
 Use a focused branch and a conventional commit-style title such as `feat(memory): ...`, `fix(runtime): ...` or `docs: ...`. A pull request should explain the user-visible change, list changed contracts, identify platform coverage, link tests and state limitations or remaining warnings. Schema changes must include fixtures and backward/forward compatibility notes where relevant.

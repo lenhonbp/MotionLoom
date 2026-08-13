@@ -225,3 +225,13 @@
 - [x] Chạy skill validation, docs link/structure checks, full regression, package dry-run và kiểm tra working tree trước commit.
 
 > Public repository acceptance: docs audit pass, Skill Doctor pass with 0 warnings, regression/intelligence/runtime checks pass, and npm dry-run produced `motionloom@2.1.0` with 132 files.
+
+## GitHub Actions CI/CD automation
+
+- [x] Tách workflow CI đa nền tảng, docs/metadata, security hygiene, package verification và release workflow có trigger rõ ràng.
+- [x] Giới hạn permissions theo job, tránh secret exposure trên fork và giữ release/npm publish sau environment approval.
+- [x] Bổ sung cache/dependency setup, artifact upload, concurrency và path filters để CI nhanh nhưng có kiểm chứng.
+- [x] Kiểm tra YAML/schema/workflow semantics, chạy local acceptance tương ứng và cập nhật README/CONTRIBUTING/release docs.
+- [ ] Tạo commit local; chỉ push sau explicit user confirmation.
+
+> CI/CD acceptance: docs/workflow audit, Skill Doctor, Project Memory contract, full regression, runtime adapters, browser-review snapshot harness, npm dry-run and diff hygiene pass. The release workflow remains manual-only and environment-protected.

@@ -21,3 +21,7 @@ MotionLoom can read and write files in the host project, invoke runtimes and pre
 Path guards, task identity, source/manifest hashes, evidence freshness, signer policy and approval invariants are security-relevant contracts. Report any bypass that allows cross-project memory, cross-task evidence, stale runtime output or unreviewed Git side effects.
 
 See the [signed attestation reference](references/signed-attestation.md), [browser review contract](references/browser-review-contract.md) and [2.1.0 release note](docs/releases/2.1.0.md) for the current threat model and limitations.
+
+## CI/CD controls
+
+GitHub Actions workflows default to read-only repository permissions. The publication workflow is manual-only, uses the protected `npm-release` environment, requests OIDC only for the release job, and keeps npm credentials in environment secrets. Dependency updates are proposed by Dependabot as pull requests rather than applied directly to `main`.

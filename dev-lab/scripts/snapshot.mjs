@@ -19,6 +19,8 @@ const argv = Object.fromEntries(
   process.argv.slice(2).map((a, i, arr) => [a.replace(/^--/, ""), arr[i + 1]]),
 );
 const scene = argv.scene;
+const taskId = argv["task-id"] || "unbound";
+const candidateId = argv["candidate-id"] || "";
 const progress = (argv.progress || "0,50,100").split(",").map(Number);
 const outDir = path.resolve(argv.out || `${ROOT}/../src/output/${scene}/snapshot`);
 
@@ -33,7 +35,13 @@ const page = await browser.newPage({ viewport: { width: 800, height: 600 } });
 
 // Boot the local dev-lab server (spawned by scripts/devlab.sh) or fall back to a static file.
 const base = process.env.LAB_URL || "http://localhost:3300";
-await page.goto(`${base}/?scene=${encodeURIComponent(scene)}&mode=snapshot`, {
+const query = new URLSearchParams({
+  scene,
+  mode: "snapshot",
+  task_id: taskId,
+  candidate_id: candidateId,
+});
+await page.goto(`${base}/?${query.toString()}`, {
   waitUntil: "networkidle",
   timeout: 30_000,
 });

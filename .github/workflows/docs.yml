@@ -1,0 +1,78 @@
+name: Documentation and Package Hygiene
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "ROADMAP.md"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "SECURITY.md"
+      - "SUPPORT.md"
+      - "SKILL.md"
+      - "docs/**"
+      - "references/**"
+      - ".github/**"
+      - "package.json"
+      - "scripts/docs-audit.py"
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "ROADMAP.md"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "SECURITY.md"
+      - "SUPPORT.md"
+      - "SKILL.md"
+      - "docs/**"
+      - "references/**"
+      - ".github/**"
+      - "package.json"
+      - "scripts/docs-audit.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-and-package:
+    name: Docs, metadata and npm package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate documentation, links and workflow safety
+        run: pnpm run docs:check
+
+      - name: Validate Skill metadata
+        run: python3 scripts/skill-doctor.py --json
+
+      - name: Inspect public npm tarball
+        run: npm pack --dry-run --access public

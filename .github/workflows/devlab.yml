@@ -1,0 +1,69 @@
+name: Dev Lab Build
+
+on:
+  pull_request:
+    paths:
+      - "dev-lab/**"
+      - ".github/workflows/devlab.yml"
+  push:
+    branches: [main]
+    paths:
+      - "dev-lab/**"
+      - ".github/workflows/devlab.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devlab-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    name: Run browser review harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: dev-lab/pnpm-lock.yaml
+
+      - name: Install Dev Lab dependencies
+        run: pnpm --dir dev-lab install --frozen-lockfile
+
+      - name: Install Chromium for the harness
+        run: pnpm --dir dev-lab exec playwright install --with-deps chromium
+
+      - name: Serve the static Dev Lab fixture
+        run: |
+          python3 -m http.server 3300 --directory dev-lab/public >/tmp/motionloom-devlab.log 2>&1 &
+          echo $! > /tmp/motionloom-devlab.pid
+
+      - name: Capture deterministic browser review snapshots
+        run: >-
+          pnpm --dir dev-lab exec node scripts/snapshot.mjs
+          --scene browser-review-smoke
+          --task-id professional-review-e2e
+          --candidate-id 88a2f2f18ba45a07f56e
+          --progress 0,50,100
+          --out /tmp/motionloom-devlab-snapshot
+
+      - name: Upload Dev Lab snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: motionloom-dev-lab-snapshot-${{ github.sha }}
+          path: /tmp/motionloom-devlab-snapshot
+          if-no-files-found: error
+          retention-days: 14

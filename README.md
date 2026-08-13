@@ -196,6 +196,20 @@ npm publish --dry-run --access public
 
 The GitHub Actions workflow runs the Project Memory and CLI contract on Ubuntu, macOS and Windows, then runs the full evidence-aware quality suite on Ubuntu. A package dry-run is part of release preparation. See [CONTRIBUTING.md](CONTRIBUTING.md) for the clean-checkout procedure and [CHANGELOG.md](CHANGELOG.md) for release discipline.
 
+## Automated CI/CD
+
+MotionLoom separates verification from publication. Pull requests and pushes to `main` run the quality, documentation, security and relevant Dev Lab workflows. A weekly Dependabot job proposes dependency updates for the root package, Dev Lab and GitHub Actions. The npm release workflow is manual only, protected by the `npm-release` environment, and requires the maintainer to choose the distribution tag; GitHub release creation is an explicit input rather than an automatic side effect.
+
+| Workflow | Trigger | Responsibility |
+|---|---|---|
+| `quality.yml` | Pull request, `main`, manual | Cross-platform memory/CLI matrix and full evidence-aware quality suite |
+| `docs.yml` | Documentation/package changes, `main`, manual | Internal links, metadata, workflow safety, Skill Doctor and npm tarball inspection |
+| `security.yml` | Pull request, `main`, weekly schedule, manual | Dependency review and CodeQL for JavaScript/Python |
+| `devlab.yml` | `dev-lab/**` changes, `main`, manual | Build and retain the browser review workbench artifact |
+| `release.yml` | Manual dispatch only | Regression, npm publish with provenance and optional GitHub release |
+
+To enable npm publication, configure a protected GitHub environment named `npm-release` and either add the `NPM_TOKEN` environment secret or configure npm trusted publishing for this repository. The workflow never runs on a pull request and never changes MotionLoom's user-review or approval contract.
+
 ## License
 
 MotionLoom is released under the [MIT License](LICENSE). Third-party runtime packages and source assets retain their own licenses and attribution requirements.

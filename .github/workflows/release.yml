@@ -1,0 +1,88 @@
+name: Release MotionLoom npm package
+
+on:
+  workflow_dispatch:
+    inputs:
+      npm_tag:
+        description: npm distribution tag
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+      create_github_release:
+        description: Create a GitHub release after npm publication
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Verify and publish npm package
+    runs-on: ubuntu-latest
+    environment: npm-release
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate docs and package metadata
+        run: pnpm run docs:check
+
+      - name: Validate Skill package
+        run: python3 scripts/skill-doctor.py --json
+
+      - name: Run release regression
+        run: python3 tests/scripts/run_tests.py
+
+      - name: Verify version and tag
+        env:
+          EXPECTED_TAG: ${{ inputs.npm_tag }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "Publishing motionloom@$version with npm tag $EXPECTED_TAG"
+          test -n "$version"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ inputs.npm_tag }}
+        run: npm publish --access public --provenance --tag "$NPM_TAG"
+
+      - name: Create GitHub release
+        if: inputs.create_github_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          gh release create "v$version" --title "MotionLoom $version" --generate-notes

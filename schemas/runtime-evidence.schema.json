@@ -11,8 +11,10 @@
     "mode": {"const": "runtime"},
     "harness": {"type": "string", "minLength": 1},
     "scene": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
     "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "motion_ir_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "status": {"const": "pass"},
     "frameworks": {
       "type": "array",
@@ -26,7 +28,17 @@
           "status": {"const": "pass"},
           "ready": {"const": true},
           "frames": {"type": "array", "minItems": 3},
-          "console_errors": {"type": "array"}
+          "console_errors": {"type": "array"},
+          "telemetry": {
+            "type": "object",
+            "required": ["file", "sha256", "metrics"],
+            "properties": {
+              "file": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "metrics": {"type": "object"}
+            },
+            "additionalProperties": true
+          }
         },
         "additionalProperties": true
       }

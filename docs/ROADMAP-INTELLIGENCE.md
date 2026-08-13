@@ -20,6 +20,12 @@ Milestone **1.8.0 đã hoàn tất và được merge vào `main`**. Deep audit 
 
 Audit này không tuyên bố hệ thống đã có cryptographic trust anchor bên ngoài repository. Các guard hiện tại là deterministic repository/runtime checks; approval vẫn chỉ đến từ review artifact hợp lệ và user consent.
 
+### 0.3 Evidence interoperability và runtime observability — 1.9.0
+
+Milestone **1.9.0 đã hoàn tất ở lớp internal evidence interoperability**. Runtime adapter thật ghi `runtime-telemetry.json` tại các scrub point với RAF timing, runtime state hashes và binding tới task, scene, source, manifest và Motion IR. `scripts/evidence-verifier.py` cung cấp verifier read-only với stable JSON result, age/path/symlink guards, cross-task identity checks, tamper detection và invariant `approval: false`.
+
+CI và quality gate đã có capture/verify sequence cùng cờ `--require-telemetry`; report collection và handoff quảng bá verifier report, runtime evidence và telemetry. Dev Lab hiển thị telemetry/verifier/benchmark trong evidence rail và khóa confirm khi integrity hoặc identity binding chưa pass. Đây là integrity contract nội bộ, chưa phải signed DSSE/in-toto trust anchor bên ngoài repository.
+
 ## 1. Baseline hiện tại và khoảng trống cần giải quyết
 
 | Lớp | Đã có | Khoảng trống chính | Hậu quả nếu chưa xử lý |
@@ -27,8 +33,8 @@ Audit này không tuyên bố hệ thống đã có cryptographic trust anchor b
 | Skill discovery | `SKILL.md`, `agent-card.json`, capability registry v0.1 | Chưa có refresh service và compatibility matrix theo từng browser/library release | Registry tốt hơn flat flags nhưng cần CI refresh có policy và diff review |
 | Project awareness | `project-context.json`, context hash, task binding, `project-graph.json` | Graph chưa có semantic constraint nodes và multi-scene supersedes đầy đủ | Agent đã có index quan hệ nhưng chưa suy luận continuity sâu |
 | Motion reasoning | `motion-spec.json`, `motion-ir.json`, analyzer/spec pipeline | Semantic lint và compiler intent → adapter plan chưa hoàn chỉnh | Intent phức tạp vẫn cần policy/profile và human review |
-| Provenance | Source binding, artifact manifest, `provenance.json`, hash chain | Chưa có signed attestation/DSSE và external verifier | Chuỗi bằng chứng đã verify được nội bộ nhưng chưa có trust anchor ngoài repo |
-| Runtime | Adapter thật cho Rive, GSAP, Framer Motion; evidence schema | Chưa có adapter interface chung và compatibility matrix theo browser/library/version | Thêm runtime mới dễ tạo logic đặc thù, khó so sánh và khó replay |
+| Provenance | Source binding, artifact manifest, `provenance.json`, hash chain, read-only evidence verifier | Chưa có signed attestation/DSSE và external trust anchor | Chuỗi bằng chứng đã verify được nội bộ nhưng chưa chống được repo compromise bằng chữ ký độc lập |
+| Runtime | Adapter thật cho Rive, GSAP, Framer Motion; runtime evidence và scrub-point telemetry | Chưa có adapter interface chung và compatibility matrix theo browser/library/version | Telemetry đã so sánh được integrity/runtime state, nhưng compatibility history vẫn cần chuẩn hóa |
 | Quality | Schema validation, quality gate, browser review | Semantic lint và continuity checks còn mỏng | File hợp lệ về cấu trúc nhưng vẫn sai nhịp, sai intent hoặc phá UX |
 | Review loop | Dev Lab, checklist, `review.json`, expiry/replay protection | Feedback chưa được chuyển thành root-cause/fix-plan có thể chạy lại | Agent thường rerender toàn scene thay vì sửa đúng nguyên nhân |
 | Evaluation | Regression scripts, E2E contract và bảy adversarial eval cases | Chưa có benchmark prompt/context đa dạng và aggregate historical metrics | Chưa đủ dữ liệu để khẳng định capability selection trên nhiều dự án |
@@ -193,9 +199,9 @@ Không nên đưa toàn bộ runbook vào `SKILL.md`. Agent Skills khuyến ngh�
 
 ## 7. Việc nên làm ngay ở milestone kế tiếp
 
-Milestone kế tiếp nên là **Evidence interoperability và runtime observability**, không phải thêm framework theo số lượng. Ưu tiên là signed attestation/DSSE hoặc external verifier, runtime frame telemetry, asset-level visual comparison có dataset được gắn nhãn, và aggregate benchmark history theo project/context/framework.
+Milestone 1.9.0 đã hoàn tất phần **internal evidence interoperability và runtime observability**. Phase kế tiếp nên chuyển từ integrity checks nội bộ sang **signed attestation và external trust anchor**, không nên thêm framework theo số lượng. Ưu tiên tiếp theo là DSSE/in-toto-compatible attestation, key rotation/revocation policy, external verifier độc lập với repository, asset-level visual comparison có dataset được gắn nhãn và aggregate benchmark history theo project/context/framework.
 
-Trình tự triển khai cụ thể là: xác định trust anchor và threat model trước; version schema và verifier contract; tạo fixture clean-room cho attestation/telemetry/visual comparison; thêm adversarial evals; sau đó mới nâng capability trong `agent-card.json`. Mỗi milestone phải giữ nguyên nguyên tắc: evidence có hash và identity, failure có stable exit code, heuristic không tự thành approval, và side effect GitHub luôn cần explicit confirmation.
+Trình tự triển khai cụ thể là: version trust-anchor schema trước; tạo clean-room fixtures cho signed attestation; thêm adversarial cases về signature forgery, key substitution, replay và revocation; sau đó mới nâng capability trong `agent-card.json`. Mỗi milestone phải giữ nguyên nguyên tắc: evidence có hash và identity, failure có stable exit code, heuristic không tự thành approval, và side effect GitHub luôn cần explicit confirmation.
 
 ### References
 

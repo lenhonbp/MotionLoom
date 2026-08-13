@@ -39,15 +39,18 @@
   ],
   "required_artifacts": [
     "browser-review.json",
-    "project-context.json",
+    "continuity-report.json",
+    "evidence-verifier-report.json",
     "execution-report.json",
+    "fix-plan.json",
+    "issue-register.json",
+    "project-context.json",
     "quality-report.json",
     "review.json",
-    "task.json",
-    "fix-plan.json",
+    "runtime-adapters/runtime-evidence.json",
+    "semantic-lint-benchmark.json",
     "semantic-lint-report.json",
-    "continuity-report.json",
-    "issue-register.json"
+    "task.json"
   ],
   "blockers": [
     "fix-plan-browser-review-smoke-task:fix-accessibility-keyboard-review"

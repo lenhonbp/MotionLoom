@@ -1,13 +1,13 @@
 {
   "manifest_version": "1.0",
   "task_id": "browser-review-smoke-task",
-  "generated_at": "2026-08-12T20:08:30Z",
+  "generated_at": "2026-08-13T05:12:41Z",
   "artifacts": [
     {
       "path": "REPORT.md",
       "type": "md",
-      "sha256": "9185c26b0c1ae9712ad920e11a4820cdf8d7b4c8dc2acbbbde83b3bc13c8b18e",
-      "bytes": 2569
+      "sha256": "fcd900264a14fab7053150d6ba0c6c60f7e33d15d4aaa52b6583999fc9377f36",
+      "bytes": 4235
     },
     {
       "path": "browser-review.json",
@@ -22,6 +22,12 @@
       "bytes": 744
     },
     {
+      "path": "evidence-verifier-report.json",
+      "type": "json",
+      "sha256": "b346414ec3b2fa74d0ef42cd510223d7f1ee9a2a0ff493ab6be4474f6b8029e1",
+      "bytes": 704
+    },
+    {
       "path": "fix-plan.json",
       "type": "json",
       "sha256": "2dbf9523484086567438ac5628a87de7567193f2327506640e8a1263776e5917",
@@ -30,8 +36,8 @@
     {
       "path": "handoff.json",
       "type": "json",
-      "sha256": "bdcbab12aa3872551ec7a71dbd13e389a9aa465a4d2ac38d88e9ce18fbb4c203",
-      "bytes": 1810
+      "sha256": "19ca4d743c3a1e4b53cba6ae0aecd155e7c53584be8fd58db05456c627c8b5a1",
+      "bytes": 1929
     },
     {
       "path": "issue-register.json",
@@ -72,14 +78,62 @@
     {
       "path": "replay-bundle.json",
       "type": "json",
-      "sha256": "a96449edd5775c4e16aaf10948b4a86910ad770e8ddfbe69599a5abea2ff5276",
-      "bytes": 3187
+      "sha256": "9f82084d21f15c60d528e50aafe68d769007d68bc66dedfd26d3f6e1901786d3",
+      "bytes": 4938
     },
     {
       "path": "review.json",
       "type": "json",
       "sha256": "217a10e85522fb9f69ccc5bd5afe865fc779e96687cabc20138a54260817b736",
       "bytes": 303
+    },
+    {
+      "path": "runtime-adapters/framer-motion/runtime-evidence.json",
+      "type": "json",
+      "sha256": "3dfeda5f63dcd00c24c7b623e7c4c5c16d6fb85a97e4a50362f47724f6dcfa5a",
+      "bytes": 1444
+    },
+    {
+      "path": "runtime-adapters/framer-motion/runtime-telemetry.json",
+      "type": "json",
+      "sha256": "f1b25d00328df344367163441384867f6bd3c350148e4bb49cd78b7144191649",
+      "bytes": 2109
+    },
+    {
+      "path": "runtime-adapters/gsap/runtime-evidence.json",
+      "type": "json",
+      "sha256": "602fa8f9fda099a19efd83fd820190f50a8ef0e1ef9fb08501302e49c21e782d",
+      "bytes": 1384
+    },
+    {
+      "path": "runtime-adapters/gsap/runtime-telemetry.json",
+      "type": "json",
+      "sha256": "f93c97c47582acf7f1b8dce08eb14d7daac2b2c3275266eb4e8d6773f30cb7f0",
+      "bytes": 2067
+    },
+    {
+      "path": "runtime-adapters/rive/runtime-evidence.json",
+      "type": "json",
+      "sha256": "ade8b965f7e4b73513d9939e347fbce37ca8b66cc94f34e4680a82a89d9fb3c1",
+      "bytes": 2127
+    },
+    {
+      "path": "runtime-adapters/rive/runtime-telemetry.json",
+      "type": "json",
+      "sha256": "16691fd7ad6845c1f7a28235cfd8881d34a1db68bf07940504e35478ea9f5df1",
+      "bytes": 2838
+    },
+    {
+      "path": "runtime-adapters/runtime-evidence.json",
+      "type": "json",
+      "sha256": "bb3248af074773d4ed39fb74953892f8b562f8a6e2a48dde09ae8d0d58efe356",
+      "bytes": 6269
+    },
+    {
+      "path": "semantic-lint-benchmark.json",
+      "type": "json",
+      "sha256": "ff0df9ddfb43999bb233552b05f3ef8853b2912f1e94a53b9a40b25f13235af0",
+      "bytes": 1217
     },
     {
       "path": "semantic-lint-report.json",

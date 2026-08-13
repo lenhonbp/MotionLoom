@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/runtime-telemetry.schema.json",
+  "title": "MotionLoom runtime frame telemetry",
+  "type": "object",
+  "required": ["schema_version", "run_id", "generated_at", "mode", "scene", "framework", "runtime", "samples", "metrics", "status"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "mode": {"type": "string", "const": "runtime-telemetry"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "framework": {"type": "string", "minLength": 1},
+    "runtime": {"type": "string", "minLength": 1},
+    "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "motion_ir_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "samples": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["sequence", "percent", "captured_at_ms", "raf_intervals_ms", "state_sha256", "state"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 0},
+          "percent": {"type": "number", "minimum": 0, "maximum": 100},
+          "captured_at_ms": {"type": "number", "minimum": 0},
+          "raf_intervals_ms": {"type": "array", "minItems": 1, "items": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000}},
+          "state_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "state": {"type": "object"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["sample_count", "raf_interval_count", "max_raf_interval_ms", "p95_raf_interval_ms"],
+      "properties": {
+        "sample_count": {"type": "integer", "minimum": 3},
+        "raf_interval_count": {"type": "integer", "minimum": 1},
+        "max_raf_interval_ms": {"type": "number", "exclusiveMinimum": 0},
+        "p95_raf_interval_ms": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "additionalProperties": true
+    },
+    "status": {"type": "string", "enum": ["pass", "fail"]}
+  },
+  "additionalProperties": true
+}

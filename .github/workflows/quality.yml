@@ -69,6 +69,17 @@ jobs:
           fi
           cat /tmp/changed-scenes
 
+      - name: Capture and verify runtime telemetry for changed scenes
+        run: |
+          if [ ! -s /tmp/changed-scenes ]; then
+            echo "No changed scenes; runtime telemetry capture is skipped."
+            exit 0
+          fi
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            bash scripts/capture-runtime-telemetry.sh "$scene" "artifacts/${scene}-task"
+          done < /tmp/changed-scenes
+
       - name: Generate semantic lint benchmarks for changed scenes
         run: |
           if [ ! -s /tmp/changed-scenes ]; then
@@ -84,6 +95,13 @@ jobs:
             fi
             python3 scripts/intelligence.py semantic-lint benchmark --task-dir "$task_dir" \
               --iterations 25 --threshold-ms 500 --output "$task_dir/semantic-lint-benchmark.json"
+          done < /tmp/changed-scenes
+
+      - name: Refresh task artifact manifest and handoff
+        run: |
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            python3 scripts/report.py collect --task-dir "artifacts/${scene}-task"
           done < /tmp/changed-scenes
 
       - name: Require task report and handoff for changed scenes
@@ -137,5 +155,5 @@ jobs:
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
-              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark
+              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry
           done < /tmp/changed-scenes

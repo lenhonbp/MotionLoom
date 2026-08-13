@@ -269,8 +269,10 @@ def test_deep_audit_contracts():
             "--root", str(root), "--scenes-file", str(scenes),
         ], capture_output=True, text=True)
         check(
-            "report contract selects strongest duplicate scene bundle",
-            contract.returncode == 0 and "professional-review-e2e" in contract.stdout,
+            "report contract selects deterministic complete scene bundle",
+            contract.returncode == 0
+            and contract.stdout.count("Selected bundles:") == 1
+            and "browser-review-smoke-task" in contract.stdout,
             contract.stdout.strip(),
         )
 
@@ -320,6 +322,60 @@ def test_deep_audit_contracts():
         capture_output=True, text=True,
     )
     check("runtime adapter rejects unsupported framework path", unsafe_runtime.returncode != 0 and "unsupported" in (unsafe_runtime.stderr + unsafe_runtime.stdout))
+
+
+def test_runtime_telemetry_verifier_contract():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        scene = root / "browser-review-smoke"
+        task = root / "artifacts/browser-review-smoke-task"
+        shutil.copytree(ROOT / "src/output/browser-review-smoke", scene)
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", task)
+        verifier = ROOT / "scripts/evidence-verifier.py"
+        base_args = [sys.executable, str(verifier), "--scene-dir", str(scene), "--task-dir", str(task)]
+        clean = subprocess.run(base_args, capture_output=True, text=True)
+        check("telemetry verifier accepts bound evidence", clean.returncode == 0 and '"approval": false' in clean.stdout)
+
+        telemetry_path = task / "runtime-adapters/rive/runtime-telemetry.json"
+        telemetry = json.loads(telemetry_path.read_text())
+        telemetry["samples"][0]["state"]["tampered"] = True
+        telemetry_path.write_text(json.dumps(telemetry, indent=2) + "\n")
+        tampered = subprocess.run(base_args, capture_output=True, text=True)
+        check("telemetry verifier rejects state tamper", tampered.returncode != 0 and "sha256 mismatch" in tampered.stdout)
+
+        cross_task = root / "artifacts/other-task"
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", cross_task)
+        cross_task_doc = json.loads((cross_task / "task.json").read_text())
+        cross_task_doc["task_id"] = "other-task"
+        (cross_task / "task.json").write_text(json.dumps(cross_task_doc, indent=2) + "\n")
+        cross_args = [sys.executable, str(verifier), "--scene-dir", str(scene), "--task-dir", str(cross_task), "--max-age-days", "1"]
+        cross = subprocess.run(cross_args, capture_output=True, text=True)
+        check("telemetry verifier rejects cross-task identity", cross.returncode != 0 and "task_id" in cross.stdout)
+
+        stale_task = root / "artifacts/stale-task"
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", stale_task)
+        stale_evidence = stale_task / "runtime-adapters/runtime-evidence.json"
+        stale_doc = json.loads(stale_evidence.read_text())
+        stale_doc["generated_at"] = "2020-01-01T00:00:00+00:00"
+        stale_evidence.write_text(json.dumps(stale_doc, indent=2) + "\n")
+        stale_args = [sys.executable, str(verifier), "--scene-dir", str(scene), "--task-dir", str(stale_task), "--max-age-days", "1"]
+        stale = subprocess.run(stale_args, capture_output=True, text=True)
+        check("telemetry verifier rejects stale evidence", stale.returncode != 0 and "stale" in stale.stdout)
+
+        symlink_task = root / "artifacts/symlink-task"
+        shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", symlink_task)
+        outside = root / "outside-telemetry"
+        outside.mkdir()
+        (outside / "runtime-telemetry.json").write_text(telemetry_path.read_text())
+        linked = symlink_task / "runtime-adapters/linked"
+        linked.symlink_to(outside, target_is_directory=True)
+        symlink_evidence = symlink_task / "runtime-adapters/runtime-evidence.json"
+        symlink_doc = json.loads(symlink_evidence.read_text())
+        symlink_doc["frameworks"][0]["telemetry"]["file"] = "linked/runtime-telemetry.json"
+        symlink_evidence.write_text(json.dumps(symlink_doc, indent=2) + "\n")
+        symlink_args = [sys.executable, str(verifier), "--scene-dir", str(scene), "--task-dir", str(symlink_task), "--max-age-days", "1"]
+        symlink = subprocess.run(symlink_args, capture_output=True, text=True)
+        check("telemetry verifier rejects symlink escape", symlink.returncode != 0 and "symlink" in symlink.stdout)
 
 
 def test_approved_browser_review_e2e_contract():
@@ -762,6 +818,7 @@ if __name__ == "__main__":
     test_placeholder_is_not_runtime_evidence()
     test_runtime_evidence_binding()
     test_deep_audit_contracts()
+    test_runtime_telemetry_verifier_contract()
     test_approved_browser_review_e2e_contract()
     test_intelligence_core_contracts()
     test_malformed_spec_is_rejected_cleanly()

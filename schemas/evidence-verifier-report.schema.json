@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/evidence-verifier-report.schema.json",
+  "title": "MotionLoom external evidence verifier report",
+  "type": "object",
+  "required": ["schema_version", "verifier", "verified", "approval", "issues", "bindings"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "verifier": {"type": "string", "const": "motionloom-evidence-verifier/1.0"},
+    "verified": {"type": "boolean"},
+    "approval": {"type": "boolean", "const": false},
+    "issues": {"type": "array", "items": {"type": "string"}},
+    "bindings": {
+      "type": "object",
+      "required": ["scene", "task_id", "source_sha256", "manifest_sha256", "motion_ir_sha256", "telemetry_files"],
+      "properties": {
+        "scene": {"type": "string", "minLength": 1},
+        "task_id": {"type": "string", "minLength": 1},
+        "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "motion_ir_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "telemetry_files": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": true
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "max_age_days": {"type": "number", "minimum": 0}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

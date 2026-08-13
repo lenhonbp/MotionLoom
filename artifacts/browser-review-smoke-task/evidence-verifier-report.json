@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "verifier": "motionloom-evidence-verifier/1.0",
+  "verified": true,
+  "approval": false,
+  "issues": [],
+  "bindings": {
+    "scene": "browser-review-smoke",
+    "task_id": "browser-review-smoke-task",
+    "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+    "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+    "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+    "telemetry_files": [
+      "rive/runtime-telemetry.json",
+      "gsap/runtime-telemetry.json",
+      "framer-motion/runtime-telemetry.json"
+    ]
+  },
+  "policy": {
+    "max_age_days": 1.0
+  }
+}

@@ -23,12 +23,18 @@ if (outputRoot === ROOT || outputRoot === path.parse(outputRoot).root) {
 const baseUrl = `http://127.0.0.1:${port}`;
 const runId = `${Date.now()}-${process.pid}`;
 const runtimeScene = process.env.RUNTIME_SCENE || null;
+const runtimeTaskId = process.env.RUNTIME_TASK_ID || null;
 const runtimeSourcePath = process.env.RUNTIME_SOURCE_PATH ? path.resolve(process.env.RUNTIME_SOURCE_PATH) : null;
 const runtimeManifestPath = process.env.RUNTIME_MANIFEST_PATH ? path.resolve(process.env.RUNTIME_MANIFEST_PATH) : null;
+const runtimeMotionIrPath = process.env.RUNTIME_MOTION_IR_PATH ? path.resolve(process.env.RUNTIME_MOTION_IR_PATH) : null;
 
 function sha256File(filePath) {
   if (!filePath || !fs.existsSync(filePath)) return null;
   return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
+}
+
+function sha256Json(value) {
+  return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
 fs.rmSync(outputRoot, { recursive: true, force: true });
@@ -51,7 +57,7 @@ try {
   }
   await browser.close();
   const report = {
-    schema_version: "1.0",
+    schema_version: "1.1",
     run_id: runId,
     generated_at: new Date().toISOString(),
     mode: "runtime",
@@ -60,8 +66,10 @@ try {
     frameworks: summary,
   };
   if (runtimeScene) report.scene = runtimeScene;
+  if (runtimeTaskId) report.task_id = runtimeTaskId;
   if (runtimeSourcePath) report.source_sha256 = sha256File(runtimeSourcePath);
   if (runtimeManifestPath) report.manifest_sha256 = sha256File(runtimeManifestPath);
+  if (runtimeMotionIrPath) report.motion_ir_sha256 = sha256File(runtimeMotionIrPath);
   fs.writeFileSync(path.join(outputRoot, "runtime-evidence.json"), `${JSON.stringify(report, null, 2)}\n`);
   const failed = summary.filter((item) => item.status !== "pass");
   if (failed.length) {
@@ -105,17 +113,69 @@ async function testFramework(browser, framework) {
     await page.waitForFunction(() => Boolean(window.__animationAdapter?.ready), null, { timeout: 30000 });
     result.ready = true;
     result.runtime = await page.evaluate(() => window.__animationAdapter.runtime);
-    for (const percent of [0, 50, 100]) {
-      await page.evaluate(async (value) => {
+    const telemetrySamples = [];
+    for (const [sequence, percent] of [0, 50, 100].entries()) {
+      const timing = await page.evaluate(async (value) => {
         window.__animationAdapter.setProgress(value / 100);
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const timestamps = await new Promise((resolve) => {
+          const values = [];
+          const collect = (timestamp) => {
+            values.push(timestamp);
+            if (values.length >= 4) resolve(values);
+            else requestAnimationFrame(collect);
+          };
+          requestAnimationFrame(collect);
+        });
+        return {
+          captured_at_ms: performance.now(),
+          raf_intervals_ms: timestamps.slice(1).map((timestamp, index) => Math.max(0, timestamp - timestamps[index])),
+        };
       }, percent);
       const state = await page.evaluate(() => window.__animationAdapter.getState());
       const file = path.join(sceneDir, `frame-${String(percent).padStart(2, "0")}.png`);
       await page.screenshot({ path: file });
       result.frames.push({ percent, file: path.relative(ROOT, file), state });
+      telemetrySamples.push({
+        sequence,
+        percent,
+        captured_at_ms: Number(timing.captured_at_ms),
+        raf_intervals_ms: timing.raf_intervals_ms.map(Number),
+        state_sha256: sha256Json(state),
+        state,
+      });
     }
     if (consoleErrors.length) throw new Error(consoleErrors.join("; "));
+    const intervals = telemetrySamples.flatMap((sample) => sample.raf_intervals_ms);
+    const sortedIntervals = [...intervals].sort((a, b) => a - b);
+    const p95Index = Math.min(sortedIntervals.length - 1, Math.max(0, Math.ceil(sortedIntervals.length * 0.95) - 1));
+    const telemetry = {
+      schema_version: "1.0",
+      run_id: runId,
+      generated_at: new Date().toISOString(),
+      mode: "runtime-telemetry",
+      ...(runtimeTaskId ? { task_id: runtimeTaskId } : {}),
+      ...(runtimeScene ? { scene: runtimeScene } : {}),
+      framework,
+      runtime: result.runtime,
+      ...(runtimeSourcePath ? { source_sha256: sha256File(runtimeSourcePath) } : {}),
+      ...(runtimeManifestPath ? { manifest_sha256: sha256File(runtimeManifestPath) } : {}),
+      ...(runtimeMotionIrPath ? { motion_ir_sha256: sha256File(runtimeMotionIrPath) } : {}),
+      samples: telemetrySamples,
+      metrics: {
+        sample_count: telemetrySamples.length,
+        raf_interval_count: intervals.length,
+        max_raf_interval_ms: Math.max(...intervals),
+        p95_raf_interval_ms: sortedIntervals[p95Index],
+      },
+      status: "pass",
+    };
+    const telemetryPath = path.join(sceneDir, "runtime-telemetry.json");
+    fs.writeFileSync(telemetryPath, `${JSON.stringify(telemetry, null, 2)}\n`);
+    result.telemetry = {
+      file: path.relative(outputRoot, telemetryPath),
+      sha256: sha256File(telemetryPath),
+      metrics: telemetry.metrics,
+    };
     result.status = "pass";
   } catch (error) {
     result.error = error instanceof Error ? error.message : String(error);

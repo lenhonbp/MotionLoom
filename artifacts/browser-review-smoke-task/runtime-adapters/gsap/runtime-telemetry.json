@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "run_id": "1786598203602-44370",
+  "generated_at": "2026-08-13T05:16:46.653Z",
+  "mode": "runtime-telemetry",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "framework": "gsap",
+  "runtime": "gsap@3.15.0",
+  "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+  "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+  "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+  "samples": [
+    {
+      "sequence": 0,
+      "percent": 0,
+      "captured_at_ms": 750.2000000476837,
+      "raf_intervals_ms": [
+        16.800000000000068,
+        16.59999999999991,
+        16.600000000000023
+      ],
+      "state_sha256": "1689db87591c2372350f67bacbeb61ccbf9e4a8b5f8f19b10d9c0be0eef6f9a8",
+      "state": {
+        "progress": 0,
+        "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+        "opacity": "0.25"
+      }
+    },
+    {
+      "sequence": 1,
+      "percent": 50,
+      "captured_at_ms": 833.5,
+      "raf_intervals_ms": [
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932
+      ],
+      "state_sha256": "553a81c8ec75aee1891509b4b1381b715617d13de906965a6f95284f9e8bcd08",
+      "state": {
+        "progress": 0.5,
+        "transform": "matrix(0.889487, 0.405363, -0.405363, 0.889487, 210, -31.5)",
+        "opacity": "0.9063"
+      }
+    },
+    {
+      "sequence": 2,
+      "percent": 100,
+      "captured_at_ms": 933.5,
+      "raf_intervals_ms": [
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932
+      ],
+      "state_sha256": "1cb06296dad7efa85ea1a7e9e8efcbbeb5f79cd83faa3a05afa08dbe69a442b0",
+      "state": {
+        "progress": 1,
+        "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+        "opacity": "1"
+      }
+    }
+  ],
+  "metrics": {
+    "sample_count": 3,
+    "raf_interval_count": 9,
+    "max_raf_interval_ms": 16.800000000000068,
+    "p95_raf_interval_ms": 16.800000000000068
+  },
+  "status": "pass"
+}

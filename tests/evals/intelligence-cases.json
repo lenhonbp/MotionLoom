@@ -81,6 +81,26 @@
       "id": "p1-benchmark-execution-time",
       "class": "positive",
       "assertion": "The semantic lint benchmark records rule coverage and passes when p95 execution remains below threshold."
+    },
+    {
+      "id": "p2-runtime-verifier-clean",
+      "class": "positive",
+      "assertion": "The external verifier accepts internally consistent runtime telemetry while keeping approval false."
+    },
+    {
+      "id": "p2-runtime-verifier-tamper",
+      "class": "negative",
+      "assertion": "A changed telemetry file is rejected when its bound SHA-256 no longer matches."
+    },
+    {
+      "id": "p2-runtime-verifier-cross-task",
+      "class": "negative",
+      "assertion": "Telemetry bound to a different task identity is rejected."
+    },
+    {
+      "id": "p2-runtime-verifier-symlink",
+      "class": "negative",
+      "assertion": "A telemetry path traversing a symlink is rejected before evidence is trusted."
     }
   ]
 }

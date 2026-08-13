@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INTELLIGENCE = ROOT / "scripts/intelligence.py"
 REPORT = ROOT / "scripts/report.py"
+VERIFIER = ROOT / "scripts/evidence-verifier.py"
 CASES = ROOT / "tests/evals/intelligence-cases.json"
 
 
@@ -151,6 +152,49 @@ def run_performance_perceptual_cases(root: Path, task_dir: Path, results: list[d
     record(results, "p1-benchmark-execution-time", benchmark_result.returncode == 0 and benchmark_ok, benchmark_result.stdout + benchmark_result.stderr)
 
 
+def run_runtime_verifier_cases(root: Path, results: list[dict[str, object]]) -> None:
+    """Exercise external verification without granting approval or trusting paths."""
+    scene = root / "telemetry-scene/browser-review-smoke"
+    task = root / "telemetry-task"
+    shutil.copytree(ROOT / "src/output/browser-review-smoke", scene)
+    shutil.copytree(ROOT / "artifacts/browser-review-smoke-task", task)
+    base = [str(VERIFIER), "--scene-dir", str(scene), "--task-dir", str(task)]
+
+    clean = invoke(base)
+    clean_doc = json.loads(clean.stdout) if clean.stdout.strip().startswith("{") else {}
+    record(results, "p2-runtime-verifier-clean", clean.returncode == 0 and clean_doc.get("verified") is True and clean_doc.get("approval") is False, clean.stdout + clean.stderr)
+
+    tampered_task = root / "telemetry-tampered"
+    shutil.copytree(task, tampered_task)
+    tampered_path = tampered_task / "runtime-adapters/rive/runtime-telemetry.json"
+    tampered = json.loads(tampered_path.read_text(encoding="utf-8"))
+    tampered["samples"][0]["state"]["eval_tamper"] = True
+    tampered_path.write_text(json.dumps(tampered, indent=2) + "\n", encoding="utf-8")
+    tampered_result = invoke([str(VERIFIER), "--scene-dir", str(scene), "--task-dir", str(tampered_task)])
+    record(results, "p2-runtime-verifier-tamper", tampered_result.returncode != 0 and "sha256 mismatch" in tampered_result.stdout, tampered_result.stdout + tampered_result.stderr)
+
+    foreign_task = root / "telemetry-foreign-task"
+    shutil.copytree(task, foreign_task)
+    foreign_doc = json.loads((foreign_task / "task.json").read_text(encoding="utf-8"))
+    foreign_doc["task_id"] = "telemetry-foreign-task"
+    (foreign_task / "task.json").write_text(json.dumps(foreign_doc, indent=2) + "\n", encoding="utf-8")
+    foreign_result = invoke([str(VERIFIER), "--scene-dir", str(scene), "--task-dir", str(foreign_task)])
+    record(results, "p2-runtime-verifier-cross-task", foreign_result.returncode != 0 and "task_id" in foreign_result.stdout, foreign_result.stdout + foreign_result.stderr)
+
+    symlink_task = root / "telemetry-symlink-task"
+    shutil.copytree(task, symlink_task)
+    outside = root / "telemetry-outside"
+    outside.mkdir()
+    (outside / "runtime-telemetry.json").write_text((task / "runtime-adapters/rive/runtime-telemetry.json").read_text(encoding="utf-8"), encoding="utf-8")
+    (symlink_task / "runtime-adapters/linked").symlink_to(outside, target_is_directory=True)
+    symlink_evidence_path = symlink_task / "runtime-adapters/runtime-evidence.json"
+    symlink_evidence = json.loads(symlink_evidence_path.read_text(encoding="utf-8"))
+    symlink_evidence["frameworks"][0]["telemetry"]["file"] = "linked/runtime-telemetry.json"
+    symlink_evidence_path.write_text(json.dumps(symlink_evidence, indent=2) + "\n", encoding="utf-8")
+    symlink_result = invoke([str(VERIFIER), "--scene-dir", str(scene), "--task-dir", str(symlink_task)])
+    record(results, "p2-runtime-verifier-symlink", symlink_result.returncode != 0 and "symlink" in symlink_result.stdout, symlink_result.stdout + symlink_result.stderr)
+
+
 def main() -> int:
     corpus = json.loads(CASES.read_text(encoding="utf-8"))
     expected = {case["id"] for case in corpus.get("cases", [])}
@@ -215,6 +259,7 @@ def main() -> int:
 
         run_p1_cases(root, task_dir, results)
         run_performance_perceptual_cases(root, task_dir, results)
+        run_runtime_verifier_cases(root, results)
 
     missing = expected - {str(item["id"]) for item in results}
     for case_id in sorted(missing):

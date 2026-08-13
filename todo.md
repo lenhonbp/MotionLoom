@@ -154,3 +154,12 @@
 - [x] Hardening các đường bypass có bằng chứng từ audit, ưu tiên các lỗi có thể biến heuristic hoặc artifact giả thành approval.
 - [x] Cập nhật SKILL.md, Agent Card, README và release note với audit findings, trust boundaries và remediation status.
 - [x] Chạy clean-checkout/CI/full acceptance, commit milestone roadmap và cập nhật trạng thái checklist sau khi xác minh.
+
+## Roadmap phase: evidence interoperability and runtime observability
+
+- [x] Chốt threat model và ranh giới tin cậy cho runtime frame telemetry và external verifier.
+- [x] Thiết kế schema/versioned contract cho telemetry, verifier result và identity binding.
+- [x] Triển khai telemetry capture/validate và verifier CLI với stable exit codes, root/path guards và không tự cấp approval.
+- [x] Bổ sung adversarial eval, regression, quality gate và CI coverage cho telemetry/verifier tamper, replay, cross-task và stale evidence.
+- [x] Cập nhật Dev Lab handoff, Agent Card, SKILL.md, roadmap, audit report và release metadata.
+- [ ] Chạy full acceptance, commit milestone, push sau explicit confirmation và xác minh CI trên main.

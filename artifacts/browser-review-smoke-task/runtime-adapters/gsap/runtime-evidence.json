@@ -1,0 +1,48 @@
+{
+  "run_id": "1786598203602-44370",
+  "framework": "gsap",
+  "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=gsap",
+  "status": "pass",
+  "ready": true,
+  "runtime": "gsap@3.15.0",
+  "frames": [
+    {
+      "percent": 0,
+      "file": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-00.png",
+      "state": {
+        "progress": 0,
+        "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+        "opacity": "0.25"
+      }
+    },
+    {
+      "percent": 50,
+      "file": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-50.png",
+      "state": {
+        "progress": 0.5,
+        "transform": "matrix(0.889487, 0.405363, -0.405363, 0.889487, 210, -31.5)",
+        "opacity": "0.9063"
+      }
+    },
+    {
+      "percent": 100,
+      "file": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-100.png",
+      "state": {
+        "progress": 1,
+        "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+        "opacity": "1"
+      }
+    }
+  ],
+  "console_errors": [],
+  "telemetry": {
+    "file": "gsap/runtime-telemetry.json",
+    "sha256": "9cf22c3b3f7f74a4494dc6397e0f6f71a3402bcdeeab460d53e9355f0aae8f7a",
+    "metrics": {
+      "sample_count": 3,
+      "raf_interval_count": 9,
+      "max_raf_interval_ms": 16.800000000000068,
+      "p95_raf_interval_ms": 16.800000000000068
+    }
+  }
+}

@@ -4,7 +4,7 @@
   "task_id": "browser-review-smoke-task",
   "scene": "browser-review-smoke",
   "task_dir": "artifacts/browser-review-smoke-task",
-  "generated_at": "2026-08-12T20:02:30Z",
+  "generated_at": "2026-08-13T05:17:42Z",
   "environment": {
     "python": "3.12.3",
     "node": "v22.13.0",
@@ -22,14 +22,19 @@
       "bytes": 744
     },
     {
+      "path": "artifacts/browser-review-smoke-task/evidence-verifier-report.json",
+      "sha256": "b346414ec3b2fa74d0ef42cd510223d7f1ee9a2a0ff493ab6be4474f6b8029e1",
+      "bytes": 704
+    },
+    {
       "path": "artifacts/browser-review-smoke-task/fix-plan.json",
       "sha256": "2dbf9523484086567438ac5628a87de7567193f2327506640e8a1263776e5917",
       "bytes": 1709
     },
     {
       "path": "artifacts/browser-review-smoke-task/handoff.json",
-      "sha256": "bdcbab12aa3872551ec7a71dbd13e389a9aa465a4d2ac38d88e9ce18fbb4c203",
-      "bytes": 1810
+      "sha256": "19ca4d743c3a1e4b53cba6ae0aecd155e7c53584be8fd58db05456c627c8b5a1",
+      "bytes": 1929
     },
     {
       "path": "artifacts/browser-review-smoke-task/issue-register.json",
@@ -67,6 +72,86 @@
       "bytes": 303
     },
     {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/frame-00.png",
+      "sha256": "11c144229885bf8fc8b11bc9ae038c54216dc67ed4485477db624aba6659d041",
+      "bytes": 5484
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/frame-100.png",
+      "sha256": "bcd2ba0138627555689be9bc0c04fdeb8bc6455a083afd2d609b8a34ff60f311",
+      "bytes": 7391
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/frame-50.png",
+      "sha256": "f6ba5cfba7cece0a84e910341216c8629f6475bb7d1dd54b8dcc11773b63eafa",
+      "bytes": 6525
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/runtime-evidence.json",
+      "sha256": "eb037ebf10ea1b2b8c3cee6373c368183b507a97db74493568fa289907a44832",
+      "bytes": 1444
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/framer-motion/runtime-telemetry.json",
+      "sha256": "4cc5fed0ac53101980b1aa84c2b634cd3df041bf33e10cd05b7890f46ec86903",
+      "bytes": 2121
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-00.png",
+      "sha256": "d1e8eb13a5aac33e4669a1004f1a595916d2d143bbde918ca953b0adc9daa060",
+      "bytes": 4949
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-100.png",
+      "sha256": "0fe9d869be3c08c7b714cbbce4e1d7d9e787ec21cce59acabf3d41d0272074be",
+      "bytes": 6742
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/frame-50.png",
+      "sha256": "e9e7ac7811f8372ebcac94ce7c0b70ac15b8616d8cd11c7cb45962561d427756",
+      "bytes": 7617
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/runtime-evidence.json",
+      "sha256": "5ca844d47ed91f2caeac071aa879a307d3f693f0afedd15ba50930cc11976e2c",
+      "bytes": 1384
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/gsap/runtime-telemetry.json",
+      "sha256": "9cf22c3b3f7f74a4494dc6397e0f6f71a3402bcdeeab460d53e9355f0aae8f7a",
+      "bytes": 2083
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/frame-00.png",
+      "sha256": "f9c55155cb2deb3d06e87a0e106ef399b91e471964a9d320d27c2b6034d6d3ba",
+      "bytes": 3132
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/frame-100.png",
+      "sha256": "f9c55155cb2deb3d06e87a0e106ef399b91e471964a9d320d27c2b6034d6d3ba",
+      "bytes": 3132
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/frame-50.png",
+      "sha256": "f9c55155cb2deb3d06e87a0e106ef399b91e471964a9d320d27c2b6034d6d3ba",
+      "bytes": 3132
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/runtime-evidence.json",
+      "sha256": "d6827cf618d698f9b8b8fd5975f581da352214bca5449233e780a11a1db69d06",
+      "bytes": 2127
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/rive/runtime-telemetry.json",
+      "sha256": "01b566f1bd01b36bd9d5ab184c6e1eb3b50156c1162b3e880a6cea06ef8344d6",
+      "bytes": 2839
+    },
+    {
+      "path": "artifacts/browser-review-smoke-task/runtime-adapters/runtime-evidence.json",
+      "sha256": "2d51a37dbd1962c3f8539fed53fd5709448da55f2b00f2ceb37dfd8a55d0d716",
+      "bytes": 6269
+    },
+    {
       "path": "artifacts/browser-review-smoke-task/semantic-lint-report.json",
       "sha256": "4a2a4620b84a10ae240933b0aa80a253f0292a0aeb0338da04ce3c73fcca301b",
       "bytes": 1399
@@ -84,7 +169,8 @@
       "artifact-manifest.json",
       "decision-log.jsonl",
       "execution-report.json",
-      "replay-bundle.json"
+      "replay-bundle.json",
+      "semantic-lint-benchmark.json"
     ],
     "mode": "integrity"
   },

@@ -31,6 +31,14 @@ def _load_validator():
     return module
 
 
+def _load_evidence_verifier():
+    path = ROOT / "scripts" / "evidence-verifier.py"
+    loader = importlib.util.spec_from_file_location("evidence_verifier", path)
+    module = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(module)
+    return module
+
+
 def _json(path: Path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -38,7 +46,7 @@ def _json(path: Path):
         raise ValueError(f"{path}: {exc}")
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -239,6 +247,16 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
             issues.append("benchmark gate requires --task-dir")
         else:
             issues.extend(validate_task_benchmark(task_dir, scene_dir.name))
+    if require_telemetry:
+        if not task_dir:
+            issues.append("telemetry gate requires --task-dir")
+        else:
+            verifier = _load_evidence_verifier()
+            verification = verifier.verify(scene_dir, task_dir, "runtime-adapters/runtime-evidence.json", None)
+            if not verification.get("verified"):
+                issues.extend(f"external evidence verifier: {issue}" for issue in verification.get("issues", []))
+            if verification.get("approval") is not False:
+                issues.append("external evidence verifier must never grant approval")
     return issues
 
 
@@ -254,6 +272,7 @@ def main() -> int:
     parser.add_argument("--require-intelligence", action="store_true")
     parser.add_argument("--require-p1", action="store_true")
     parser.add_argument("--require-benchmark", action="store_true")
+    parser.add_argument("--require-telemetry", action="store_true")
     args = parser.parse_args()
     if args.scene and (args.scene in {".", ".."} or not SAFE_SCENE.fullmatch(args.scene)):
         print("QUALITY GATE: unsafe scene identifier")
@@ -270,7 +289,7 @@ def main() -> int:
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")

@@ -73,6 +73,7 @@ def main() -> int:
         "semantic-lint-benchmark.json",
         "continuity-report.json",
         "fix-plan.json",
+        "evidence-verifier-report.json",
     )
     for scene in scenes:
         matched = task_dirs(root, scene)
@@ -91,7 +92,15 @@ def main() -> int:
                 capture_output=True,
                 text=True,
             )
-            if result.returncode == 0:
+            verification = read_json(task_dir / "evidence-verifier-report.json")
+            task = read_json(task_dir / "task.json")
+            verifier_ok = (
+                verification.get("verified") is True
+                and verification.get("approval") is False
+                and verification.get("bindings", {}).get("scene") == scene
+                and verification.get("bindings", {}).get("task_id") == task.get("task_id")
+            )
+            if result.returncode == 0 and verifier_ok:
                 passing.append(task_dir)
         if not passing:
             missing.append(f"{scene}: semantic report check failed")

@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "run_id": "1786598203602-44370",
+  "generated_at": "2026-08-13T05:16:47.650Z",
+  "mode": "runtime-telemetry",
+  "task_id": "browser-review-smoke-task",
+  "scene": "browser-review-smoke",
+  "framework": "framer-motion",
+  "runtime": "framer-motion@13.1.0",
+  "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+  "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+  "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+  "samples": [
+    {
+      "sequence": 0,
+      "percent": 0,
+      "captured_at_ms": 754.7000000476837,
+      "raf_intervals_ms": [
+        16.600000000000023,
+        16.699999999999932,
+        16.700000000000045
+      ],
+      "state_sha256": "1689db87591c2372350f67bacbeb61ccbf9e4a8b5f8f19b10d9c0be0eef6f9a8",
+      "state": {
+        "progress": 0,
+        "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+        "opacity": "0.25"
+      }
+    },
+    {
+      "sequence": 1,
+      "percent": 50,
+      "captured_at_ms": 837.9000000357628,
+      "raf_intervals_ms": [
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991
+      ],
+      "state_sha256": "b0d9cf5a553a8726c175551e788d8035da761f8bee51ba672c998e9dbd27d742",
+      "state": {
+        "progress": 0.5,
+        "transform": "matrix(0.882969, 0.220149, -0.220149, 0.882969, 120, -18)",
+        "opacity": "0.625"
+      }
+    },
+    {
+      "sequence": 2,
+      "percent": 100,
+      "captured_at_ms": 921.3000000119209,
+      "raf_intervals_ms": [
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045
+      ],
+      "state_sha256": "1cb06296dad7efa85ea1a7e9e8efcbbeb5f79cd83faa3a05afa08dbe69a442b0",
+      "state": {
+        "progress": 1,
+        "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+        "opacity": "1"
+      }
+    }
+  ],
+  "metrics": {
+    "sample_count": 3,
+    "raf_interval_count": 9,
+    "max_raf_interval_ms": 16.700000000000045,
+    "p95_raf_interval_ms": 16.700000000000045
+  },
+  "status": "pass"
+}

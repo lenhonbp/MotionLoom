@@ -12,6 +12,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+EVIDENCE_ARTIFACTS = (
+    "semantic-lint-benchmark.json",
+    "evidence-verifier-report.json",
+    "runtime-adapters/runtime-evidence.json",
+)
 STATES = ["created", "needs_context", "planning", "sourcing", "generating", "rendering", "review_required", "blocked", "failed", "validated", "ready_for_pr", "confirmed"]
 TRANSITIONS = {
     "created": {"needs_context", "planning", "blocked", "failed"},
@@ -109,7 +114,7 @@ def init_task(args: argparse.Namespace) -> int:
         "state": "created",
         "summary": "New animation task initialized.",
         "next_actions": [{"action": "Analyze host project context", "skill": "motionloom", "evidence_needed": ["project-context.json"]}],
-        "required_artifacts": ["task.json", "execution-report.json"],
+        "required_artifacts": ["task.json", "execution-report.json", *EVIDENCE_ARTIFACTS],
         "blockers": [],
     }
     write_json(task_dir / "task.json", task)
@@ -136,6 +141,13 @@ def collect(args: argparse.Namespace) -> int:
         artifacts.append({"path": str(path.relative_to(task_dir)), "type": path.suffix.lstrip(".") or "file", "sha256": digest, "bytes": path.stat().st_size})
     manifest = {"manifest_version": "1.0", "task_id": task.get("task_id", task_dir.name), "generated_at": now(), "artifacts": artifacts}
     write_json(task_dir / "artifact-manifest.json", manifest)
+    handoff_path = task_dir / "handoff.json"
+    if handoff_path.is_file():
+        handoff = read_json(handoff_path)
+        required = set(handoff.get("required_artifacts", []))
+        required.update(name for name in EVIDENCE_ARTIFACTS if (task_dir / name).is_file())
+        handoff["required_artifacts"] = sorted(required)
+        write_json(handoff_path, handoff)
     print(json.dumps({"status": "collected", "task_id": manifest["task_id"], "artifact_count": len(artifacts)}, ensure_ascii=False))
     return 0
 

@@ -260,3 +260,10 @@
 - [x] Sửa README cùng tài liệu liên quan khi phát hiện documentation drift hoặc claim vượt evidence.
 - [x] Chạy docs audit, release verifier, Skill Doctor, regression và package dry-run sau chỉnh sửa.
 - [ ] Tạo commit local; chỉ push sau explicit user confirmation.
+
+## Release synchronization 2.1.0
+
+- [x] Xác minh `origin/main`, package version, changelog, release note và npm registry.
+- [x] Chạy release verifier và kiểm tra tarball `motionloom@2.1.0`.
+- [ ] Tạo tag và GitHub Release 2.1.0 nếu mọi metadata khớp.
+- [ ] Hướng dẫn publish npm 2.1.0 từ workstation của user; không giả định sandbox có npm credentials.

@@ -4,6 +4,10 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+- No unreleased changes are currently tracked.
+
+## [2.2.0] - 2026-08-13
+
 ### Added
 
 - Canonical Agent interoperability surfaces for `.agents/skills`, `.claude`, `.codex`, source discovery and cross-platform installation checks.
@@ -15,9 +19,14 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 - Quality CI now rebuilds the context-bound replay bundle after runtime, report and attestation artifacts are generated, preventing stale replay hashes from rejecting an otherwise valid changed-scene gate.
 
+### Verified
+
+- Mainline Quality, Documentation and Package Hygiene, and Security workflows pass on the replay-remediation commit.
+- The local release candidate passes the full regression, docs/Skill validation, runtime adapter, discovery, installation matrix, Visual Truth, Remediation Learning, attestation and npm tarball checks.
+
 ### Boundary
 
-- These additions are local working-tree changes on top of the published `2.1.0` package. They do not change the published version and do not grant approval, push commits or open pull requests.
+- This is a release candidate prepared from the green mainline. Remote tag creation, GitHub Release creation and npm publication remain explicit maintainer actions; evidence and heuristics never grant user approval.
 
 ## [2.1.0] - 2026-08-13
 
@@ -54,5 +63,6 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
+[2.2.0]: docs/releases/2.2.0.md
 [2.1.0]: docs/releases/2.1.0.md
 [2.0.0]: docs/releases/2.0.0.md

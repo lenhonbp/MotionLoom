@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.1.0",
-  "description": "Project-aware animation production with durable Project Memory, graph, provenance, framework-neutral motion IR, runtime verification and telemetry, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
+  "version": "2.2.0",
+  "description": "Project-aware animation production with durable Project Memory, graph, provenance, framework-neutral motion IR, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "agent.discovery.check",
     "agent.discovery.source",

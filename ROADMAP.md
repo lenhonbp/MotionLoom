@@ -2,22 +2,22 @@
 
 MotionLoom's roadmap is organized around one question: **does this reduce incorrect animation iterations while keeping the user in control of quality and Git side effects?** A roadmap item is not complete because a prompt or template exists; it is complete when the contract, evidence, regression coverage and Agent handoff are inspectable.
 
-## Current baseline: 2.1.0
+## Current baseline: 2.2.0 release candidate
 
-The current repository baseline includes project-aware analysis, durable Project Memory, context-bound Motion Spec, source binding, real runtime adapters for Lottie/dotLottie/SVG cutout/Rive/GSAP/Framer Motion, Dev Lab browser review, Intelligence Core, semantic and continuity feedback, runtime telemetry, external evidence verification, signed attestation and cross-platform CLI/CI contracts.
+The current repository baseline includes project-aware analysis, durable Project Memory, context-bound Motion Spec, source binding, real runtime adapters for Lottie/dotLottie/SVG cutout/Rive/GSAP/Framer Motion, Dev Lab browser review, Intelligence Core, semantic and continuity feedback, runtime telemetry, external evidence verification, signed attestation, Agent interoperability surfaces, Visual Truth, Remediation Learning and cross-platform CLI/CI contracts. The package metadata is at `2.2.0`; remote publication remains pending explicit release approval.
 
 ## Next milestones
 
 | Milestone | Focus | Acceptance signal | Status |
 |---|---|---|---|
-| **2.2** | Visual Truth Contract | Provenance-bound frame comparison with `pass`, `fail`, `warn` and `unknown`; no automatic user approval | Planned |
-| **2.3** | Remediation Learning | User-confirmed correction count, first-pass acceptance and rerender-avoidance ledger | Planned |
+| **2.2** | Visual Truth Contract | Provenance-bound frame comparison with `pass`, `fail`, `warn` and `unknown`; no automatic user approval | Included in 2.2.0 candidate |
+| **2.3** | Remediation Learning | User-confirmed correction count, first-pass acceptance and rerender-avoidance ledger | Included in 2.2.0 candidate |
 | **2.4** | Runtime Scale | Multi-project, browser and device corpus with capability compatibility explanations | Planned |
-| **2.5** | Agent Interoperability | Versioned schemas, compatibility matrix and replayable task bundles across Agents | Planned |
+| **2.5** | Agent Interoperability | Versioned schemas, compatibility matrix and replayable task bundles across Agents | Included in 2.2.0 candidate |
 
 ## Working-tree implementation status
 
-The current implementation pass has delivered the contracts behind the next milestones without changing the published `2.1.0` version: canonical Agent discovery/install surfaces, consumer fixtures and a Ubuntu/macOS/Windows matrix; Visual Truth is bound into scene manifests, Dev Lab handoff and the review-first quality gate; and Remediation Learning records hash-chained benchmark/outcome history. The remaining release work is full validation, CI observation, release-note review and an explicit user decision before commit/push.
+The current implementation pass has delivered the contracts behind milestones 2.2, 2.3 and 2.5: canonical Agent discovery/install surfaces, consumer fixtures and a Ubuntu/macOS/Windows matrix; Visual Truth is bound into scene manifests, Dev Lab handoff and the review-first quality gate; Remediation Learning records hash-chained benchmark/outcome history; and CI replay evidence is rebuilt after generated artifacts. The remaining release work is remote tag/Release creation, npm publication and paired evaluation on additional real projects.
 
 ## Product principles
 

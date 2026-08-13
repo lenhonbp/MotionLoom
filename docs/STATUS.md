@@ -4,7 +4,7 @@
 
 ## Current release posture
 
-MotionLoom's repository source and package manifest are at version **2.1.0**. The public npm registry currently serves **2.0.0**; the GitHub repository has no tag or GitHub Release for 2.1.0 until an explicitly approved release is performed. The repository has a cross-platform CLI, durable Project Memory, artifact-first handoff, runtime evidence, signed attestation and a browser-based Dev Lab review contract. The protected manual release workflow verifies package/changelog/release-note alignment before publication.
+MotionLoom's repository source and package manifest are at **2.2.0 release-candidate metadata**. The public npm registry currently serves **2.1.0**, while the latest published GitHub Release/tag remains **v2.1.0**; the 2.2.0 tag, GitHub Release and npm publication are intentionally pending explicit maintainer approval. The repository has a cross-platform CLI, durable Project Memory, Agent interoperability surfaces, artifact-first handoff, runtime evidence, Visual Truth, Remediation Learning, signed attestation and a browser-based Dev Lab review contract. The protected manual release workflow verifies package/changelog/release-note alignment before publication.
 
 The repository is **engineering-ready for continued integration work**, not a universal production certification for every animation framework or every host project. CI status must be read from the latest GitHub Actions run, not inferred from historical audit prose.
 

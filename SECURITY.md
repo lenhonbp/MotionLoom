@@ -4,7 +4,8 @@
 
 | Version | Security fixes |
 |---|---|
-| `2.1.x` | Supported |
+| `2.2.x` | Release candidate; support begins on publication |
+| `2.1.x` | Current published line; supported until 2.2.0 publication |
 | `2.0.x` | Best effort while upgrading |
 | `<2.0.0` | Not supported |
 
@@ -20,7 +21,7 @@ MotionLoom can read and write files in the host project, invoke runtimes and pre
 
 Path guards, task identity, source/manifest hashes, evidence freshness, signer policy and approval invariants are security-relevant contracts. Report any bypass that allows cross-project memory, cross-task evidence, stale runtime output or unreviewed Git side effects.
 
-See the [signed attestation reference](references/signed-attestation.md), [browser review contract](references/browser-review-contract.md) and [2.1.0 release note](docs/releases/2.1.0.md) for the current threat model and limitations.
+See the [signed attestation reference](references/signed-attestation.md), [browser review contract](references/browser-review-contract.md) and [2.2.0 release note](docs/releases/2.2.0.md) for the current threat model and limitations.
 
 ## CI/CD controls
 

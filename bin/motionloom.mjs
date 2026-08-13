@@ -40,7 +40,7 @@ const PYTHON_COMMANDS = {
 };
 
 function printHelp() {
-  console.log(`MotionLoom 2.1.0 — project-aware animation production and evidence contracts
+  console.log(`MotionLoom 2.2.0 — project-aware animation production and evidence contracts
 
 Usage:
   motionloom <command> [args...]

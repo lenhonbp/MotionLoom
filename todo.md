@@ -294,3 +294,11 @@
 - [x] Bổ sung regression để thay đổi artifact/manifest/runtime evidence phải buộc replay rebuild trước khi Quality pass.
 - [x] Chạy full local validation, kiểm tra diff hygiene và tạo commit fix local.
 - [ ] Chỉ push commit fix sau explicit user confirmation; theo dõi lại Quality, Documentation/Package và Security trên commit fix.
+
+## Approved release candidate 2.2.0
+- [x] Khóa scope release gồm Agent interoperability, consumer fixtures, Visual Truth, Remediation Learning và CI replay remediation.
+- [x] Kiểm kê và đồng bộ version 2.2.0 trong package metadata, Agent Card, SKILL contract, schemas và release metadata.
+- [x] Cập nhật CHANGELOG, release note và ROADMAP; giữ ranh giới rõ giữa Unreleased/release candidate và bản đã publish.
+- [x] Chạy release verifier, full regression, docs/Skill validation, runtime/quality checks và npm tarball audit.
+- [x] Tạo commit `61edd2c` và local tag `v2.2.0-rc.1`; kiểm tra review boundary và working tree sạch.
+- [ ] Chỉ push/tag remote sau explicit user confirmation; chỉ publish npm sau confirmation release/publish riêng.

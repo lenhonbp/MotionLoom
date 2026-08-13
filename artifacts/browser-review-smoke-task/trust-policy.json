@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "motionloom-ephemeral-ci-policy",
+  "trust_domain": "https://motionloom.dev/trust/ci-ephemeral",
+  "keys": [
+    {
+      "key_id": "motionloom-ci-2-0",
+      "algorithm": "ed25519",
+      "public_key_base64": "twv4vKJ8IOQ3GogsPIs0Q9TbUtWx6eH58b+0uGmz9ko=",
+      "status": "active",
+      "valid_from": "2026-08-13T07:33:55.503466Z"
+    }
+  ],
+  "rotation": {
+    "max_key_age_days": 1,
+    "overlap_days": 0,
+    "require_active_signer": true
+  },
+  "revocation": {
+    "mode": "local-policy",
+    "fail_closed": true,
+    "sources": [
+      "ci-ephemeral"
+    ]
+  }
+}

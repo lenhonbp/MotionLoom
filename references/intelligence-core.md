@@ -15,12 +15,16 @@ Use this reference when an Agent needs to understand or extend MotionLoom's task
 | `semantic-lint-benchmark.json` | `python3 scripts/intelligence.py semantic-lint benchmark --task-dir <task>` | Measures in-process semantic-lint execution, rule coverage and p95 against a deterministic threshold; it is a performance contract, not visual approval. |
 | `runtime-telemetry.json` | `bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>` | Records deterministic scrub-point observations, RAF timing, runtime state hashes and source/manifest/Motion IR bindings from the real adapter harness. |
 | `evidence-verifier-report.json` | `python3 scripts/evidence-verifier.py --scene-dir <scene-dir> --task-dir <task> --runtime-evidence <path>` | Read-only external verification result for task/scene/path/hash/age integrity; `approval` is always `false`. |
+| `attestation-statement.json` | `python3 scripts/attestation.py statement --scene-dir <scene-dir> --task-dir <task> --context <context>` | Derives canonical task/scene/source/manifest/Motion IR/evidence hash bindings before signing. |
+| `attestation.json` | `python3 scripts/attestation.py build --statement <statement> --private-key <key> --key-id <id>` | DSSE-compatible Ed25519 envelope over the versioned statement; `approval` is always `false`. |
+| `trust-policy.json` | `python3 scripts/attestation.py validate-policy --path <policy>` | Declares trusted keys, validity, rotation and fail-closed revocation behavior. |
+| `attestation-verifier-report.json` | `python3 scripts/attestation-verifier.py --attestation <bundle> --trust-policy <policy>` | Independent verifier result with stable exit codes 0/10/11/12/13/14; verification never grants approval. |
 | `continuity-report.json` | `python3 scripts/intelligence.py continuity build --task-dirs <task>...` | Checks context, intent, Motion IR and transition continuity across an ordered scene set. |
 | `fix-plan.json` | `python3 scripts/intelligence.py fix-plan build --task-dir <task> --reports <report>...` | Converts findings into root cause, patch scope, selective rerun scope, verification and user-review requirements. |
 
 ## Agent operating rules
 
-The Agent must build the graph, Motion IR, provenance, replay bundle, P1 feedback reports and semantic-lint benchmark after render and before the strict quality gate. For a strict observability run it must also capture runtime telemetry and run the external verifier before `--require-telemetry`. It must run the report completeness contract for changed scenes; that contract selects one deterministic passing task bundle and fails on ambiguous ties. It may use a verified capability only when the registry evidence is fresh, its hash matches the referenced file and the target environment is compatible. `scaffold_only` is a planning option, never a production acceptance result.
+The Agent must build the graph, Motion IR, provenance, replay bundle, P1 feedback reports and semantic-lint benchmark after render and before the strict quality gate. For a strict observability run it must also capture runtime telemetry and run the external verifier before `--require-telemetry`. For a production trust run it must derive/sign `attestation.json`, copy or resolve a managed `trust-policy.json`, run the independent attestation verifier and use `--require-attestation`. It must run the report completeness contract for changed scenes; that contract selects one deterministic passing task bundle and fails on ambiguous ties. It may use a verified capability only when the registry evidence is fresh, its hash matches the referenced file and the target environment is compatible. `scaffold_only` is a planning option, never a production acceptance result.
 
 The graph and provenance are evidence indexes, not approval tokens. A valid graph cannot bypass source binding, runtime assertions, browser review, reviewer consent or the `OPEN_PR=0` default. A confidence or risk value can prioritize investigation but cannot replace a deterministic rule or human decision.
 
@@ -44,6 +48,20 @@ python3 scripts/evidence-verifier.py \
   --runtime-evidence runtime-adapters/runtime-evidence.json \
   --max-age-days 1 \
   --output artifacts/<task-id>/evidence-verifier-report.json
+python3 scripts/attestation.py statement \
+  --scene-dir src/output/<scene> \
+  --task-dir artifacts/<task-id> \
+  --context <project-context.json> \
+  --output artifacts/<task-id>/attestation-statement.json
+python3 scripts/attestation.py build \
+  --statement artifacts/<task-id>/attestation-statement.json \
+  --private-key <managed-ed25519-key> --key-id <key-id> \
+  --output artifacts/<task-id>/attestation.json
+python3 scripts/attestation-verifier.py \
+  --attestation artifacts/<task-id>/attestation.json \
+  --trust-policy artifacts/<task-id>/trust-policy.json \
+  --expected-task-id <task-id> --expected-scene <scene> \
+  --output artifacts/<task-id>/attestation-verifier-report.json
 python3 scripts/intelligence.py continuity validate \
   --path artifacts/<task-id>/continuity-report.json
 python3 scripts/intelligence.py fix-plan validate \
@@ -52,7 +70,7 @@ python3 scripts/quality-gate.py \
   --scene <scene> \
   --context <project-context.json> \
   --task-dir artifacts/<task-id> \
-  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry
+  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
 python3 scripts/eval-intelligence.py
 ```
 
@@ -75,5 +93,6 @@ The replay policy excludes generated reports and manifests because `report.py co
 | `ambiguous passing task bundles share the same state and updated_at` | More than one task bundle could supply evidence for the same changed scene | Resolve the duplicate explicitly and rerun the report contract; never merge evidence by filename order. |
 | `artifact_base must share the Dev Lab origin` or identity binding failure | Dev Lab query parameters would mix an external or foreign task/candidate bundle | Reject the handoff and regenerate the review URL from the canonical task bundle. |
 | `runtime telemetry verification failed` | Scrub-point evidence is stale, tampered, missing, cross-task, path-escaped or bound to different source/manifest/Motion IR bytes | Re-run the real runtime capture from the canonical scene/task bundle, then verify again; never treat the verifier as approval. |
+| `attestation verification failed` | Payload hash, DSSE signature, signer validity/revocation, policy lookup, path binding or expected task/scene binding failed | Regenerate the statement from current artifacts, re-run the external verifier against a managed policy and investigate signer lifecycle; never flip `approval` or bypass user review. |
 
-The public eval corpus is `tests/evals/intelligence-cases.json`. It covers positive verified selection plus scaffold-only, stale evidence, tampering, graph corruption, replay tamper and foreign-task candidate failures. P1 extends the acceptance surface with semantic warning preservation, generic-intent detection, multi-scene context drift, selective rerun binding, performance budget/frame-rate warnings, perceptual easing/reduced-motion warnings and benchmark execution time. The 1.9.0 slice adds runtime telemetry happy-path, state tamper, cross-task identity, stale evidence and symlink escape cases without weakening the v0.1 safety assertions.
+The public eval corpus is `tests/evals/intelligence-cases.json`. It covers positive verified selection plus scaffold-only, stale evidence, tampering, graph corruption, replay tamper and foreign-task candidate failures. P1 extends the acceptance surface with semantic warning preservation, generic-intent detection, multi-scene context drift, selective rerun binding, performance budget/frame-rate warnings, perceptual easing/reduced-motion warnings and benchmark execution time. The 1.9.0 slice adds runtime telemetry happy-path, state tamper, cross-task identity, stale evidence and symlink escape cases. The 2.0.0 slice adds clean attestation, payload tamper, binding mismatch, revoked signer and unknown signer cases without weakening the approval=false and human-review invariants.

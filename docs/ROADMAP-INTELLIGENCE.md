@@ -26,6 +26,12 @@ Milestone **1.9.0 đã hoàn tất ở lớp internal evidence interoperability*
 
 CI và quality gate đã có capture/verify sequence cùng cờ `--require-telemetry`; report collection và handoff quảng bá verifier report, runtime evidence và telemetry. Dev Lab hiển thị telemetry/verifier/benchmark trong evidence rail và khóa confirm khi integrity hoặc identity binding chưa pass. Đây là integrity contract nội bộ, chưa phải signed DSSE/in-toto trust anchor bên ngoài repository.
 
+### 0.4 Signed attestation và trust anchor — 2.0.0
+
+Milestone **2.0.0 đã hoàn tất ở lớp signed evidence interoperability**. `scripts/attestation.py` tạo statement canonical từ scene/task bytes, đóng gói DSSE-compatible envelope và ký Ed25519; `scripts/attestation-verifier.py` là verifier độc lập với stable exit codes, trust-policy lookup, validity/rotation/revocation checks và fail-closed semantics. `approval` luôn là `false`.
+
+Quality gate và report contract có `--require-attestation`; CI tạo fixture key ephemeral cho verification plumbing, còn production trust anchor/key material phải được quản lý ngoài source repository. Eval corpus và regression harness bao phủ clean path, payload tamper, binding mismatch, revoked signer và unknown signer. Đây là chữ ký xác nhận integrity/identity của evidence, không phải user approval hay quyền mở PR.
+
 ## 1. Baseline hiện tại và khoảng trống cần giải quyết
 
 | Lớp | Đã có | Khoảng trống chính | Hậu quả nếu chưa xử lý |
@@ -33,7 +39,7 @@ CI và quality gate đã có capture/verify sequence cùng cờ `--require-telem
 | Skill discovery | `SKILL.md`, `agent-card.json`, capability registry v0.1 | Chưa có refresh service và compatibility matrix theo từng browser/library release | Registry tốt hơn flat flags nhưng cần CI refresh có policy và diff review |
 | Project awareness | `project-context.json`, context hash, task binding, `project-graph.json` | Graph chưa có semantic constraint nodes và multi-scene supersedes đầy đủ | Agent đã có index quan hệ nhưng chưa suy luận continuity sâu |
 | Motion reasoning | `motion-spec.json`, `motion-ir.json`, analyzer/spec pipeline | Semantic lint và compiler intent → adapter plan chưa hoàn chỉnh | Intent phức tạp vẫn cần policy/profile và human review |
-| Provenance | Source binding, artifact manifest, `provenance.json`, hash chain, read-only evidence verifier | Chưa có signed attestation/DSSE và external trust anchor | Chuỗi bằng chứng đã verify được nội bộ nhưng chưa chống được repo compromise bằng chữ ký độc lập |
+| Provenance | Source binding, artifact manifest, `provenance.json`, DSSE-compatible signed attestation, Ed25519 trust policy, read-only external verifiers | Chưa có managed key distribution/rotation service và remote transparency log | Chữ ký đã tách khỏi hash-only integrity; vận hành trust anchor vẫn cần secret management và policy distribution phù hợp |
 | Runtime | Adapter thật cho Rive, GSAP, Framer Motion; runtime evidence và scrub-point telemetry | Chưa có adapter interface chung và compatibility matrix theo browser/library/version | Telemetry đã so sánh được integrity/runtime state, nhưng compatibility history vẫn cần chuẩn hóa |
 | Quality | Schema validation, quality gate, browser review | Semantic lint và continuity checks còn mỏng | File hợp lệ về cấu trúc nhưng vẫn sai nhịp, sai intent hoặc phá UX |
 | Review loop | Dev Lab, checklist, `review.json`, expiry/replay protection | Feedback chưa được chuyển thành root-cause/fix-plan có thể chạy lại | Agent thường rerender toàn scene thay vì sửa đúng nguyên nhân |
@@ -66,7 +72,7 @@ Mỗi step phải ghi tối thiểu:
 | `result` | `pass`, `fail`, `blocked` hoặc `needs_review` |
 | `parent_attestation` | Liên kết step trước để tạo chain, không chỉ danh sách file |
 
-Ban đầu có thể dùng hash chain và manifest verification. Khi contract ổn định, mới thêm DSSE/signature hoặc SLSA-compatible attestation; không nên ký một format còn thay đổi liên tục.
+MotionLoom hiện dùng hash chain nội bộ cùng DSSE-compatible envelope và SLSA/in-toto-inspired statement. Private key không nằm trong artifact bundle; trust policy phải công bố key lifecycle, validity, revocation và fail-closed behavior. Chữ ký không được nâng `approval` hoặc thay thế browser review/user consent.
 
 ### 2.3 Capability Registry v2
 
@@ -119,13 +125,15 @@ Tại giai đoạn này nên đưa `fix-plan.json` vào Dev Lab. Khi reviewer re
 
 **Definition of done P1:** với cùng một context, Agent chọn capability đúng trong benchmark; mọi quyết định heuristic có confidence và evidence; reviewer feedback có thể chuyển thành patch plan; rerun scope không làm stale artifact ngoài phạm vi.
 
-### P2 — Protocol and ecosystem, 6–10 tuần
+### P2 — Protocol and ecosystem, 6–10 tuần — **Đã hoàn tất lớp 2.0.0; còn visual/benchmark extensions**
 
 Sau khi core contracts ổn định, expose MotionLoom qua typed CLI trước, sau đó thêm MCP adapter nếu cần interoperability. Theo MCP, resources nên đại diện cho context/task/artifact; prompts hoặc workflow resources đại diện cho playbook; tools đại diện cho prepare, render, inspect, validate và confirm với output schema rõ ràng [4]. Tool execution errors phải actionable để Agent tự sửa, nhưng các side effect như remote push/open PR vẫn phải giữ human-in-the-loop [4].
 
 Mỗi tool cần khai báo `side_effect_level`: `read`, `local_write`, `user_review_required`, `remote_write`. `confirm-to-PR` chỉ được gọi khi có approval authority còn hạn, task identity khớp và quality gate đã pass. Không mở quyền remote write chỉ vì Agent đã nhìn thấy một artifact `approved` cũ.
 
 **Definition of done P2:** host Agent có thể discover capability, lấy resource đúng task, gọi tool typed, nhận lỗi có hướng tự sửa, và không thể gọi remote write khi thiếu approval authority.
+
+Signed attestation 2.0.0 đã hoàn tất trước khi mở rộng protocol: statement canonical, Ed25519 signing, trust policy, external verification, CI/gate/report integration và adversarial coverage đều đã có. Khoảng trống kế tiếp là **visual comparison contract** có dataset fixture được gắn provenance và **benchmark history** append-only; cả hai phải giữ review-first, không biến metric thành approval.
 
 ### P3 — Scale and learning, sau 10 tuần
 
@@ -199,9 +207,9 @@ Không nên đưa toàn bộ runbook vào `SKILL.md`. Agent Skills khuyến ngh�
 
 ## 7. Việc nên làm ngay ở milestone kế tiếp
 
-Milestone 1.9.0 đã hoàn tất phần **internal evidence interoperability và runtime observability**. Phase kế tiếp nên chuyển từ integrity checks nội bộ sang **signed attestation và external trust anchor**, không nên thêm framework theo số lượng. Ưu tiên tiếp theo là DSSE/in-toto-compatible attestation, key rotation/revocation policy, external verifier độc lập với repository, asset-level visual comparison có dataset được gắn nhãn và aggregate benchmark history theo project/context/framework.
+Milestone 2.0.0 đã hoàn tất phần **signed evidence integrity** trên nền 1.9.0. Không nên thêm framework theo số lượng. Ưu tiên tiếp theo là asset/frame-level visual comparison có dataset được gắn nhãn nguồn gốc, benchmark history append-only và aggregate metrics theo project/context/framework; trust anchor vận hành cần secret management/rotation thực tế bên ngoài repository.
 
-Trình tự triển khai cụ thể là: version trust-anchor schema trước; tạo clean-room fixtures cho signed attestation; thêm adversarial cases về signature forgery, key substitution, replay và revocation; sau đó mới nâng capability trong `agent-card.json`. Mỗi milestone phải giữ nguyên nguyên tắc: evidence có hash và identity, failure có stable exit code, heuristic không tự thành approval, và side effect GitHub luôn cần explicit confirmation.
+Trình tự triển khai cụ thể là: version visual-comparison schema và labeled fixtures; thêm pixel/perceptual hash checks với dataset drift guards; ghi append-only benchmark runs và outlier detection; sau đó tích hợp review rail vào Dev Lab. Mỗi milestone phải giữ nguyên nguyên tắc: evidence có hash và identity, failure có stable exit code, heuristic/metric/chữ ký không tự thành approval, và side effect GitHub luôn cần explicit confirmation.
 
 ### References
 

@@ -805,6 +805,16 @@ def test_observability_contract():
     doctor_data = json.loads(doctor.stdout)
     check("skill doctor passes package structure", doctor.returncode == 0 and doctor_data.get("status") == "pass")
 
+    attestation_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_attestation.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "signed attestation trust and revocation contract passes",
+        attestation_tests.returncode == 0 and "attestation contract tests: PASS" in attestation_tests.stdout,
+    )
+
 
 if __name__ == "__main__":
     print("== MotionLoom engine tests ==")

@@ -52,6 +52,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scenes-file", required=True)
     parser.add_argument("--root", default=".")
+    parser.add_argument("--require-attestation", action="store_true")
     args = parser.parse_args()
     root = Path(args.root).resolve()
     report_script = Path(__file__).resolve().with_name("report.py")
@@ -75,6 +76,9 @@ def main() -> int:
         "fix-plan.json",
         "evidence-verifier-report.json",
     )
+    if args.require_attestation:
+        required = required + ("attestation.json", "trust-policy.json")
+    attestation_verifier = Path(__file__).resolve().with_name("attestation-verifier.py")
     for scene in scenes:
         matched = task_dirs(root, scene)
         if not matched:
@@ -100,7 +104,41 @@ def main() -> int:
                 and verification.get("bindings", {}).get("scene") == scene
                 and verification.get("bindings", {}).get("task_id") == task.get("task_id")
             )
-            if result.returncode == 0 and verifier_ok:
+            attestation_ok = True
+            if args.require_attestation:
+                attestation_result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(attestation_verifier),
+                        "--attestation",
+                        str(task_dir / "attestation.json"),
+                        "--trust-policy",
+                        str(task_dir / "trust-policy.json"),
+                        "--expected-task-id",
+                        str(task.get("task_id") or ""),
+                        "--expected-scene",
+                        scene,
+                    ],
+                    cwd=root,
+                    capture_output=True,
+                    text=True,
+                )
+                attestation_doc = read_json(task_dir / "attestation.json")
+                verifier_doc = read_json(task_dir / "attestation-verifier-report.json")
+                if not verifier_doc:
+                    try:
+                        verifier_doc = json.loads(attestation_result.stdout)
+                    except json.JSONDecodeError:
+                        verifier_doc = {}
+                attestation_ok = (
+                    attestation_result.returncode == 0
+                    and verifier_doc.get("verified") is True
+                    and verifier_doc.get("approval") is False
+                    and attestation_doc.get("approval") is False
+                    and verifier_doc.get("bindings", {}).get("scene") == scene
+                    and verifier_doc.get("bindings", {}).get("task_id") == task.get("task_id")
+                )
+            if result.returncode == 0 and verifier_ok and attestation_ok:
                 passing.append(task_dir)
         if not passing:
             missing.append(f"{scene}: semantic report check failed")

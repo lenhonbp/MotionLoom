@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "envelope": {
+    "payload_type": "application/vnd.motionloom.attestation+json;version=1",
+    "payload_sha256": "89289dc08f1d1d4a4d381de077b21cff9b798d1ab783eb925d490b555eaa8156",
+    "payload_base64": "eyJwcmVkaWNhdGUiOnsiYnVpbGRlciI6eyJuYW1lIjoibW90aW9ubG9vbS1hdHRlc3RhdGlvbi1idWlsZGVyIiwidmVyc2lvbiI6IjEuMC4wIn0sImNvbnRleHRfaGFzaCI6ImNiYmQ0M2E1M2EwZGRkNWNmNTQ1MmRmNWY2ZDUyMWYwNjgyOTQ2NWJkNThjNmQ3NjRhNTlkNTAxZWQxNzEwZmEiLCJldmlkZW5jZSI6eyJydW50aW1lX2V2aWRlbmNlX3NoYTI1NiI6IjJkNTFhMzdkYmQxOTYyYzNmODUzOWZlZDUzZmQ1NzA5NDQ4ZGE1NWYyYjAwZjJjZWIzN2RmZDhhNTVkMGQ3MTYiLCJydW50aW1lX3RlbGVtZXRyeV9zaGEyNTYiOiJjMTM3NzM1Mjk1NjNmMmFlMzAwZWRhNTUwYTdiMDUwMmQ1M2VjZWYwNWZjNjc5NzM3NjMzYjcyNjQwOTczZDIwIiwidmVyaWZpZXJfcmVwb3J0X3NoYTI1NiI6ImIzNDY0MTRlYzNiMmZhNzRkMGVmNDJjZDUxMDIyM2Q3ZjFlZTlhMmEwZmY0OTNhYjZiZTQ0NzRmNmI4MDI5ZTEifSwiZ2VuZXJhdGVkX2F0IjoiMjAyNi0wOC0xM1QwNzozMzo1NS42MTY1MDNaIiwibWFuaWZlc3Rfc2hhMjU2IjoiYzE0YjM4MjUyNGUyZDMxYmQ1NTQ3NjZhMGU4YmU3YTUwNWU2OGQwYjcxZjU4ODJmZWFkYzZiMjNmYmVjMDQ1YSIsIm1vdGlvbl9pcl9zaGEyNTYiOiJiZGIyMzA1NzM3ZTVkZWU5YjllZTA3OGRkNTY1N2E0YTU3MTdiZjQxODRmMTEyYTFkMDFhYzgyMzYxYzVhMjNmIiwicG9saWN5X3ZlcnNpb24iOiIxLjAiLCJwcm92ZW5hbmNlX2NoYWluX2hhc2giOiJjNmFhN2Q2NmM0YjAzM2JhNmNmMzMzMGFjNzhhNmNkMWVhYTU0MTk5Nzk2YmNlZGFmNjYxNzFkNzZlZmJhZDExIiwic2NlbmUiOiJicm93c2VyLXJldmlldy1zbW9rZSIsInNvdXJjZV9zaGEyNTYiOiJjNWFiMzEyNDI3Njc4YjE3YWU5MDNkMjgwZDg5ZGI5ZDIwMjY3MGYwMzFmMTBhZDZmZTc3NGZjOWFhZWNlZThhIiwidGFza19pZCI6ImJyb3dzZXItcmV2aWV3LXNtb2tlLXRhc2sifSwicHJlZGljYXRlX3R5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L3ByZWRpY2F0ZS9hbmltYXRpb24tZXZpZGVuY2UvdjEiLCJzdWJqZWN0IjpbeyJkaWdlc3QiOnsic2hhMjU2IjoiYzE0YjM4MjUyNGUyZDMxYmQ1NTQ3NjZhMGU4YmU3YTUwNWU2OGQwYjcxZjU4ODJmZWFkYzZiMjNmYmVjMDQ1YSJ9LCJuYW1lIjoiYnJvd3Nlci1yZXZpZXctc21va2UifV0sInR5cGUiOiJodHRwczovL21vdGlvbmxvb20uZGV2L2F0dGVzdGF0aW9uL3YxIn0=",
+    "signatures": [
+      {
+        "key_id": "motionloom-ci-2-0",
+        "algorithm": "ed25519",
+        "signature_base64": "M1bnCV97aMTgQP24y9Xk77A09bGHE+7FXknDVlf5yNAq8pjxuH4D61fSn7XK0dlSKi5QN4V5E62vibWWvJCpAw=="
+      }
+    ]
+  },
+  "statement": {
+    "type": "https://motionloom.dev/attestation/v1",
+    "predicate_type": "https://motionloom.dev/predicate/animation-evidence/v1",
+    "subject": [
+      {
+        "name": "browser-review-smoke",
+        "digest": {
+          "sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a"
+        }
+      }
+    ],
+    "predicate": {
+      "task_id": "browser-review-smoke-task",
+      "scene": "browser-review-smoke",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+      "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+      "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+      "evidence": {
+        "runtime_evidence_sha256": "2d51a37dbd1962c3f8539fed53fd5709448da55f2b00f2ceb37dfd8a55d0d716",
+        "runtime_telemetry_sha256": "c13773529563f2ae300eda550a7b0502d53ecef05fc679737633b72640973d20",
+        "verifier_report_sha256": "b346414ec3b2fa74d0ef42cd510223d7f1ee9a2a0ff493ab6be4474f6b8029e1"
+      },
+      "provenance_chain_hash": "c6aa7d66c4b033ba6cf3330ac78a6cd1eaa54199796bcedaf66171d76efbad11",
+      "policy_version": "1.0",
+      "generated_at": "2026-08-13T07:33:55.616503Z",
+      "builder": {
+        "name": "motionloom-attestation-builder",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "approval": false
+}

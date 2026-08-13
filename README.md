@@ -40,13 +40,24 @@ node scripts/runtime-adapters.mjs
 # 4d. Capture runtime telemetry and verify evidence bindings externally
 bash scripts/capture-runtime-telemetry.sh my-scene artifacts/onboarding-wave
 
+# 4e. Derive and verify a signed task-bound statement against a managed trust policy
+python3 scripts/attestation.py statement --scene-dir src/output/my-scene \
+  --task-dir artifacts/onboarding-wave --context /path/to/your/project/project-context.json \
+  --output artifacts/onboarding-wave/attestation-statement.json
+python3 scripts/attestation.py build --statement artifacts/onboarding-wave/attestation-statement.json \
+  --private-key <managed-ed25519-key> --key-id <key-id> \
+  --output artifacts/onboarding-wave/attestation.json
+python3 scripts/attestation-verifier.py --attestation artifacts/onboarding-wave/attestation.json \
+  --trust-policy artifacts/onboarding-wave/trust-policy.json \
+  --expected-task-id onboarding-wave --expected-scene my-scene
+
 # 5. Boot the Dev Lab to test & fix interactively
 bash scripts/devlab.sh my-scene
 
 # 6. Run the acceptance gate, then confirm and ship
 python3 scripts/quality-gate.py --scene my-scene \
   --context /path/to/your/project/project-context.json \
-  --task-dir artifacts/onboarding-wave --require-telemetry
+  --task-dir artifacts/onboarding-wave --require-telemetry --require-attestation
 
 # 6. Collect evidence and render the user-facing report
 python3 scripts/report.py collect --task-dir artifacts/onboarding-wave
@@ -71,7 +82,7 @@ node scripts/runtime-adapters.mjs
 
 When these variables are supplied, `runtime-evidence.json` records `scene`, `source_sha256` and `manifest_sha256`; the quality gate rejects evidence copied from another scene or generated against an older manifest.
 
-### Intelligence Core v0.1 + P1 feedback intelligence + trust-boundary hardening + evidence interoperability
+### Intelligence Core v0.1 + P1 feedback intelligence + trust-boundary hardening + evidence interoperability + signed attestation
 
 After render and before strict acceptance, build the task-bound Intelligence Core artifacts. They give an Agent a single relationship graph, step-level provenance, framework-neutral Motion IR, capability selection policy and deterministic replay inventory instead of requiring it to infer relationships from prose and unrelated files:
 
@@ -90,11 +101,11 @@ python3 scripts/intelligence.py fix-plan build --task-dir artifacts/onboarding-w
 python3 scripts/quality-gate.py --scene my-scene \
   --context /path/to/your/project/project-context.json \
   --task-dir artifacts/onboarding-wave \
-  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry
+  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
 python3 scripts/eval-intelligence.py
 ```
 
-Semantic lint reports intent, timing, easing, accessibility and performance findings with severity, confidence and evidence. The benchmark records rule coverage and p95 execution time against a 500 ms default threshold; it does not claim to measure human visual quality. Continuity analysis checks context and transition drift across an ordered scene set. `fix-plan.json` converts findings into root cause, affected artifacts, selective rerun scope and verification commands; it does not auto-approve a scene. The 1.8.0 hardening layer rejects symlinked or cross-task Intelligence artifacts, binds replay to task identity, chooses one deterministic passing report bundle per scene, and makes the Dev Lab reject cross-origin or mismatched task/candidate evidence. The 1.9.0 evidence layer captures scrub-point, RAF timing, runtime-state and source/manifest/Motion IR hash bindings, then lets a read-only external verifier reject stale, tampered, cross-task or path-escaped evidence. A verifier pass still means integrity only: runtime assertions, Dev Lab review and user consent remain mandatory. See [Intelligence Core](references/intelligence-core.md), the [1.9.0 threat model](docs/audits/1.9.0-evidence-interoperability-threat-model.md) and the [1.9.0 release note](docs/releases/1.9.0.md).
+Semantic lint reports intent, timing, easing, accessibility and performance findings with severity, confidence and evidence. The benchmark records rule coverage and p95 execution time against a 500 ms default threshold; it does not claim to measure human visual quality. Continuity analysis checks context and transition drift across an ordered scene set. `fix-plan.json` converts findings into root cause, affected artifacts, selective rerun scope and verification commands; it does not auto-approve a scene. The 1.8.0 hardening layer rejects symlinked or cross-task Intelligence artifacts, binds replay to task identity, chooses one deterministic passing report bundle per scene, and makes the Dev Lab reject cross-origin or mismatched task/candidate evidence. The 1.9.0 evidence layer captures scrub-point, RAF timing, runtime-state and source/manifest/Motion IR hash bindings, then lets a read-only external verifier reject stale, tampered, cross-task or path-escaped evidence. The 2.0.0 attestation layer signs canonical task-bound hashes with a DSSE-compatible Ed25519 envelope and checks signer lifecycle through fail-closed trust policy. A verifier pass still means integrity only: runtime assertions, Dev Lab review and user consent remain mandatory; `approval` is always `false`. See [Intelligence Core](references/intelligence-core.md), [signed attestation reference](references/signed-attestation.md), the [1.9.0 threat model](docs/audits/1.9.0-evidence-interoperability-threat-model.md) and the [2.0.0 release note](docs/releases/2.0.0.md).
 
 ## Pipeline
 
@@ -116,10 +127,10 @@ Semantic lint reports intent, timing, easing, accessibility and performance find
 | `src/rig/` | Cutout character body rig engine |
 | `templates/` | Canonical Lottie / Rive / GSAP / Framer Motion templates |
 | `assets/library/` | Vetted source assets + attribution, including the MIT Rive adapter fixture |
-| `scripts/` | Pipeline CLI plus Intelligence Core (`analyze`, `render`, `devlab`, `pr`, `quality-gate`, `validate-lottie`, `to-dotlottie`, `runtime-adapters`, `capture-runtime-telemetry`, `evidence-verifier`, `skill-doctor`, `report`, `report-contract`, `intelligence`, `eval-intelligence`) |
+| `scripts/` | Pipeline CLI plus Intelligence Core (`analyze`, `render`, `devlab`, `pr`, `quality-gate`, `validate-lottie`, `to-dotlottie`, `runtime-adapters`, `capture-runtime-telemetry`, `evidence-verifier`, `attestation`, `attestation-verifier`, `attestation-keygen`, `skill-doctor`, `report`, `report-contract`, `intelligence`, `eval-intelligence`) |
 | `dev-lab/` | Self-contained static Dev Lab + Playwright snapshot harness |
 | `agent-card.json` | Capability discovery, runtime levels and side-effect policy for other Agents |
-| `schemas/` | Task, report, artifact-manifest, scene-manifest, handoff and Intelligence Core JSON Schemas |
+| `schemas/` | Task, report, artifact-manifest, scene-manifest, handoff, Intelligence Core, signed-attestation and trust-policy JSON Schemas |
 | `references/` | Progressive-disclosure contracts for reporting, runtime capability, dotLottie packaging and Intelligence Core |
 | `artifacts/<task-id>/` | Per-task ledger, evidence, review, issue register and handoff bundle |
 | `tests/` | Deterministic engine tests |
@@ -127,7 +138,7 @@ Semantic lint reports intent, timing, easing, accessibility and performance find
 
 ## The quality gate
 
-A scene is only "ready" when, together, the Dev Lab checklist passes, runtime snapshot frames exist at 0/50/100%, the context-bound JSON spec matches the implementation, brand tokens come from the target project's `project-context.json`, the required `source_binding` traces `manifest.file` to an authoritative source with a matching checksum, the P1 reports have been validated and the semantic-lint benchmark is below threshold. For strict observability runs, runtime telemetry and the external verifier report must also pass their identity, freshness and hash checks. A warning may require human review and a selective fix; it is never silently converted into approval. CI reproduces these checks on every PR — see [CHECKLIST.md](docs/CHECKLIST.md).
+A scene is only "ready" when, together, the Dev Lab checklist passes, runtime snapshot frames exist at 0/50/100%, the context-bound JSON spec matches the implementation, brand tokens come from the target project's `project-context.json`, the required `source_binding` traces `manifest.file` to an authoritative source with a matching checksum, the P1 reports have been validated and the semantic-lint benchmark is below threshold. For strict observability runs, runtime telemetry and the external verifier report must also pass their identity, freshness and hash checks; for production trust runs, the signed attestation must verify against an active trust-policy key and bind the same task/scene/material hashes. A warning or valid signature may require human review and a selective fix; neither is silently converted into approval. CI reproduces these checks on every PR — see [CHECKLIST.md](docs/CHECKLIST.md).
 
 ## Transparent task reporting
 

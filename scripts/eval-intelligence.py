@@ -8,18 +8,25 @@ never turns a negative case into a successful acceptance.
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 
 ROOT = Path(__file__).resolve().parents[1]
 INTELLIGENCE = ROOT / "scripts/intelligence.py"
 REPORT = ROOT / "scripts/report.py"
 VERIFIER = ROOT / "scripts/evidence-verifier.py"
+ATTESTATION = ROOT / "scripts/attestation.py"
+ATTESTATION_VERIFIER = ROOT / "scripts/attestation-verifier.py"
 CASES = ROOT / "tests/evals/intelligence-cases.json"
 
 
@@ -29,6 +36,102 @@ def invoke(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProc
 
 def record(results: list[dict[str, object]], case_id: str, passed: bool, detail: str = "") -> None:
     results.append({"id": case_id, "status": "pass" if passed else "fail", "detail": detail.strip()[-500:]})
+
+
+def iso(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def attestation_policy(key_id: str, public_key: bytes, status: str = "active") -> dict[str, object]:
+    now = datetime.now(timezone.utc)
+    key: dict[str, object] = {
+        "key_id": key_id,
+        "algorithm": "ed25519",
+        "public_key_base64": base64.b64encode(public_key).decode("ascii"),
+        "status": status,
+        "valid_from": iso(now - timedelta(days=1)),
+    }
+    if status == "revoked":
+        key["revoked_at"] = iso(now - timedelta(hours=1))
+        key["revocation_reason"] = "eval fixture revocation"
+    return {
+        "schema_version": "1.0",
+        "policy_id": "motionloom-eval-policy",
+        "trust_domain": "https://motionloom.dev/trust/eval",
+        "keys": [key],
+        "rotation": {"max_key_age_days": 90, "overlap_days": 7, "require_active_signer": True},
+        "revocation": {"mode": "local-policy", "fail_closed": True, "sources": ["eval-fixture"]},
+    }
+
+
+def run_attestation_cases(root: Path, results: list[dict[str, object]]) -> None:
+    """Exercise the signed-attestation boundary with stable verifier outcomes."""
+    case_root = root / "attestation-eval"
+    case_root.mkdir(parents=True, exist_ok=True)
+    private_key = Ed25519PrivateKey.generate()
+    key_id = "eval-signer-v1"
+    private_key_path = case_root / "private.key"
+    private_key_path.write_text(base64.b64encode(private_key.private_bytes_raw()).decode("ascii") + "\n", encoding="utf-8")
+    policy_path = case_root / "trust-policy.json"
+    policy_path.write_text(json.dumps(attestation_policy(key_id, private_key.public_key().public_bytes_raw()), indent=2) + "\n", encoding="utf-8")
+    statement = {
+        "type": "https://motionloom.dev/attestation/v1",
+        "predicate_type": "https://motionloom.dev/predicate/animation-evidence/v1",
+        "subject": [{"name": "eval-scene", "digest": {"sha256": "a" * 64}}],
+        "predicate": {
+            "task_id": "attestation-eval-task",
+            "scene": "eval-scene",
+            "context_hash": "b" * 64,
+            "source_sha256": "c" * 64,
+            "manifest_sha256": "d" * 64,
+            "motion_ir_sha256": "e" * 64,
+            "evidence": {
+                "runtime_evidence_sha256": "f" * 64,
+                "runtime_telemetry_sha256": "0" * 64,
+                "verifier_report_sha256": "1" * 64,
+            },
+            "provenance_chain_hash": "2" * 64,
+            "policy_version": "1.0",
+            "generated_at": iso(datetime.now(timezone.utc)),
+            "builder": {"name": "motionloom-eval", "version": "1.0.0"},
+        },
+    }
+    statement_path = case_root / "statement.json"
+    statement_path.write_text(json.dumps(statement, indent=2) + "\n", encoding="utf-8")
+    bundle_path = case_root / "attestation.json"
+    built = invoke([
+        str(ATTESTATION), "build", "--statement", str(statement_path), "--private-key", str(private_key_path),
+        "--key-id", key_id, "--output", str(bundle_path),
+    ])
+    clean = invoke([
+        str(ATTESTATION_VERIFIER), "--attestation", str(bundle_path), "--trust-policy", str(policy_path),
+        "--expected-task-id", "attestation-eval-task", "--expected-scene", "eval-scene",
+    ])
+    clean_doc = json.loads(clean.stdout) if clean.stdout.strip().startswith("{") else {}
+    record(results, "p2-attestation-clean", built.returncode == 0 and clean.returncode == 0 and clean_doc.get("verified") is True and clean_doc.get("approval") is False, clean.stdout + clean.stderr)
+
+    tampered = json.loads(bundle_path.read_text(encoding="utf-8"))
+    tampered["envelope"]["payload_base64"] = base64.b64encode(b"tampered").decode("ascii")
+    tampered_path = case_root / "tampered.json"
+    tampered_path.write_text(json.dumps(tampered, indent=2) + "\n", encoding="utf-8")
+    tamper_result = invoke([str(ATTESTATION_VERIFIER), "--attestation", str(tampered_path), "--trust-policy", str(policy_path)])
+    record(results, "p2-attestation-payload-tamper", tamper_result.returncode == 11, tamper_result.stdout + tamper_result.stderr)
+
+    binding_result = invoke([
+        str(ATTESTATION_VERIFIER), "--attestation", str(bundle_path), "--trust-policy", str(policy_path),
+        "--expected-task-id", "foreign-task",
+    ])
+    record(results, "p2-attestation-binding-mismatch", binding_result.returncode == 14, binding_result.stdout + binding_result.stderr)
+
+    revoked_policy = case_root / "revoked-policy.json"
+    revoked_policy.write_text(json.dumps(attestation_policy(key_id, private_key.public_key().public_bytes_raw(), "revoked"), indent=2) + "\n", encoding="utf-8")
+    revoked_result = invoke([str(ATTESTATION_VERIFIER), "--attestation", str(bundle_path), "--trust-policy", str(revoked_policy)])
+    record(results, "p2-attestation-revoked-signer", revoked_result.returncode == 13, revoked_result.stdout + revoked_result.stderr)
+
+    unknown_policy = case_root / "unknown-policy.json"
+    unknown_policy.write_text(json.dumps(attestation_policy("other-signer-v1", private_key.public_key().public_bytes_raw()), indent=2) + "\n", encoding="utf-8")
+    unknown_result = invoke([str(ATTESTATION_VERIFIER), "--attestation", str(bundle_path), "--trust-policy", str(unknown_policy)])
+    record(results, "p2-attestation-unknown-signer", unknown_result.returncode == 13, unknown_result.stdout + unknown_result.stderr)
 
 
 def run_p1_cases(root: Path, task_dir: Path, results: list[dict[str, object]]) -> None:
@@ -260,6 +363,7 @@ def main() -> int:
         run_p1_cases(root, task_dir, results)
         run_performance_perceptual_cases(root, task_dir, results)
         run_runtime_verifier_cases(root, results)
+        run_attestation_cases(root, results)
 
     missing = expected - {str(item["id"]) for item in results}
     for case_id in sorted(missing):

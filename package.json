@@ -1,9 +1,9 @@
 {
   "name": "motionloom",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "MotionLoom: project-aware animation Skill with graph, provenance, Motion IR, runtime telemetry, external evidence verification and Dev Lab review.",
+  "description": "MotionLoom: project-aware animation Skill with graph, provenance, Motion IR, runtime telemetry, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",
   "scripts": {
     "test": "python3 tests/scripts/run_tests.py",
     "validate": "python3 scripts/quality-gate.py --all",
@@ -20,7 +20,12 @@
     "eval:intelligence": "python3 scripts/eval-intelligence.py",
     "benchmark:semantic": "python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/professional-review-e2e --iterations 25 --threshold-ms 500",
     "evidence:verify": "python3 scripts/evidence-verifier.py --scene-dir src/output/browser-review-smoke --task-dir artifacts/browser-review-smoke-task --runtime-evidence runtime-adapters/runtime-evidence.json --max-age-days 1 --output artifacts/browser-review-smoke-task/evidence-verifier-report.json",
+    "attestation:build": "python3 scripts/attestation.py build",
+    "attestation:verify": "python3 scripts/attestation-verifier.py",
+    "attestation:policy": "python3 scripts/attestation.py validate-policy",
+    "attestation:keygen": "python3 scripts/attestation-keygen.py",
     "quality:telemetry": "python3 scripts/quality-gate.py --scene browser-review-smoke --context artifacts/browser-review-smoke-task/project-context.json --task-dir artifacts/browser-review-smoke-task --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry",
+    "quality:attestation": "python3 scripts/quality-gate.py --scene browser-review-smoke --context artifacts/browser-review-smoke-task/project-context.json --task-dir artifacts/browser-review-smoke-task --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation",
     "pack:dotlottie": "bash scripts/to-dotlottie.sh",
     "runtime:test": "node scripts/runtime-adapters.mjs"
   },

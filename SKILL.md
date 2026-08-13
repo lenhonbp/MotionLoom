@@ -7,7 +7,7 @@ description: >-
   validate, review, or deliver animation inside an existing project.
 license: MIT
 metadata:
-  version: "1.9.0"
+  version: "2.0.0"
   target_frameworks: "lottie,dotlottie,rive,gsap,framer-motion,spine,threejs"
   verified_runtimes: "lottie-json,dotlottie-package,svg-cutout-rig,rive,gsap,framer-motion"
 ---
@@ -25,9 +25,10 @@ Treat every animation request as a production task, not as an isolated asset-gen
 5. **Render** — run `bash scripts/render.sh <scene>` for scene output, or `node scripts/runtime-adapters.mjs` for the verified Rive/GSAP/Framer Motion adapter matrix. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
 6. **Bind Intelligence Core** — build a framework-neutral `motion-ir.json`, `project-graph.json`, `provenance.json`, `replay-bundle.json`, `semantic-lint-report.json` and `semantic-lint-benchmark.json` with `python3 scripts/intelligence.py`. Select only a capability registry entry whose status is `verified`, whose evidence is fresh and whose compatibility matches the target environment. A confidence score or benchmark result can prioritize investigation; neither can replace deterministic or human acceptance.
 6a. **Harden the trust boundary** — keep artifact and task bundles inside the repository/task root, reject symlinked evidence, bind replay to its exact `task_dir`, `task_id` and scene, select one deterministic report bundle per scene, and require browser candidate/review identity and expiry checks before readiness. The Dev Lab must reject cross-origin or identity-mismatched artifact bases. In strict runtime-observability runs, capture `runtime-telemetry.json` and a read-only `evidence-verifier-report.json`; verifier output must preserve `approval: false`. These checks expose risk and prevent evidence mixing, but do not turn heuristics or evidence integrity into approval.
+6b. **Attest** — derive a canonical statement from the exact scene/task hashes, sign it with an Ed25519 key through `scripts/attestation.py`, and verify it with the independent `scripts/attestation-verifier.py` against a fail-closed `trust-policy.json`. DSSE/SLSA-compatible attestation proves signer and binding integrity only; `approval` must remain `false` and never replaces user review.
 7. **Browser review handoff** — run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
 8. **Review capture** — the browser Agent calls `window.__lab.getReview()` after the user approves or requests changes, then persists it with `python3 scripts/report.py review --task-dir artifacts/<task-id> --candidate-id <id> --decision approved|changes_requested --reviewer user`. A change request returns to generation; no approval means no PR.
-9. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>`, `python3 scripts/report-contract.py --root . --scenes-file <changed-scenes>`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
+9. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>`, the independent attestation verifier, `python3 scripts/report-contract.py --root . --scenes-file <changed-scenes> --require-attestation`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
 10. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, browser candidate/review evidence and the recommended next Agent/Skill.
 11. **Confirm** — only after approved browser review and a passing quality gate run `TASK_DIR=artifacts/<task-id> bash scripts/pr.sh <scene>`. Commit, push and open PR are explicit side effects.
 
@@ -56,6 +57,7 @@ Treat every animation request as a production task, not as an isolated asset-gen
 - Browser-review candidates are single-use, time-bounded and bound to the exact task, scene and candidate identity; Dev Lab artifact/task bases must be same-origin and identity-consistent before staging a review decision.
 - Report completeness must select one deterministic passing task bundle per scene and fail on ambiguous ties; a valid artifact is never sufficient to bypass explicit user approval.
 - Runtime telemetry must bind task, scene, source, manifest, Motion IR and deterministic scrub points; tampered, stale, missing or cross-task telemetry is a verification failure.
+- Signed attestation must bind the same task, scene, context, source, manifest, Motion IR and evidence hashes; unknown, expired or revoked signers fail closed. Attestation verification is an integrity result only and must preserve `approval: false`.
 
 ## Framework boundary
 
@@ -65,7 +67,7 @@ The audited production paths are **Lottie JSON runtime rendering, dotLottie v2 p
 
 Every production `src/output/<scene>/manifest.json` must include a `source_binding` object matching `schemas/scene-manifest.schema.json`. The acceptance gate rejects a missing binding, a mismatched source path, an unknown license/authority or a stale SHA-256.
 
-The Intelligence Core contracts are defined in `schemas/project-graph.schema.json`, `schemas/provenance.schema.json`, `schemas/capability-registry.schema.json` and `schemas/motion-ir.schema.json`. They make project relationships, supply-chain steps, runtime selection and framework-neutral intent inspectable without relying on prose.
+The Intelligence Core contracts are defined in `schemas/project-graph.schema.json`, `schemas/provenance.schema.json`, `schemas/capability-registry.schema.json`, `schemas/motion-ir.schema.json`, `schemas/signed-attestation.schema.json` and `schemas/trust-policy.schema.json`. They make project relationships, supply-chain steps, runtime selection, framework-neutral intent and signer trust inspectable without relying on prose.
 
 ```bash
 # Package a Lottie JSON scene as a dotLottie v2 archive.
@@ -79,6 +81,17 @@ python3 scripts/intelligence.py motion-ir build --task-dir artifacts/<task-id>
 python3 scripts/intelligence.py graph build --task-dir artifacts/<task-id>
 python3 scripts/intelligence.py provenance build --task-dir artifacts/<task-id>
 python3 scripts/intelligence.py replay capture --task-dir artifacts/<task-id>
+
+# Derive, sign and independently verify the exact task-bound attestation.
+python3 scripts/attestation.py statement --scene-dir src/output/<scene> \
+  --task-dir artifacts/<task-id> --context <project-context.json> \
+  --output artifacts/<task-id>/attestation-statement.json
+python3 scripts/attestation.py build --statement artifacts/<task-id>/attestation-statement.json \
+  --private-key <managed-key-file> --key-id <key-id> \
+  --output artifacts/<task-id>/attestation.json
+python3 scripts/attestation-verifier.py --attestation artifacts/<task-id>/attestation.json \
+  --trust-policy artifacts/<task-id>/trust-policy.json \
+  --expected-task-id <task-id> --expected-scene <scene>
 ```
 
 `runtime-evidence.json` records the runtime package, three scrub points, observed state and generated snapshots. A template alone is never enough to upgrade a framework from `scaffold_only` to `verified`.
@@ -106,4 +119,4 @@ python3 scripts/report.py check --task-dir artifacts/<task-id>
 python3 scripts/report.py render --task-dir artifacts/<task-id>
 ```
 
-The bundle should contain `task.json`, `execution-report.json`, `decision-log.jsonl`, `artifact-manifest.json`, `quality-report.json`, `issue-register.json`, `review.json` and `handoff.json` as applicable. Telemetry-enabled bundles additionally expose `runtime-adapters/runtime-evidence.json`, `runtime-adapters/runtime-telemetry.json` and `evidence-verifier-report.json`. Reports must never convert “not run” into “passed”: an absent runtime artifact is a `not_completed` item or a blocker, while an invalid path belongs in `structure_review`.
+The bundle should contain `task.json`, `execution-report.json`, `decision-log.jsonl`, `artifact-manifest.json`, `quality-report.json`, `issue-register.json`, `review.json` and `handoff.json` as applicable. Telemetry-enabled bundles additionally expose `runtime-adapters/runtime-evidence.json`, `runtime-adapters/runtime-telemetry.json` and `evidence-verifier-report.json`; strict trust bundles also expose `attestation.json`, `trust-policy.json` and `attestation-verifier-report.json`. Reports must never convert “not run” into “passed”: an absent runtime or attestation artifact is a `not_completed` item or a blocker, while an invalid path belongs in `structure_review`. A valid signature remains distinct from user approval.

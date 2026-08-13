@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "verifier": "motionloom-attestation-verifier/1.0",
+  "verified": true,
+  "approval": false,
+  "issues": [],
+  "signers": [
+    {
+      "key_id": "motionloom-ci-2-0",
+      "status": "verified",
+      "algorithm": "ed25519"
+    }
+  ],
+  "bindings": {
+    "task_id": "browser-review-smoke-task",
+    "scene": "browser-review-smoke",
+    "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+    "source_sha256": "c5ab312427678b17ae903d280d89db9d202670f031f10ad6fe774fc9aaecee8a",
+    "manifest_sha256": "c14b382524e2d31bd554766a0e8be7a505e68d0b71f5882feadc6b23fbec045a",
+    "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/trust-policy.schema.json",
+  "title": "MotionLoom attestation trust-anchor and key lifecycle policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "trust_domain", "keys", "rotation", "revocation"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "policy_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+    "trust_domain": {"type": "string", "format": "uri"},
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key_id", "algorithm", "public_key_base64", "status", "valid_from"],
+        "properties": {
+          "key_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{2,127}$"},
+          "algorithm": {"const": "ed25519"},
+          "public_key_base64": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9+/=_-]+$"},
+          "status": {"type": "string", "enum": ["active", "retired", "revoked"]},
+          "valid_from": {"type": "string", "format": "date-time"},
+          "valid_until": {"type": "string", "format": "date-time"},
+          "replaces_key_id": {"type": "string"},
+          "revoked_at": {"type": "string", "format": "date-time"},
+          "revocation_reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "rotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_key_age_days", "overlap_days", "require_active_signer"],
+      "properties": {
+        "max_key_age_days": {"type": "integer", "minimum": 1},
+        "overlap_days": {"type": "integer", "minimum": 0},
+        "require_active_signer": {"const": true}
+      }
+    },
+    "revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "fail_closed", "sources"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["local-policy", "signed-list", "online"]},
+        "fail_closed": {"const": true},
+        "sources": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

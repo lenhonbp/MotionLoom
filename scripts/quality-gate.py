@@ -39,6 +39,14 @@ def _load_evidence_verifier():
     return module
 
 
+def _load_attestation_verifier():
+    path = ROOT / "scripts" / "attestation-verifier.py"
+    loader = importlib.util.spec_from_file_location("attestation_verifier", path)
+    module = importlib.util.module_from_spec(loader)
+    loader.loader.exec_module(module)
+    return module
+
+
 def _json(path: Path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -46,7 +54,19 @@ def _json(path: Path):
         raise ValueError(f"{path}: {exc}")
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False) -> list[str]:
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _telemetry_bundle_sha256(task_dir: Path) -> str:
+    entries = []
+    for path in sorted(task_dir.glob("runtime-adapters/**/runtime-telemetry.json")):
+        if path.is_file() and task_dir.resolve() in path.resolve().parents:
+            entries.append({"path": path.resolve().relative_to(task_dir.resolve()).as_posix(), "sha256": _sha256_file(path)})
+    return hashlib.sha256(json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -111,7 +131,7 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
     source_sha_for_evidence = ""
     if source_path_for_evidence.is_file() and scene_dir.resolve() in source_path_for_evidence.parents:
         source_sha_for_evidence = hashlib.sha256(source_path_for_evidence.read_bytes()).hexdigest()
-    manifest_sha_for_evidence = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    manifest_sha_for_evidence = _sha256_file(manifest_path)
 
     if spec.get("framework") in {"rive", "gsap", "framer-motion"}:
         evidence_name = manifest.get("runtime_evidence")
@@ -257,6 +277,55 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                 issues.extend(f"external evidence verifier: {issue}" for issue in verification.get("issues", []))
             if verification.get("approval") is not False:
                 issues.append("external evidence verifier must never grant approval")
+    if require_attestation:
+        if not task_dir:
+            issues.append("attestation gate requires --task-dir")
+        else:
+            task_path = task_dir / "task.json"
+            if not task_path.is_file():
+                issues.append("attestation gate requires task.json")
+            else:
+                try:
+                    task = _json(task_path)
+                    resolved_attestation = attestation_path or (task_dir / "attestation.json")
+                    resolved_policy = trust_policy_path or (task_dir / "trust-policy.json")
+                    verifier = _load_attestation_verifier()
+                    verification, exit_code = verifier.verify_attestation(
+                        str(resolved_attestation),
+                        str(resolved_policy),
+                        str(task.get("task_id") or ""),
+                        scene_dir.name,
+                    )
+                    if exit_code != 0 or not verification.get("verified"):
+                        issues.extend(f"signed attestation verifier: {issue}" for issue in verification.get("issues", []))
+                        if not verification.get("issues"):
+                            issues.append(f"signed attestation verifier failed with exit code {exit_code}")
+                    if verification.get("approval") is not False:
+                        issues.append("signed attestation must never grant approval")
+                    statement = _json(resolved_attestation).get("statement", {})
+                    predicate = statement.get("predicate", {}) if isinstance(statement, dict) else {}
+                    expected_motion_ir = task_dir / "motion-ir.json"
+                    expected_verifier_report = task_dir / "evidence-verifier-report.json"
+                    expected_telemetry_hash = _telemetry_bundle_sha256(task_dir)
+                    expected_bindings = {
+                        "task_id": task.get("task_id"),
+                        "scene": scene_dir.name,
+                        "context_hash": _sha256_file(context_path),
+                        "source_sha256": source_sha_for_evidence,
+                        "manifest_sha256": manifest_sha_for_evidence,
+                        "motion_ir_sha256": _sha256_file(expected_motion_ir) if expected_motion_ir.is_file() else "",
+                        "evidence.runtime_evidence_sha256": _sha256_file(task_dir / "runtime-adapters" / "runtime-evidence.json"),
+                        "evidence.runtime_telemetry_sha256": expected_telemetry_hash,
+                        "evidence.verifier_report_sha256": _sha256_file(expected_verifier_report) if expected_verifier_report.is_file() else "",
+                    }
+                    for field, expected in expected_bindings.items():
+                        actual = predicate.get(field) if "." not in field else (predicate.get("evidence") or {}).get(field.split(".", 1)[1])
+                        if expected and actual != expected:
+                            issues.append(f"signed attestation {field} binding mismatch")
+                        elif not expected:
+                            issues.append(f"signed attestation required binding source is missing: {field}")
+                except (OSError, ValueError, json.JSONDecodeError) as exc:
+                    issues.append(f"signed attestation contract: {exc}")
     return issues
 
 
@@ -273,6 +342,9 @@ def main() -> int:
     parser.add_argument("--require-p1", action="store_true")
     parser.add_argument("--require-benchmark", action="store_true")
     parser.add_argument("--require-telemetry", action="store_true")
+    parser.add_argument("--require-attestation", action="store_true")
+    parser.add_argument("--attestation")
+    parser.add_argument("--trust-policy")
     args = parser.parse_args()
     if args.scene and (args.scene in {".", ".."} or not SAFE_SCENE.fullmatch(args.scene)):
         print("QUALITY GATE: unsafe scene identifier")
@@ -283,13 +355,15 @@ def main() -> int:
         context = root / context
     output_root = root / "src" / "output"
     task_dir = Path(args.task_dir).resolve() if args.task_dir else None
+    attestation_path = Path(args.attestation).resolve() if args.attestation else None
+    trust_policy_path = Path(args.trust_policy).resolve() if args.trust_policy else None
     scenes = [root / "src" / "output" / args.scene] if args.scene else sorted(p for p in output_root.iterdir() if p.is_dir()) if output_root.exists() else []
     if not scenes:
         print("QUALITY GATE: no scene outputs found")
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")

@@ -8,6 +8,9 @@ on:
       - "scripts/**"
       - "schemas/**"
       - "references/**"
+      - "requirements.txt"
+      - "tests/**"
+      - "package.json"
       - "SKILL.md"
       - "agent-card.json"
       - "artifacts/**"
@@ -28,6 +31,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install Python verification dependencies
+        run: python3 -m pip install --requirement requirements.txt
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -104,13 +110,51 @@ jobs:
             python3 scripts/report.py collect --task-dir "artifacts/${scene}-task"
           done < /tmp/changed-scenes
 
+      - name: Build and verify signed attestations for changed scenes
+        run: |
+          if [ ! -s /tmp/changed-scenes ]; then
+            echo "No changed scenes; signed attestation generation is skipped."
+            exit 0
+          fi
+          python3 scripts/attestation-keygen.py \
+            --private-key /tmp/motionloom-ci-attestation.key \
+            --policy /tmp/motionloom-ci-policy.json \
+            --key-id "ci-ephemeral-${GITHUB_RUN_ID}"
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            task_dir="artifacts/${scene}-task"
+            if [ -f project-context.json ]; then
+              context="project-context.json"
+            else
+              context="$task_dir/project-context.json"
+            fi
+            python3 scripts/attestation.py statement \
+              --scene-dir "src/output/$scene" \
+              --task-dir "$task_dir" \
+              --context "$context" \
+              --output "$task_dir/attestation-statement.json"
+            python3 scripts/attestation.py build \
+              --statement "$task_dir/attestation-statement.json" \
+              --private-key /tmp/motionloom-ci-attestation.key \
+              --key-id "ci-ephemeral-${GITHUB_RUN_ID}" \
+              --output "$task_dir/attestation.json"
+            cp /tmp/motionloom-ci-policy.json "$task_dir/trust-policy.json"
+            task_id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["task_id"])' "$task_dir/task.json")
+            python3 scripts/attestation-verifier.py \
+              --attestation "$task_dir/attestation.json" \
+              --trust-policy "$task_dir/trust-policy.json" \
+              --expected-task-id "$task_id" \
+              --expected-scene "$scene" \
+              --output "$task_dir/attestation-verifier-report.json"
+          done < /tmp/changed-scenes
+
       - name: Require task report and handoff for changed scenes
         run: |
           if [ ! -s /tmp/changed-scenes ]; then
             echo "No changed scenes; report contract is skipped."
             exit 0
           fi
-          python3 scripts/report-contract.py --scenes-file /tmp/changed-scenes
+          python3 scripts/report-contract.py --scenes-file /tmp/changed-scenes --require-attestation
 
       - name: Prepare Dev Lab scene artifacts
         run: |
@@ -155,5 +199,5 @@ jobs:
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
-              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry
+              --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
           done < /tmp/changed-scenes

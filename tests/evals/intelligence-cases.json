@@ -101,6 +101,31 @@
       "id": "p2-runtime-verifier-symlink",
       "class": "negative",
       "assertion": "A telemetry path traversing a symlink is rejected before evidence is trusted."
+    },
+    {
+      "id": "p2-attestation-clean",
+      "class": "positive",
+      "assertion": "A DSSE-compatible attestation signed by an active trusted Ed25519 key verifies without granting approval."
+    },
+    {
+      "id": "p2-attestation-payload-tamper",
+      "class": "negative",
+      "assertion": "A signed attestation whose payload bytes are changed fails with the stable payload mismatch exit code."
+    },
+    {
+      "id": "p2-attestation-binding-mismatch",
+      "class": "negative",
+      "assertion": "An attestation presented for a different expected task identity is rejected before trust is granted."
+    },
+    {
+      "id": "p2-attestation-revoked-signer",
+      "class": "negative",
+      "assertion": "A mathematically valid signature from a revoked signer is rejected by fail-closed trust policy."
+    },
+    {
+      "id": "p2-attestation-unknown-signer",
+      "class": "negative",
+      "assertion": "A signature whose key id is absent from the configured trust policy is rejected."
     }
   ]
 }

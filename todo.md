@@ -163,3 +163,20 @@
 - [x] Bổ sung adversarial eval, regression, quality gate và CI coverage cho telemetry/verifier tamper, replay, cross-task và stale evidence.
 - [x] Cập nhật Dev Lab handoff, Agent Card, SKILL.md, roadmap, audit report và release metadata.
 - [x] Chạy full acceptance, commit milestone, push sau explicit confirmation và xác minh CI trên main.
+
+## Roadmap phase: production-grade trust, visual quality and benchmark history
+
+- [x] Kiểm kê roadmap, baseline hiện tại và threat model tổng thể cho các phase còn mở.
+- [x] Thiết kế schema/versioned contract cho signed attestation, trust anchor, key rotation và revocation.
+- [x] Triển khai attestation builder với canonical payload, domain separation và không tự cấp approval.
+- [x] Triển khai key policy, rotation/revocation checks và fixture cho expired/revoked/unknown signer.
+- [x] Xây external verifier độc lập khỏi repository runtime, có stable exit codes và fail-closed semantics.
+- [ ] Thiết kế visual-comparison contract theo asset/frame hash, perceptual metrics và dataset fixture có nhãn nguồn gốc rõ ràng.
+- [ ] Bổ sung benchmark history schema, append-only run records, aggregate metrics và outlier detection.
+- [ ] Tích hợp attestation, visual comparison và benchmark history vào Dev Lab theo review-first flow.
+- [x] Bổ sung adversarial eval, regression, quality gate và CI cho attestation tamper, replay, signer revocation, binding mismatch và approval invariant.
+- [x] Cập nhật SKILL.md, Agent Card, README, Intelligence reference, roadmap, audit report, release note và handoff contracts cho attestation.
+- [ ] Thiết kế visual-comparison contract theo asset/frame hash, perceptual metrics và dataset fixture có nhãn nguồn gốc rõ ràng.
+- [ ] Bổ sung benchmark history schema, append-only run records, aggregate metrics và outlier detection.
+- [ ] Tích hợp visual comparison và benchmark history vào Dev Lab theo review-first flow.
+- [ ] Chạy full acceptance, tạo checkpoint/commit, push sau explicit confirmation và xác minh CI trên main.

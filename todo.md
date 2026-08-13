@@ -162,4 +162,4 @@
 - [x] Triển khai telemetry capture/validate và verifier CLI với stable exit codes, root/path guards và không tự cấp approval.
 - [x] Bổ sung adversarial eval, regression, quality gate và CI coverage cho telemetry/verifier tamper, replay, cross-task và stale evidence.
 - [x] Cập nhật Dev Lab handoff, Agent Card, SKILL.md, roadmap, audit report và release metadata.
-- [ ] Chạy full acceptance, commit milestone, push sau explicit confirmation và xác minh CI trên main.
+- [x] Chạy full acceptance, commit milestone, push sau explicit confirmation và xác minh CI trên main.

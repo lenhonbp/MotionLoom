@@ -53,7 +53,7 @@ PY
   fi
   rm -rf "$LAB/public/tasks/$TASK_ID"
   mkdir -p "$LAB/public/tasks/$TASK_ID"
-  for artifact in task.json browser-review.json review.json execution-report.json handoff.json quality-report.json artifact-manifest.json issue-register.json decision-log.jsonl; do
+  for artifact in task.json browser-review.json review.json execution-report.json handoff.json quality-report.json artifact-manifest.json issue-register.json decision-log.jsonl project-graph.json provenance.json capability-registry.json motion-ir.json replay-bundle.json semantic-lint-report.json continuity-report.json fix-plan.json browser-observation.md; do
     if [ -f "$TASK_DIR/$artifact" ]; then
       cp "$TASK_DIR/$artifact" "$LAB/public/tasks/$TASK_ID/$artifact"
     fi

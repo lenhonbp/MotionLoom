@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1",
+  "report_id": "continuity-motionloom-continuity-fixture",
+  "project_id": "motionloom-continuity-fixture",
+  "status": "pass",
+  "scenes": [
+    {
+      "scene": "hero-intro",
+      "order": 0,
+      "motion_ir_path": "/home/ubuntu/animation-skill/tests/fixtures/continuity-multiscene/scene-01/motion-ir.json",
+      "motion_ir_sha256": "044b3e86ba60d0d502d7c42a894258f35599db8837d9b5b0730d83f67d82b9b3",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "intent": "Stage the hero reveal and establish the shared context for the transition."
+    },
+    {
+      "scene": "hero-cta",
+      "order": 1,
+      "motion_ir_path": "/home/ubuntu/animation-skill/tests/fixtures/continuity-multiscene/scene-02/motion-ir.json",
+      "motion_ir_sha256": "acba77c18aad3850bca2fbfe3c14994d8f6b4c06ebba94a1cb07223c4b14ed4a",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "intent": "Continue the hero reveal into the CTA handoff while preserving shared context."
+    }
+  ],
+  "transitions": [
+    {
+      "id": "transition-hero-intro-hero-cta",
+      "from_scene": "hero-intro",
+      "to_scene": "hero-cta",
+      "status": "pass",
+      "checks": [
+        "scene identity",
+        "intent present",
+        "context binding",
+        "fps compatibility",
+        "duration continuity"
+      ],
+      "findings": []
+    }
+  ],
+  "summary": {
+    "scene_count": 2,
+    "transition_count": 1,
+    "errors": 0,
+    "warnings": 0,
+    "blocking": 0
+  },
+  "generated_at": "2026-08-12T23:41:10Z"
+}

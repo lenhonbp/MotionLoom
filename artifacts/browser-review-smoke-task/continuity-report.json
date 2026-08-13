@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1",
+  "report_id": "continuity-MotionLoom",
+  "project_id": "MotionLoom",
+  "status": "pass",
+  "scenes": [
+    {
+      "scene": "browser-review-smoke",
+      "order": 0,
+      "motion_ir_path": "/home/ubuntu/animation-skill/artifacts/browser-review-smoke-task/motion-ir.json",
+      "motion_ir_sha256": "bdb2305737e5dee9b9ee078dd5657a4a5717bf4184f112a1d01ac82361c5a23f",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "intent": "Verify mandatory internal browser review"
+    }
+  ],
+  "transitions": [],
+  "summary": {
+    "scene_count": 1,
+    "transition_count": 0,
+    "errors": 0,
+    "warnings": 0,
+    "blocking": 0
+  },
+  "generated_at": "2026-08-12T20:02:29Z"
+}

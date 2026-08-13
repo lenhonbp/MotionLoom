@@ -8,7 +8,10 @@
       "id": "browser-review",
       "summary": "Internal Dev Lab candidate reviewed by the user.",
       "status": "pass",
-      "evidence": ["browser-review.json", "review.json"]
+      "evidence": [
+        "browser-review.json",
+        "review.json"
+      ]
     }
   ],
   "verified": [
@@ -16,11 +19,35 @@
       "id": "quality-gate",
       "summary": "Context-bound scene quality gate passed for the approved candidate.",
       "status": "pass",
-      "evidence": ["quality-report.json", "artifact-manifest.json"]
+      "evidence": [
+        "quality-report.json",
+        "artifact-manifest.json"
+      ]
     }
   ],
   "not_completed": [],
-  "problems": [],
+  "problems": [
+    {
+      "id": "fix-plan-browser-review-smoke-task:fix-accessibility-keyboard-review",
+      "summary": "The linter does not infer keyboard safety from animation data.",
+      "status": "open",
+      "severity": "warning",
+      "confidence": 0.97,
+      "evidence": [
+        "semantic-lint-report.json#accessibility-keyboard-review",
+        "fix-plan.json"
+      ],
+      "next_action": "Keep the human-required acceptance assertion and record the reviewer decision in review.json.",
+      "fix_plan": "fix-plan.json",
+      "rerun_scope": [
+        "lint",
+        "runtime",
+        "browser_review",
+        "quality_gate"
+      ],
+      "requires_user_review": true
+    }
+  ],
   "structure_review": {
     "missing_files": [],
     "broken_references": [],
@@ -48,9 +75,31 @@
       "status": "pending",
       "agent": "motionloom",
       "skill": "motionloom",
-      "evidence_needed": ["quality-report.json", "review.json"],
+      "evidence_needed": [
+        "quality-report.json",
+        "review.json"
+      ],
       "next_action": "Request explicit confirmation before running pr.sh."
+    },
+    {
+      "id": "fix-plan-browser-review-smoke-task",
+      "agent": "motionloom",
+      "skill": "motionloom",
+      "action": "Resolve open findings in priority order, then rerun the declared scope.",
+      "status": "pending",
+      "evidence_needed": [
+        "fix-plan.json",
+        "semantic-lint-report.json",
+        "continuity-report.json",
+        "quality-report.json"
+      ]
     }
   ],
-  "generated_at": "2026-08-12T14:32:51Z"
+  "generated_at": "2026-08-12T20:02:29Z",
+  "p1_feedback": {
+    "fix_plan": "fix-plan.json",
+    "issue_count": 1,
+    "status": "proposed",
+    "generated_at": "2026-08-12T20:02:29Z"
+  }
 }

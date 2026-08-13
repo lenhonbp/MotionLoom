@@ -287,6 +287,151 @@ def test_deep_audit_contracts():
     check("runtime adapter rejects unsupported framework path", unsafe_runtime.returncode != 0 and "unsupported" in (unsafe_runtime.stderr + unsafe_runtime.stdout))
 
 
+def test_approved_browser_review_e2e_contract():
+    """Re-run the acceptance side of a real approved task from a clean copy."""
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "artifacts/professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+        shutil.copytree(ROOT / "src/output/browser-review-smoke", root / "src/output/browser-review-smoke")
+        shutil.copy(ROOT / "artifacts/browser-review-smoke-task/project-context.json", root / "project-context.json")
+
+        candidate_path = task_dir / "browser-review.json"
+        candidate = json.loads(candidate_path.read_text())
+        candidate["expires_at"] = "2099-01-01T00:00:00Z"
+        candidate_path.write_text(json.dumps(candidate, indent=2) + "\n")
+
+        review = json.loads((task_dir / "review.json").read_text())
+        task = json.loads((task_dir / "task.json").read_text())
+        check(
+            "e2e task binds approved candidate",
+            review.get("candidate_id") == candidate.get("candidate_id")
+            and candidate.get("task_id") == task.get("task_id")
+            and candidate.get("scene") == task.get("scene"),
+        )
+        check("e2e task is confirmed", task.get("state") == "confirmed")
+
+        review_hook = subprocess.run([
+            sys.executable, str(ROOT / "scripts/review-hook.py"), "validate",
+            "--task-dir", str(task_dir), "--require-approved",
+        ], capture_output=True, text=True)
+        check("e2e review hook accepts approved candidate", review_hook.returncode == 0, review_hook.stdout.strip())
+
+        quality = subprocess.run([
+            sys.executable, str(ROOT / "scripts/quality-gate.py"), "--root", str(root),
+            "--scene", "browser-review-smoke", "--context", str(root / "project-context.json"),
+            "--task-dir", str(task_dir), "--require-browser-review",
+        ], capture_output=True, text=True)
+        check("e2e quality gate accepts task evidence", quality.returncode == 0, quality.stdout.strip())
+
+        report_check = subprocess.run([
+            sys.executable, str(ROOT / "scripts/report.py"), "check", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("e2e report contract accepts confirmed task", report_check.returncode == 0, report_check.stdout.strip())
+
+
+def test_intelligence_core_contracts():
+    """Exercise the deterministic intelligence layer and its adversarial boundary."""
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "artifacts/professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+
+        intelligence = ROOT / "scripts/intelligence.py"
+        motion_ir = subprocess.run([
+            sys.executable, str(intelligence), "motion-ir", "build", "--task-dir", str(task_dir),
+            "--spec", str(ROOT / "src/output/browser-review-smoke/motion-spec.json"),
+        ], capture_output=True, text=True)
+        check("intelligence Motion IR builds", motion_ir.returncode == 0, motion_ir.stdout.strip())
+        motion_ir_check = subprocess.run([
+            sys.executable, str(intelligence), "motion-ir", "validate",
+            "--path", str(task_dir / "motion-ir.json"),
+        ], capture_output=True, text=True)
+        check("intelligence Motion IR validates", motion_ir_check.returncode == 0, motion_ir_check.stdout.strip())
+        graph = subprocess.run([
+            sys.executable, str(intelligence), "graph", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence graph builds", graph.returncode == 0, graph.stdout.strip())
+        graph_check = subprocess.run([
+            sys.executable, str(intelligence), "graph", "validate",
+            "--path", str(task_dir / "project-graph.json"),
+        ], capture_output=True, text=True)
+        check("intelligence graph validates", graph_check.returncode == 0, graph_check.stdout.strip())
+
+        provenance = subprocess.run([
+            sys.executable, str(intelligence), "provenance", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence provenance builds", provenance.returncode == 0, provenance.stdout.strip())
+        provenance_check = subprocess.run([
+            sys.executable, str(intelligence), "provenance", "validate",
+            "--task-dir", str(task_dir), "--path", str(task_dir / "provenance.json"),
+        ], capture_output=True, text=True)
+        check("intelligence provenance validates", provenance_check.returncode == 0, provenance_check.stdout.strip())
+
+        registry = root / "capability-registry.json"
+        capability = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "build",
+            "--evidence", str(ROOT / "artifacts/browser-review-smoke-task/quality-report.json"),
+            "--evidence-kind", "ci", "--output", str(registry),
+        ], capture_output=True, text=True)
+        check("intelligence capability registry builds", capability.returncode == 0, capability.stdout.strip())
+        registry_check = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "validate", "--path", str(registry),
+        ], capture_output=True, text=True)
+        check("intelligence capability registry validates", registry_check.returncode == 0, registry_check.stdout.strip())
+        selected = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(registry), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence selects verified runtime", selected.returncode == 0 and '"status": "verified"' in selected.stdout)
+        scaffold = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(registry), "--capability", "runtime.spine",
+        ], capture_output=True, text=True)
+        check("intelligence blocks scaffold-only runtime", scaffold.returncode != 0)
+
+        stale_registry = json.loads(registry.read_text())
+        for entry in stale_registry["capabilities"]:
+            if entry.get("status") == "verified":
+                entry["last_verified_at"] = "2000-01-01T00:00:00Z"
+        stale_path = root / "stale-capability-registry.json"
+        stale_path.write_text(json.dumps(stale_registry, indent=2) + "\n")
+        stale_select = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(stale_path), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence blocks stale capability evidence", stale_select.returncode != 0)
+
+        tampered_registry = json.loads(registry.read_text())
+        rive_entry = next(entry for entry in tampered_registry["capabilities"] if entry.get("id") == "runtime.rive")
+        rive_entry["evidence"][0]["sha256"] = "0" * 64
+        tampered_path = root / "tampered-capability-registry.json"
+        tampered_path.write_text(json.dumps(tampered_registry, indent=2) + "\n")
+        tampered_select = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "select",
+            "--registry", str(tampered_path), "--capability", "runtime.rive",
+        ], capture_output=True, text=True)
+        check("intelligence blocks tampered capability evidence", tampered_select.returncode != 0)
+
+        replay = subprocess.run([
+            sys.executable, str(intelligence), "replay", "capture",
+            "--root", str(root), "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        check("intelligence replay captures bundle", replay.returncode == 0, replay.stdout.strip())
+        replay_check = subprocess.run([
+            sys.executable, str(intelligence), "replay", "verify",
+            "--root", str(root), "--bundle", str(task_dir / "replay-bundle.json"),
+        ], capture_output=True, text=True)
+        check("intelligence replay verifies clean bundle", replay_check.returncode == 0, replay_check.stdout.strip())
+        review = task_dir / "review.json"
+        review.write_text(review.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        tampered = subprocess.run([
+            sys.executable, str(intelligence), "replay", "verify",
+            "--root", str(root), "--bundle", str(task_dir / "replay-bundle.json"),
+        ], capture_output=True, text=True)
+        check("intelligence replay rejects tampered artifact", tampered.returncode != 0 and "hash_mismatch" in tampered.stdout)
+
+
 def test_malformed_spec_is_rejected_cleanly():
     with tempfile.TemporaryDirectory() as td:
         bad = Path(td) / "bad.json"
@@ -295,6 +440,137 @@ def test_malformed_spec_is_rejected_cleanly():
                                 capture_output=True, text=True)
         check("malformed spec exits non-zero", result.returncode != 0)
         check("malformed spec reports issues", "ISSUES:" in result.stdout and "duration_s" in result.stdout)
+
+
+def test_p1_semantic_continuity_fix_plan():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        task_dir = root / "professional-review-e2e"
+        shutil.copytree(ROOT / "artifacts/professional-review-e2e", task_dir)
+        intelligence = ROOT / "scripts/intelligence.py"
+
+        lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(task_dir),
+        ], capture_output=True, text=True)
+        lint_data = json.loads((task_dir / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint builds report", lint.returncode == 0)
+        check("P1 semantic lint preserves human keyboard review", lint_data.get("status") == "warn" and any(item.get("id") == "accessibility-keyboard-review" and item.get("basis") == "human" for item in lint_data.get("findings", [])))
+        lint_validate = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "validate", "--path", str(task_dir / "semantic-lint-report.json"),
+        ], capture_output=True, text=True)
+        check("P1 semantic lint validates report", lint_validate.returncode == 0)
+
+        duration_task = root / "duration-budget-task"
+        shutil.copytree(task_dir, duration_task)
+        duration_ir_path = duration_task / "motion-ir.json"
+        duration_ir = json.loads(duration_ir_path.read_text())
+        duration_ir["duration_ms"] = 600
+        duration_ir_path.write_text(json.dumps(duration_ir, indent=2) + "\n")
+        duration_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(duration_task),
+        ], capture_output=True, text=True)
+        duration_report = json.loads((duration_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on UI animation budget", duration_lint.returncode == 0 and any(item.get("id") == "perf-animation-budget" and item.get("severity") == "warning" and not item.get("approval_blocking") for item in duration_report.get("findings", [])))
+
+        fps_task = root / "fps-task"
+        shutil.copytree(task_dir, fps_task)
+        fps_ir_path = fps_task / "motion-ir.json"
+        fps_ir = json.loads(fps_ir_path.read_text())
+        fps_ir["fps"] = 24
+        fps_ir_path.write_text(json.dumps(fps_ir, indent=2) + "\n")
+        fps_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(fps_task),
+        ], capture_output=True, text=True)
+        fps_report = json.loads((fps_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns below 30 FPS", fps_lint.returncode == 0 and any(item.get("id") == "perf-frame-rate" for item in fps_report.get("findings", [])))
+
+        easing_task = root / "easing-task"
+        shutil.copytree(task_dir, easing_task)
+        easing_ir_path = easing_task / "motion-ir.json"
+        easing_ir = json.loads(easing_ir_path.read_text())
+        for keyframe in easing_ir.get("tracks", [])[0].get("keyframes", []):
+            keyframe["easing"] = "linear"
+        easing_ir_path.write_text(json.dumps(easing_ir, indent=2) + "\n")
+        easing_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(easing_task),
+        ], capture_output=True, text=True)
+        easing_report = json.loads((easing_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on linear UI easing", easing_lint.returncode == 0 and any(item.get("id") == "perceptual-easing-linear" and item.get("severity") == "warning" for item in easing_report.get("findings", [])))
+
+        reduced_task = root / "reduced-motion-task"
+        shutil.copytree(task_dir, reduced_task)
+        reduced_ir_path = reduced_task / "motion-ir.json"
+        reduced_ir = json.loads(reduced_ir_path.read_text())
+        reduced_ir.setdefault("accessibility", {})["reduced_motion"] = "none"
+        reduced_ir_path.write_text(json.dumps(reduced_ir, indent=2) + "\n")
+        reduced_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(reduced_task),
+        ], capture_output=True, text=True)
+        reduced_report = json.loads((reduced_task / "semantic-lint-report.json").read_text())
+        check("P1 semantic lint warns on absent reduced-motion fallback", reduced_lint.returncode == 0 and any(item.get("id") == "perceptual-reduced-motion-missing" and not item.get("approval_blocking") for item in reduced_report.get("findings", [])))
+
+        benchmark_path = task_dir / "semantic-lint-benchmark.json"
+        benchmark = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "benchmark", "--task-dir", str(task_dir),
+            "--iterations", "10", "--threshold-ms", "500", "--output", str(benchmark_path),
+        ], capture_output=True, text=True)
+        benchmark_data = json.loads(benchmark_path.read_text())
+        check("P1 semantic lint benchmark passes threshold", benchmark.returncode == 0 and benchmark_data.get("status") == "pass" and benchmark_data.get("p95_ms", 999999) < benchmark_data.get("threshold_ms", 0))
+        benchmark_validate = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "benchmark", "--task-dir", str(task_dir),
+            "--iterations", "2", "--threshold-ms", "500", "--output", str(task_dir / "semantic-lint-benchmark-2.json"),
+        ], capture_output=True, text=True)
+        check("P1 semantic lint benchmark is repeatable", benchmark_validate.returncode == 0)
+
+        ir = json.loads((task_dir / "motion-ir.json").read_text())
+        ir["intent"] = "motion"
+        (task_dir / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
+        generic_lint = subprocess.run([
+            sys.executable, str(intelligence), "semantic-lint", "build", "--task-dir", str(task_dir),
+            "--output", str(task_dir / "generic-lint.json"),
+        ], capture_output=True, text=True)
+        generic_data = json.loads((task_dir / "generic-lint.json").read_text())
+        check("P1 semantic lint detects low-specificity intent", generic_lint.returncode == 0 and any(item.get("id") == "intent-low-specificity" for item in generic_data.get("findings", [])))
+
+        fix_plan = subprocess.run([
+            sys.executable, str(intelligence), "fix-plan", "build", "--task-dir", str(task_dir),
+            "--reports", "generic-lint.json",
+        ], capture_output=True, text=True)
+        plan = json.loads((task_dir / "fix-plan.json").read_text())
+        check("P1 fix plan binds semantic report", fix_plan.returncode == 0 and plan.get("status") == "proposed", f"rc={fix_plan.returncode} stdout={fix_plan.stdout.strip()} stderr={fix_plan.stderr.strip()}")
+        check("P1 fix plan declares selective lint rerun", any(issue.get("rerun_scope") == ["lint"] and "intent-low-specificity" in issue.get("finding_ref", "") for issue in plan.get("issues", []) if isinstance(issue, dict)))
+        plan_validate = subprocess.run([
+            sys.executable, str(intelligence), "fix-plan", "validate", "--path", str(task_dir / "fix-plan.json"),
+        ], capture_output=True, text=True)
+        check("P1 fix plan validates", plan_validate.returncode == 0)
+
+        first = root / "scene-a"
+        second = root / "scene-b"
+        shutil.copytree(task_dir, first)
+        shutil.copytree(task_dir, second)
+        for path, task_id, scene, order in ((first, "p1-scene-a", "scene-a", 0), (second, "p1-scene-b", "scene-b", 1)):
+            task = json.loads((path / "task.json").read_text())
+            task.update({"task_id": task_id, "scene": scene, "scene_order": order, "project_name": "p1-continuity"})
+            (path / "task.json").write_text(json.dumps(task, indent=2) + "\n")
+            ir = json.loads((path / "motion-ir.json").read_text())
+            ir.update({"task_id": task_id, "scene": scene, "context_hash": task.get("context_hash")})
+            (path / "motion-ir.json").write_text(json.dumps(ir, indent=2) + "\n")
+
+        continuity = subprocess.run([
+            sys.executable, str(intelligence), "continuity", "build", "--task-dirs", str(first), str(second),
+        ], capture_output=True, text=True)
+        continuity_data = json.loads((first / "continuity-report.json").read_text())
+        check("P1 continuity builds multi-scene report", continuity.returncode == 0 and continuity_data.get("summary", {}).get("transition_count") == 1)
+        check("P1 continuity passes matching context", continuity_data.get("status") == "pass")
+
+        second_ir = json.loads((second / "motion-ir.json").read_text())
+        second_ir["context_hash"] = "f" * 64
+        (second / "motion-ir.json").write_text(json.dumps(second_ir, indent=2) + "\n")
+        drift = subprocess.run([
+            sys.executable, str(intelligence), "continuity", "build", "--task-dirs", str(first), str(second),
+        ], capture_output=True, text=True)
+        drift_data = json.loads((first / "continuity-report.json").read_text())
+        check("P1 continuity detects context drift", drift.returncode == 0 and drift_data.get("status") == "warn" and "context hash changes between adjacent scenes" in drift_data["transitions"][0].get("findings", []))
 
 
 def test_category_coverage():
@@ -417,7 +693,10 @@ if __name__ == "__main__":
     test_placeholder_is_not_runtime_evidence()
     test_runtime_evidence_binding()
     test_deep_audit_contracts()
+    test_approved_browser_review_e2e_contract()
+    test_intelligence_core_contracts()
     test_malformed_spec_is_rejected_cleanly()
+    test_p1_semantic_continuity_fix_plan()
     sys.path.insert(0, str(ROOT))
     test_category_coverage()
     test_observability_contract()

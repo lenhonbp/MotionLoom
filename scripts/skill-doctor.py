@@ -22,6 +22,10 @@ REQUIRED_SCHEMAS = [
     "browser-review-candidate.schema.json",
     "scene-manifest.schema.json",
     "runtime-evidence.schema.json",
+    "project-graph.schema.json",
+    "provenance.schema.json",
+    "capability-registry.schema.json",
+    "motion-ir.schema.json",
 ]
 
 

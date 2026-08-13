@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "plan_id": "fix-plan-professional-review-e2e",
+  "task_id": "professional-review-e2e",
+  "status": "proposed",
+  "source_reports": [
+    {
+      "path": "semantic-lint-report.json",
+      "sha256": "ecdceac60765eb82636db029fb2c64bea24e29f5e8b10a93fc186ac447674c0c",
+      "kind": "semantic-lint"
+    },
+    {
+      "path": "continuity-report.json",
+      "sha256": "e4998ea4350cc27462101f0ade52a2907cb7a6ea33421f8a72b332701a5260d3",
+      "kind": "continuity"
+    }
+  ],
+  "issues": [
+    {
+      "id": "fix-accessibility-keyboard-review",
+      "finding_ref": "semantic-lint-report.json#accessibility-keyboard-review",
+      "severity": "warning",
+      "confidence": 0.97,
+      "root_cause": "The linter does not infer keyboard safety from animation data.",
+      "affected_artifacts": [
+        "motion-ir.json",
+        "review.json"
+      ],
+      "patch_scope": [
+        "Keep the human-required acceptance assertion and record the reviewer decision in review.json."
+      ],
+      "rerun_scope": [
+        "lint",
+        "runtime",
+        "browser_review",
+        "quality_gate"
+      ],
+      "verification": [
+        "python3 scripts/intelligence.py semantic-lint validate --path semantic-lint-report.json",
+        "python3 scripts/report.py check --task-dir <task-dir>"
+      ],
+      "requires_user_review": true,
+      "status": "open"
+    }
+  ],
+  "generated_at": "2026-08-12T19:58:07Z",
+  "next_agent": {
+    "action": "Resolve open findings in priority order, then rerun the declared scope.",
+    "skill": "motionloom",
+    "evidence_needed": [
+      "semantic-lint-report.json",
+      "continuity-report.json",
+      "quality-report.json"
+    ]
+  }
+}

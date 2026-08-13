@@ -1,0 +1,97 @@
+{
+  "manifest_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "generated_at": "2026-08-12T20:08:30Z",
+  "artifacts": [
+    {
+      "path": "REPORT.md",
+      "type": "md",
+      "sha256": "338521ac5f7f665fe3b49de159aa9dbb353c55fe4062943105ac90f404f20827",
+      "bytes": 4145
+    },
+    {
+      "path": "browser-observation.md",
+      "type": "md",
+      "sha256": "4161597a40ab9d924844a7d48e18093e1e5f6083643d4362163b6c7275bf4de0",
+      "bytes": 2213
+    },
+    {
+      "path": "browser-review.json",
+      "type": "json",
+      "sha256": "3a74b4aac673133c9e3cbda8e82fa8e147e0fc89204d60fd39912f8abd179948",
+      "bytes": 1005
+    },
+    {
+      "path": "continuity-report.json",
+      "type": "json",
+      "sha256": "e4998ea4350cc27462101f0ade52a2907cb7a6ea33421f8a72b332701a5260d3",
+      "bytes": 796
+    },
+    {
+      "path": "fix-plan.json",
+      "type": "json",
+      "sha256": "3016504cdd58ca578493ede22d5a61a7b0f357f0725cabf2555f835475b2b8c6",
+      "bytes": 1705
+    },
+    {
+      "path": "handoff.json",
+      "type": "json",
+      "sha256": "cf7da3c4ee4b49da41edbe8c14f22adbac0205089474b89728e47edb729dcda8",
+      "bytes": 2146
+    },
+    {
+      "path": "issue-register.json",
+      "type": "json",
+      "sha256": "f8eaa14ab0e7f022b303a034060cb860290260cbb96b7ff3fdee93d2a4ecb58e",
+      "bytes": 762
+    },
+    {
+      "path": "motion-ir.json",
+      "type": "json",
+      "sha256": "a3fee6be2ae667935ebe1e2aec2dd439bf77e85f9135835ff4dfb6df6cb681c4",
+      "bytes": 2095
+    },
+    {
+      "path": "project-graph.json",
+      "type": "json",
+      "sha256": "eac3193483929ce17c422cd173c8985a3cba0fdfbd95bf86a83d4839f3f12f4d",
+      "bytes": 6478
+    },
+    {
+      "path": "provenance.json",
+      "type": "json",
+      "sha256": "a22d68c5bd8f5226906ec07134deac8e3a6e2465c7795fe0a5be4852ec8d833e",
+      "bytes": 6838
+    },
+    {
+      "path": "quality-report.json",
+      "type": "json",
+      "sha256": "1fae971797329d3526240b8bb578ac1e8e809a132e7cbbb0b75604b1eba3a009",
+      "bytes": 583
+    },
+    {
+      "path": "replay-bundle.json",
+      "type": "json",
+      "sha256": "b0ed41569de4013a9ec8489423d1c2eac3cf84ddd4b94752d10210471fdc3656",
+      "bytes": 3158
+    },
+    {
+      "path": "review.json",
+      "type": "json",
+      "sha256": "556999f1e36620d379ab20c3f09afeacabe58d015c0f6990f206c5ea62d72c26",
+      "bytes": 457
+    },
+    {
+      "path": "semantic-lint-report.json",
+      "type": "json",
+      "sha256": "ecdceac60765eb82636db029fb2c64bea24e29f5e8b10a93fc186ac447674c0c",
+      "bytes": 1395
+    },
+    {
+      "path": "task.json",
+      "type": "json",
+      "sha256": "723f897ea4d149bfbe0f43d385e76e0ff3bddd7bf8593385b2105ec9a80d517d",
+      "bytes": 710
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.1",
+  "report_id": "continuity-motionloom-continuity-fixture-drift",
+  "project_id": "motionloom-continuity-fixture-drift",
+  "status": "warn",
+  "scenes": [
+    {
+      "scene": "hero-intro",
+      "order": 0,
+      "motion_ir_path": "/home/ubuntu/animation-skill/tests/fixtures/continuity-multiscene/scene-01/motion-ir.json",
+      "motion_ir_sha256": "044b3e86ba60d0d502d7c42a894258f35599db8837d9b5b0730d83f67d82b9b3",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "intent": "Stage the hero reveal and establish the shared context for the transition."
+    },
+    {
+      "scene": "hero-cta",
+      "order": 1,
+      "motion_ir_path": "/home/ubuntu/animation-skill/tests/fixtures/continuity-multiscene/scene-02-drift/motion-ir.json",
+      "motion_ir_sha256": "d06d25a17452b611c645a76f7a2fd110334b4711526a7dc2dbbc467e366e5c3c",
+      "context_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "intent": "Continue the hero reveal into the CTA handoff while preserving shared context."
+    }
+  ],
+  "transitions": [
+    {
+      "id": "transition-hero-intro-hero-cta",
+      "from_scene": "hero-intro",
+      "to_scene": "hero-cta",
+      "status": "warn",
+      "checks": [
+        "scene identity",
+        "intent present",
+        "context binding",
+        "fps compatibility",
+        "duration continuity"
+      ],
+      "findings": [
+        "context hash changes between adjacent scenes"
+      ]
+    }
+  ],
+  "summary": {
+    "scene_count": 2,
+    "transition_count": 1,
+    "errors": 0,
+    "warnings": 1,
+    "blocking": 0
+  },
+  "generated_at": "2026-08-12T23:41:33Z"
+}

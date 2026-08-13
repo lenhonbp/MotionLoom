@@ -1,0 +1,39 @@
+{
+  "schema_version": "0.1",
+  "benchmark_id": "semantic-lint-benchmark-professional-review-e2e-browser-review-smoke",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "operation": "semantic-lint-build",
+  "iterations": 5,
+  "threshold_ms": 500.0,
+  "samples_ms": [
+    0.171,
+    0.075,
+    0.058,
+    0.053,
+    0.051
+  ],
+  "average_ms": 0.082,
+  "p95_ms": 0.171,
+  "status": "pass",
+  "rule_count": 14,
+  "rule_ids": [
+    "MOTION.TIMING.DURATION",
+    "MOTION.TIMING.FPS",
+    "MOTION.INTENT.PRESENT",
+    "MOTION.INTENT.SPECIFIC",
+    "MOTION.EASING.KNOWN",
+    "MOTION.PERCEPTUAL.EASING",
+    "MOTION.A11Y.REDUCED_MOTION",
+    "MOTION.PERCEPTUAL.REDUCED_MOTION",
+    "MOTION.A11Y.KEYBOARD_REVIEW",
+    "MOTION.PERF.MAX_TRACKS",
+    "MOTION.PERF.ANIMATION_BUDGET",
+    "MOTION.PERF.FRAME_RATE",
+    "MOTION.PERF.TRACK_COUNT",
+    "MOTION.ACCEPTANCE.PRESENT"
+  ],
+  "lint_status": "warn",
+  "lint_finding_count": 2,
+  "generated_at": "2026-08-12T23:48:43Z"
+}

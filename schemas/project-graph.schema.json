@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/project-graph.schema.json",
+  "title": "MotionLoom canonical project motion graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "graph_id", "task_id", "scene", "generated_at", "context_hash", "nodes", "edges", "roots"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "graph_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "context_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "label"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{1,191}$"},
+          "kind": {"type": "string", "enum": ["project", "intent", "constraint", "asset", "source", "scene", "motion_spec", "runtime", "artifact", "evidence", "review", "decision"]},
+          "label": {"type": "string", "minLength": 1},
+          "ref": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "attributes": {"type": "object"},
+          "confidence": {"$ref": "#/$defs/confidence"}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "relation"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "relation": {"type": "string", "enum": ["contains", "derived_from", "uses", "constrained_by", "rendered_by", "verified_by", "reviewed_as", "supersedes", "blocked_by"]},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "roots": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_of_truth": {"type": "string", "enum": ["task-bundle", "project-context", "manifest"]},
+        "allow_unresolved_edges": {"type": "boolean"},
+        "required_node_kinds": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "basis"],
+      "properties": {
+        "value": {"type": "number", "minimum": 0, "maximum": 1},
+        "basis": {"type": "string", "enum": ["deterministic", "runtime", "human", "heuristic"]},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

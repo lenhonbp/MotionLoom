@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/semantic-benchmark.schema.json",
+  "title": "MotionLoom semantic lint benchmark report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "benchmark_id", "task_id", "scene", "operation", "iterations", "threshold_ms", "samples_ms", "average_ms", "p95_ms", "status", "rule_count", "rule_ids", "generated_at"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "benchmark_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "scene": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$"},
+    "operation": {"const": "semantic-lint-build"},
+    "iterations": {"type": "integer", "minimum": 1},
+    "threshold_ms": {"type": "number", "exclusiveMinimum": 0},
+    "samples_ms": {"type": "array", "minItems": 1, "items": {"type": "number", "minimum": 0}},
+    "average_ms": {"type": "number", "minimum": 0},
+    "p95_ms": {"type": "number", "minimum": 0},
+    "status": {"enum": ["pass", "fail"]},
+    "rule_count": {"type": "integer", "minimum": 1},
+    "rule_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "lint_status": {"enum": ["pass", "warn", "fail"]},
+    "lint_finding_count": {"type": "integer", "minimum": 0},
+    "generated_at": {"type": "string", "format": "date-time"}
+  }
+}

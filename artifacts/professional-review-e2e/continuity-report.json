@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1",
+  "report_id": "continuity-MotionLoom",
+  "project_id": "MotionLoom",
+  "status": "pass",
+  "scenes": [
+    {
+      "scene": "browser-review-smoke",
+      "order": 0,
+      "motion_ir_path": "/home/ubuntu/animation-skill/artifacts/professional-review-e2e/motion-ir.json",
+      "motion_ir_sha256": "a3fee6be2ae667935ebe1e2aec2dd439bf77e85f9135835ff4dfb6df6cb681c4",
+      "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+      "intent": "Prove the MotionLoom browser-review-to-local-PR contract with a real runtime-backed candidate."
+    }
+  ],
+  "transitions": [],
+  "summary": {
+    "scene_count": 1,
+    "transition_count": 0,
+    "errors": 0,
+    "warnings": 0,
+    "blocking": 0
+  },
+  "generated_at": "2026-08-12T19:53:20Z"
+}

@@ -1,0 +1,73 @@
+{
+  "report_version": "1.0",
+  "task_id": "professional-review-e2e",
+  "status": "confirmed",
+  "confidence": "low",
+  "completed": [
+    {
+      "id": "context-bound",
+      "summary": "Context path and project identity bound to the existing MotionLoom smoke scene.",
+      "status": "done",
+      "evidence": [
+        "artifacts/browser-review-smoke-task/project-context.json"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "verified": [
+    {
+      "id": "runtime-backed",
+      "summary": "Runtime snapshots and signed scene manifest are present before browser review.",
+      "status": "verified",
+      "evidence": [
+        "src/output/browser-review-smoke/.render-meta.json;src/output/browser-review-smoke/manifest.json"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "browser-review-approved",
+      "summary": "User-approved identity-bound candidate was inspected at frames 0, 50 and 100 with all four checklist checks selected.",
+      "status": "verified",
+      "evidence": [
+        "browser-observation.md;browser-review.json;review.json"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "not_completed": [],
+  "problems": [],
+  "structure_review": {
+    "missing_files": [],
+    "broken_references": [],
+    "untracked_artifacts": []
+  },
+  "browser_review": [
+    {
+      "candidate_id": "88a2f2f18ba45a07f56e",
+      "decision": "approved",
+      "reviewer": "user",
+      "evidence": [
+        "browser-review.json",
+        "review.json"
+      ]
+    }
+  ],
+  "next_agent": [
+    {
+      "agent": "motionloom",
+      "action": "Run project analysis and populate context before generation."
+    },
+    {
+      "id": "browser-review",
+      "summary": "Open the exact candidate in the internal Dev Lab browser.",
+      "status": "pending",
+      "agent": "browser-review-agent",
+      "skill": "browser-review",
+      "evidence_needed": [
+        "review.json"
+      ],
+      "next_action": "Ask user to approve or request changes."
+    }
+  ],
+  "generated_at": "2026-08-12T17:50:34Z"
+}

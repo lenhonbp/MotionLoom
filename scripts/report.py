@@ -255,6 +255,39 @@ def record_structure(args: argparse.Namespace) -> int:
     return 0
 
 
+def p1_contract_errors(task_dir: Path, task: dict) -> list[str]:
+    names = ("semantic-lint-report.json", "continuity-report.json", "fix-plan.json")
+    present = [name for name in names if (task_dir / name).is_file()]
+    if not present:
+        return []
+    errors = [f"P1 contract requires {name}" for name in names if not (task_dir / name).is_file()]
+    if errors:
+        return errors
+    lint = read_json(task_dir / "semantic-lint-report.json")
+    if lint.get("schema_version") != "0.1":
+        errors.append("semantic-lint-report.json schema_version must be 0.1")
+    if lint.get("task_id") != task.get("task_id") or lint.get("scene") != task.get("scene"):
+        errors.append("semantic-lint-report.json must bind task_id and scene to task.json")
+    continuity = read_json(task_dir / "continuity-report.json")
+    if continuity.get("schema_version") != "0.1":
+        errors.append("continuity-report.json schema_version must be 0.1")
+    if not continuity.get("scenes"):
+        errors.append("continuity-report.json requires scenes")
+    plan = read_json(task_dir / "fix-plan.json")
+    if plan.get("schema_version") != "0.1" or plan.get("task_id") != task.get("task_id"):
+        errors.append("fix-plan.json must use schema 0.1 and bind task_id to task.json")
+    for source in plan.get("source_reports", []):
+        source_path = task_dir / str(source.get("path", ""))
+        if not source_path.is_file():
+            errors.append(f"fix-plan source report missing: {source.get('path', '<unknown>')}")
+        elif source.get("sha256") != hashlib.sha256(source_path.read_bytes()).hexdigest():
+            errors.append(f"fix-plan source report hash mismatch: {source.get('path', '<unknown>')}")
+    handoff = read_json(task_dir / "handoff.json")
+    if handoff.get("fix_plan", {}).get("path") != "fix-plan.json":
+        errors.append("handoff.json must expose fix-plan.json")
+    return errors
+
+
 def check_report(args: argparse.Namespace) -> int:
     task_dir = Path(args.task_dir).resolve()
     errors = []
@@ -268,6 +301,7 @@ def check_report(args: argparse.Namespace) -> int:
     state = task.get("state")
     if not task.get("task_id") or not task.get("scene"):
         errors.append("task.json requires task_id and scene")
+    errors.extend(p1_contract_errors(task_dir, task))
     for section in ("completed", "verified", "not_completed", "problems", "next_agent"):
         if not isinstance(report.get(section), list):
             errors.append(f"execution-report.json requires list section: {section}")
@@ -371,6 +405,9 @@ def render(args: argparse.Namespace) -> int:
     manifest = read_json(task_dir / "artifact-manifest.json", {"artifacts": []})
     quality = read_json(task_dir / "quality-report.json", {})
     handoff = read_json(task_dir / "handoff.json", {})
+    lint = read_json(task_dir / "semantic-lint-report.json", {})
+    continuity = read_json(task_dir / "continuity-report.json", {})
+    fix_plan = read_json(task_dir / "fix-plan.json", {})
     lines = [
         f"# Animation Task Report — {task.get('task_id', task_dir.name)}",
         "",
@@ -397,6 +434,14 @@ def render(args: argparse.Namespace) -> int:
         "",
         "## Browser review",
         md_table(report.get("browser_review", []), [("Candidate", "candidate_id"), ("Decision", "decision"), ("Reviewer", "reviewer"), ("Evidence", "evidence")]),
+        "## Semantic motion lint",
+        f"- Status: **{lint.get('status', 'not-run')}**; errors: **{lint.get('summary', {}).get('errors', 0)}**; warnings: **{lint.get('summary', {}).get('warnings', 0)}**; blocking: **{lint.get('summary', {}).get('blocking', 0)}**",
+        md_table(lint.get("findings", []), [("Rule", "rule_id"), ("Severity", "severity"), ("Confidence", "confidence"), ("Message", "message"), ("Basis", "basis")]),
+        "## Multi-scene continuity",
+        f"- Status: **{continuity.get('status', 'not-run')}**; scenes: **{continuity.get('summary', {}).get('scene_count', 0)}**; transitions: **{continuity.get('summary', {}).get('transition_count', 0)}**; warnings: **{continuity.get('summary', {}).get('warnings', 0)}**",
+        "## Fix plan",
+        f"- Status: **{fix_plan.get('status', 'not-run')}**; issues: **{len(fix_plan.get('issues', []))}**; next action: **{fix_plan.get('next_agent', {}).get('action', '')}**",
+        md_table(fix_plan.get("issues", []), [("ID", "id"), ("Severity", "severity"), ("Confidence", "confidence"), ("Root cause", "root_cause"), ("Rerun", "rerun_scope"), ("Status", "status")]),
         "",
         "## Recommended next Agent / Skill",
         md_table(report.get("next_agent", handoff.get("next_actions", [])), [("Agent/Skill", "agent"), ("Action", "action"), ("Evidence needed", "evidence_needed")]),

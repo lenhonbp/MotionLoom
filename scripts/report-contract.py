@@ -42,7 +42,17 @@ def main() -> int:
         return 0
 
     missing: list[str] = []
-    required = ("task.json", "execution-report.json", "artifact-manifest.json", "handoff.json", "issue-register.json")
+    required = (
+        "task.json",
+        "execution-report.json",
+        "artifact-manifest.json",
+        "handoff.json",
+        "issue-register.json",
+        "semantic-lint-report.json",
+        "semantic-lint-benchmark.json",
+        "continuity-report.json",
+        "fix-plan.json",
+    )
     for scene in scenes:
         matched = task_dirs(root, scene)
         if not matched:
@@ -50,7 +60,7 @@ def main() -> int:
             continue
         complete = [task_dir for task_dir in matched if all((task_dir / name).is_file() for name in required)]
         if not complete:
-            missing.append(f"{scene}: incomplete task/execution-report/artifact-manifest/handoff/issue-register bundle")
+            missing.append(f"{scene}: incomplete task/report/P1 feedback bundle")
             continue
         checked = False
         for task_dir in complete:

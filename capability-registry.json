@@ -1,0 +1,308 @@
+{
+  "schema_version": "0.1",
+  "registry_id": "registry-motionloom-1.5.0",
+  "generated_at": "2026-08-12T18:18:03Z",
+  "selection_policy": {
+    "require_verified": true,
+    "allow_scaffold_only": false,
+    "max_evidence_age_seconds": 604800
+  },
+  "capabilities": [
+    {
+      "id": "runtime.lottie-json",
+      "kind": "renderer",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.dotlottie-package",
+      "kind": "packager",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.svg-cutout-rig",
+      "kind": "renderer",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.rive",
+      "kind": "runtime-adapter",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.gsap",
+      "kind": "runtime-adapter",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.framer-motion",
+      "kind": "runtime-adapter",
+      "status": "verified",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Capability evidence is refreshed by runtime:test."
+      ],
+      "fallback": "",
+      "risk_level": "low",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.spine",
+      "kind": "renderer",
+      "status": "scaffold_only",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Scaffold only; do not use for production acceptance."
+      ],
+      "fallback": "runtime.lottie-json",
+      "risk_level": "high",
+      "side_effect_level": "local_write"
+    },
+    {
+      "id": "runtime.threejs",
+      "kind": "renderer",
+      "status": "scaffold_only",
+      "adapter_version": "1.5.0",
+      "inputs": [
+        "project-context",
+        "motion-spec",
+        "source-binding"
+      ],
+      "outputs": [
+        "runtime-evidence"
+      ],
+      "compatibility": {
+        "browsers": [
+          "chromium"
+        ],
+        "os": [
+          "linux"
+        ],
+        "node": ">=22"
+      },
+      "last_verified_at": "2026-08-12T18:18:03Z",
+      "evidence": [
+        {
+          "path": "scripts/runtime-adapters.mjs",
+          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "kind": "ci"
+        }
+      ],
+      "limitations": [
+        "Scaffold only; do not use for production acceptance."
+      ],
+      "fallback": "runtime.lottie-json",
+      "risk_level": "high",
+      "side_effect_level": "local_write"
+    }
+  ]
+}

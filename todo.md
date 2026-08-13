@@ -83,3 +83,66 @@
 - [ ] Đánh giá Dev Lab có load candidate thật từ artifact bundle hay còn phụ thuộc catalog/demo data.
 - [ ] Bổ sung các test hoặc hardening có giá trị sau audit, ưu tiên lỗi có thể làm PR gate sai.
 - [ ] Tạo deep-audit report với mức độ rủi ro, bằng chứng, remediation và giới hạn còn lại.
+
+## Approved end-to-end browser review execution
+
+- [x] Tạo task bundle có scene, context, source binding, runtime snapshots và execution report đầy đủ.
+- [x] Chạy `review-hook.py prepare` để tạo candidate identity-bound, expiry-bound và URL có artifact/task base.
+- [x] Mở đúng candidate URL bằng Dev Lab browser nội bộ, kiểm tra frame 0/50/100, checklist và task evidence rail.
+- [x] Ghi `review.json` với reviewer, decision, timestamp, feedback và candidate/task identity khớp.
+- [x] Chạy `review-hook.py validate --require-approved` và `quality-gate.py --require-browser-review` trên cùng task bundle.
+- [x] Chạy `pr.sh` với `OPEN_PR=0`, xác nhận commit local-only và chứng minh không mở/push PR ngoài ý muốn.
+- [x] Lưu execution evidence, cập nhật report/handoff và bổ sung test tái lập flow từ clean task bundle.
+
+## Next-depth architecture roadmap
+
+- [ ] Xây canonical project graph từ context, source, scene, runtime, artifact và review để Agent reasoning trên quan hệ thay vì file rời.
+- [ ] Bổ sung uncertainty/confidence contract và provenance chain cho mọi quyết định generate, chọn framework, chọn asset và quality gate.
+- [ ] Tạo capability registry có version, adapter health, evidence age và compatibility matrix thay cho capability flag tĩnh.
+- [ ] Xây semantic animation linting: kiểm tra intent, timing, accessibility, continuity và anti-pattern trước runtime render.
+- [ ] Chuẩn hóa deterministic replay bundle để tái hiện cùng scene từ clean checkout, lockfile, browser/runtime version và input hashes.
+- [ ] Thêm mutation/adversarial tests cho stale evidence, context drift, manifest tampering, replay approval và cross-task contamination.
+- [ ] Xây feedback loop từ Dev Lab thành structured fix plan để Agent sửa đúng nguyên nhân thay vì chỉ rerender toàn scene.
+- [ ] Định nghĩa benchmark suite và metrics: acceptance precision, false approval rate, provenance completeness, replay success và time-to-fix.
+- [ ] Tách release channels/compatibility policy cho core contracts, runtime adapters, Dev Lab protocol và Agent-facing SKILL.md.
+
+## Intelligence Core v0.1 implementation
+
+- [x] Thêm schema `project-graph`, `provenance`, `capability-registry` và `motion-ir` với version/policy rõ ràng.
+- [x] Xây CLI tạo/validate project graph từ task context, scene manifest, motion spec, runtime evidence và review.
+- [x] Xây provenance emitter/validator cho từng step và liên kết parent attestation, materials, products, actor và builder.
+- [x] Nâng capability discovery từ flat flags thành registry có adapter version, evidence age, browser matrix, fallback và risk.
+- [x] Thêm deterministic replay command ghi environment, input hashes, output hashes và tolerance policy.
+- [x] Tạo eval corpus và adversarial fixtures cho context drift, stale evidence, tampering, unsupported runtime và cross-task contamination.
+- [x] Tích hợp các contract mới vào report lifecycle, quality gate, Skill Doctor, CI và smoke fixtures.
+- [x] Cập nhật SKILL.md/agent-card/references theo progressive disclosure và chạy full validation trước milestone commit.
+
+## Intelligence Core P1 implementation
+
+- [x] Thêm schema `semantic-lint-report`, `continuity-report` và `fix-plan` với severity, confidence, evidence và rerun scope.
+- [x] Xây semantic linter kiểm tra intent, timing, easing, accessibility, performance và anti-pattern nhưng không tự approve.
+- [x] Xây continuity analyzer cho nhiều scene với transition contract, shared context, asset identity và handoff constraints.
+- [x] Sinh `fix-plan.json` từ lint/continuity findings, có root cause, affected artifacts, patch scope, rerun scope và verification commands.
+- [x] Nối feedback Dev Lab/review vào structured issue register, fix plan và execution handoff.
+- [x] Tích hợp P1 reports vào quality gate, report lifecycle, Dev Lab task bundle và CI.
+- [x] Tạo eval corpus cho false positive/negative, severity stability, multi-scene drift và selective rerun.
+- [x] Cập nhật tài liệu/agent discovery và chạy full validation trước P1 milestone commit.
+
+## P1 extension: multi-scene continuity and perceptual benchmark
+
+- [x] Tạo task fixture nhiều scene với shared context, asset identity, transition contract và một case drift có chủ đích.
+- [x] Thêm continuity assertions cho asset reuse, timing handoff, context hash và selective rerun ở cấp scene.
+- [x] Bổ sung semantic lint rules đo frame budget, duration/easing risk, reduced-motion impact và runtime cost.
+- [x] Bổ sung perceptual proxy lint với evidence rõ ràng; không gọi proxy score là human visual approval.
+- [x] Xây benchmark runner có case manifest, expected severity, confidence band, false-positive/negative và report version.
+- [x] Tích hợp fixture/benchmark vào regression, eval, strict quality gate, report contract và CI.
+- [x] Chạy full acceptance, cập nhật tài liệu/release note và tạo commit release local trước khi push.
+- [ ] Xác nhận remote target, branch và commit SHA lần cuối trước thao tác push GitHub.
+
+## Merge completion: fix/browser-review-smoke
+
+- [ ] Kiểm tra branch feature không có thay đổi chưa commit và không xung đột với `origin/main`.
+- [ ] Mở Pull Request từ `fix/browser-review-smoke` vào `main` với mô tả đầy đủ và acceptance evidence.
+- [ ] Chờ GitHub Actions/checks chạy và xử lý mọi blocker trước merge.
+- [ ] Merge Pull Request vào `main` theo chính sách review/CI của repository.
+- [ ] Xác minh `origin/main`, PR merge SHA, branch state và các artifact chính sau merge.

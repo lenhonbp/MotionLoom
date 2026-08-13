@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "report_id": "lint-professional-review-e2e-browser-review-smoke",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "status": "warn",
+  "ruleset": {
+    "id": "motionloom.semantic-motion",
+    "version": "0.1"
+  },
+  "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+  "motion_ir": {
+    "path": "motion-ir.json",
+    "sha256": "a3fee6be2ae667935ebe1e2aec2dd439bf77e85f9135835ff4dfb6df6cb681c4"
+  },
+  "summary": {
+    "total": 1,
+    "errors": 0,
+    "warnings": 1,
+    "infos": 0,
+    "blocking": 0
+  },
+  "findings": [
+    {
+      "id": "accessibility-keyboard-review",
+      "rule_id": "MOTION.A11Y.KEYBOARD_REVIEW",
+      "category": "accessibility",
+      "severity": "warning",
+      "confidence": 0.97,
+      "basis": "human",
+      "message": "Keyboard safety is not proven by the current Motion IR and remains a human-review item.",
+      "rationale": "The linter does not infer keyboard safety from animation data.",
+      "evidence_refs": [
+        "motion-ir.json",
+        "review.json"
+      ],
+      "affected_paths": [
+        "motion-ir.json",
+        "review.json"
+      ],
+      "suggested_action": "Keep the human-required acceptance assertion and record the reviewer decision in review.json.",
+      "approval_blocking": false
+    }
+  ],
+  "generated_at": "2026-08-12T19:53:20Z"
+}

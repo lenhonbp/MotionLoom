@@ -1,0 +1,88 @@
+{
+  "schema_version": "0.1",
+  "ir_id": "ir-professional-review-e2e-browser-review-smoke",
+  "task_id": "professional-review-e2e",
+  "scene": "browser-review-smoke",
+  "intent": "Prove the MotionLoom browser-review-to-local-PR contract with a real runtime-backed candidate.",
+  "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa",
+  "duration_ms": 1000,
+  "fps": 60.0,
+  "tracks": [
+    {
+      "id": "scene-progress",
+      "target": "scene.progress",
+      "property": "custom",
+      "keyframes": [
+        {
+          "offset": 0,
+          "value": 0,
+          "easing": "ease-out"
+        },
+        {
+          "offset": 1,
+          "value": 1,
+          "easing": "ease-out"
+        }
+      ]
+    }
+  ],
+  "accessibility": {
+    "reduced_motion": "reduce",
+    "keyboard_safe": false,
+    "fallback_description": "Keyboard safety is not proven by the source motion spec; human review is required."
+  },
+  "performance_budget": {
+    "max_layers": 80,
+    "allow_layout_animation": false
+  },
+  "acceptance": [
+    {
+      "id": "context-binding",
+      "type": "deterministic",
+      "expected": {
+        "context_hash": "cbbd43a53a0ddd5cf5452df5f6d521f06829465bd58c6d764a59d501ed1710fa"
+      },
+      "evidence_refs": [
+        "task.json"
+      ]
+    },
+    {
+      "id": "runtime-checkpoints",
+      "type": "runtime",
+      "expected": {
+        "checkpoints": [
+          0,
+          50,
+          100
+        ]
+      },
+      "evidence_refs": [
+        "snapshot/frame-00.png",
+        "snapshot/frame-50.png",
+        "snapshot/frame-100.png"
+      ]
+    },
+    {
+      "id": "keyboard-safety",
+      "type": "human_required",
+      "expected": {
+        "review": "explicit keyboard safety review"
+      },
+      "evidence_refs": [
+        "review.json"
+      ]
+    }
+  ],
+  "confidence": {
+    "value": 0.65,
+    "basis": "heuristic",
+    "evidence_refs": [
+      "src/output/browser-review-smoke/motion-spec.json",
+      "task.json"
+    ]
+  },
+  "source_refs": [
+    "src/output/browser-review-smoke/motion-spec.json",
+    "task.json"
+  ]
+}

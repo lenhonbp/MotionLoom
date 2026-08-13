@@ -1,5 +1,26 @@
 {
   "version": "1.0",
   "task_id": "browser-review-smoke-task",
-  "issues": []
+  "issues": [
+    {
+      "id": "fix-plan-browser-review-smoke-task:fix-accessibility-keyboard-review",
+      "summary": "The linter does not infer keyboard safety from animation data.",
+      "status": "open",
+      "severity": "warning",
+      "confidence": 0.97,
+      "evidence": [
+        "semantic-lint-report.json#accessibility-keyboard-review",
+        "fix-plan.json"
+      ],
+      "next_action": "Keep the human-required acceptance assertion and record the reviewer decision in review.json.",
+      "fix_plan": "fix-plan.json",
+      "rerun_scope": [
+        "lint",
+        "runtime",
+        "browser_review",
+        "quality_gate"
+      ],
+      "requires_user_review": true
+    }
+  ]
 }

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "motionloom-project-corpus-v1",
+  "description": "Provenance-labeled analyzer corpus. External checkouts are opt-in and are never fetched by MotionLoom CI.",
+  "required_external_projects": 3,
+  "projects": [
+    {
+      "id": "motionloom-first-party",
+      "class": "first-party",
+      "external": false,
+      "scope": "repository",
+      "local_path": ".",
+      "source": "https://github.com/lenhonbp/MotionLoom",
+      "expected": {
+        "name": "motionloom"
+      }
+    },
+    {
+      "id": "motion-one-external",
+      "class": "external",
+      "external": true,
+      "local_path": "external/framer-motion",
+      "source": "https://github.com/motiondivision/motion",
+      "expected": {
+        "name": "motion-one",
+        "framework": "motion"
+      }
+    },
+    {
+      "id": "gsap-external",
+      "class": "external",
+      "external": true,
+      "local_path": "external/gsap",
+      "source": "https://github.com/greensock/GSAP",
+      "expected": {
+        "framework": "gsap"
+      }
+    },
+    {
+      "id": "rive-external",
+      "class": "external",
+      "external": true,
+      "local_path": "external/rive",
+      "source": "https://github.com/rive-app/rive-react",
+      "expected": {
+        "name": "rive-react",
+        "framework": "rive"
+      }
+    }
+  ]
+}

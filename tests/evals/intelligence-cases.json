@@ -126,6 +126,16 @@
       "id": "p2-attestation-unknown-signer",
       "class": "negative",
       "assertion": "A signature whose key id is absent from the configured trust policy is rejected."
+    },
+    {
+      "id": "project-corpus-first-party-pass",
+      "class": "positive",
+      "assertion": "The analyzer recognizes the first-party MotionLoom project through the labeled corpus harness."
+    },
+    {
+      "id": "project-corpus-insufficient-external-explicit",
+      "class": "negative",
+      "assertion": "Missing external project checkouts are reported as insufficient evidence instead of being treated as product-value proof."
     }
   ]
 }

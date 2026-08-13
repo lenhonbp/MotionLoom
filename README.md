@@ -74,6 +74,9 @@ cd /path/to/your/project
 motionloom analyze . --init-memory
 motionloom memory inspect --project-root . --json
 
+# Bound traversal when the host project is large; truncation is reported, never hidden.
+motionloom analyze . --max-files 2500 --max-bytes 25000000 --max-seconds 10
+
 # Plan and generate the scene using the selected framework.
 python3 /path/to/MotionLoom/src/core/spec.py generate loading \
   --context project-context.json --output motion-spec.json --loop
@@ -177,7 +180,9 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | Choose a runtime | [Framework selection](docs/FRAMEWORK-SELECTION.md) and [runtime capability reference](references/runtime-capability.md) |
 | Run a review-ready scene | [Production checklist](docs/CHECKLIST.md) and [browser review contract](references/browser-review-contract.md) |
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
+| Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
+| Check current evidence posture | [Current status](docs/STATUS.md), [external corpus evidence](docs/audits/external-project-corpus-2026-08-13.md) and [historical audit snapshot](AUDIT-REPORT.md) |
 | Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Report a vulnerability or request help | [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md) |
 | See version history | [CHANGELOG.md](CHANGELOG.md) and [release notes](docs/releases/) |
@@ -189,6 +194,8 @@ npm install
 python3 scripts/skill-doctor.py --json
 python3 tests/scripts/run_tests.py
 python3 scripts/eval-intelligence.py
+python3 scripts/eval-projects.py --allow-insufficient
+npm run release:verify
 npm run runtime:test
 npm run audit:deep
 npm publish --dry-run --access public
@@ -208,7 +215,7 @@ MotionLoom separates verification from publication. Pull requests and pushes to 
 | `devlab.yml` | `dev-lab/**` changes, `main`, manual | Build and retain the browser review workbench artifact |
 | `release.yml` | Manual dispatch only | Regression, npm publish with provenance and optional GitHub release |
 
-To enable npm publication, configure a protected GitHub environment named `npm-release` and either add the `NPM_TOKEN` environment secret or configure npm trusted publishing for this repository. The workflow never runs on a pull request and never changes MotionLoom's user-review or approval contract.
+To enable npm publication, configure a protected GitHub environment named `npm-release` and either add the `NPM_TOKEN` environment secret or configure npm trusted publishing for this repository. Each manual run must provide `release_version`; the workflow verifies package/changelog/release-note alignment before publishing. The workflow never runs on a pull request and never changes MotionLoom's user-review or approval contract.
 
 ## License
 

@@ -1,0 +1,33 @@
+# MotionLoom Current Status
+
+> **Authority:** This document describes the current repository contract. Historical audit snapshots and benchmark reports remain valuable evidence, but they must not be read as claims about the latest checkout.
+
+## Current release posture
+
+MotionLoom is a source-available Agent Skill and npm package at version **2.1.0**. The repository has a cross-platform CLI, durable Project Memory, artifact-first handoff, runtime evidence, signed attestation and a browser-based Dev Lab review contract. The protected manual release workflow now verifies package/changelog/release-note alignment, but a GitHub tag and GitHub Release for 2.1.0 remain absent until an explicitly approved release is performed.
+
+The repository is **engineering-ready for continued integration work**, not a universal production certification for every animation framework or every host project. CI status must be read from the latest GitHub Actions run, not inferred from historical audit prose.
+
+## Evidence levels
+
+| Capability | Current evidence level | What is actually proven | What is not implied |
+|---|---|---|---|
+| Lottie JSON and SVG cutout rig | End-to-end contract evidence | Context binding, source binding, runtime snapshots, Dev Lab review, quality gate and PR preflight have deterministic fixtures | Visual quality for every brand, asset or device |
+| Rive, GSAP and Framer Motion | Adapter and fixture evidence | Framework-specific runtime adapters and smoke checks can render representative scenes through browser/runtime paths | Equivalent coverage to the Lottie path across arbitrary projects |
+| Project Memory | Contract and relocation evidence | Stable project identity, atomic persistence, integrity guard, freshness states and path rebinding after relocation | Automatic correctness of an Agent's inferred decision |
+| Semantic intelligence | Deterministic evaluation evidence | Project graph, provenance, Motion IR, continuity, fix-plan and adversarial/deep-stress contracts; bounded analyzer reports scan budgets and truncation | Human-level design judgment, external-project product-value evidence or guaranteed first-pass acceptance |
+| Dev Lab | Review infrastructure evidence | Identity-bound candidate loading, deterministic scrub/snapshot, user checklist and review export | A visual editor, automatic approval or PR authorization |
+
+## Normative sources
+
+Use the following order when sources disagree:
+
+1. The active schemas, validators and executable tests define machine-enforced behavior.
+2. `SKILL.md`, `agent-card.json` and the current README define the Agent-facing contract.
+3. This status document defines current capability posture and evidence boundaries.
+4. Versioned release notes and focused audit reports explain a release or milestone at the time it was produced.
+5. Root-level historical audit snapshots are context only and must be labeled historical.
+
+## Known next work
+
+The bounded analyzer has now been exercised against a labeled external corpus; see the [dated evidence note](audits/external-project-corpus-2026-08-13.md). The highest-value remaining evidence work is paired product evaluation across more real projects, then closing version–tag–GitHub Release–npm provenance traceability through an approved manual release. Missing external projects are reported as `insufficient_evidence`, never as a pass. None of these items should weaken the user-review gate or convert heuristic warnings into approval.

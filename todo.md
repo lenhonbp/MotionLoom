@@ -235,3 +235,20 @@
 - [ ] Tạo commit local; chỉ push sau explicit user confirmation.
 
 > CI/CD acceptance: docs/workflow audit, Skill Doctor, Project Memory contract, full regression, runtime adapters, browser-review snapshot harness, npm dry-run and diff hygiene pass. The release workflow remains manual-only and environment-protected.
+
+## Independent audit follow-up
+
+- [x] Đối chiếu trạng thái CI hiện tại trên GitHub với audit đính kèm, đặc biệt quality/devlab workflows và check runs.
+- [x] Kiểm tra claim về runtime fixture, cross-platform matrix, analyzer scalability, documentation authority và release traceability.
+- [x] Xác định P0 stabilization items trước khi thêm subsystem mới.
+- [x] Thiết kế real-project corpus và paired product study để đo product-value evidence.
+
+## Audit implementation roadmap
+
+- [x] Sửa duplicate workflow name và xác nhận Quality workflow tạo jobs, chạy matrix thành công trên main.
+- [x] Làm Dev Lab snapshot observable: health check, page/console error capture, diagnostic artifact và fixture identity không phụ thuộc candidate production expiry.
+- [x] Thêm authority/status documentation, phân biệt normative, historical và external-project evidence; cập nhật runtime verification levels.
+- [x] Bổ sung bounded scanner cho analyzer với ignore rules, file/byte/time budgets và `scan_truncated` signal.
+- [x] Tạo labeled external-project corpus manifest và paired evaluation harness; không seed review/testimonial claims.
+- [x] Thêm release verifier cho version–changelog–release-note chain và chạy full acceptance trước checkpoint; tag/GitHub Release/npm publish thật vẫn cần manual approved release.
+- [ ] Tạo commit local; chỉ push sau explicit user confirmation.

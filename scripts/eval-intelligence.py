@@ -23,6 +23,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[1]
 INTELLIGENCE = ROOT / "scripts/intelligence.py"
+PROJECT_EVAL = ROOT / "scripts/eval-projects.py"
 REPORT = ROOT / "scripts/report.py"
 VERIFIER = ROOT / "scripts/evidence-verifier.py"
 ATTESTATION = ROOT / "scripts/attestation.py"
@@ -132,6 +133,27 @@ def run_attestation_cases(root: Path, results: list[dict[str, object]]) -> None:
     unknown_policy.write_text(json.dumps(attestation_policy("other-signer-v1", private_key.public_key().public_bytes_raw()), indent=2) + "\n", encoding="utf-8")
     unknown_result = invoke([str(ATTESTATION_VERIFIER), "--attestation", str(bundle_path), "--trust-policy", str(unknown_policy)])
     record(results, "p2-attestation-unknown-signer", unknown_result.returncode == 13, unknown_result.stdout + unknown_result.stderr)
+
+
+def run_project_corpus_cases(root: Path, results: list[dict[str, object]]) -> None:
+    """Keep first-party analyzer evidence separate from unavailable external evidence."""
+    first_party = invoke([
+        str(PROJECT_EVAL), "--workspace", str(ROOT), "--require-external", "0", "--allow-insufficient"
+    ])
+    first_doc = json.loads(first_party.stdout) if first_party.stdout.strip().startswith("{") else {}
+    first_pass = any(item.get("id") == "motionloom-first-party" and item.get("status") == "pass" for item in first_doc.get("results", []))
+    record(results, "project-corpus-first-party-pass", first_party.returncode == 0 and first_doc.get("status") == "pass" and first_pass, first_party.stdout + first_party.stderr)
+
+    insufficient = invoke([
+        str(PROJECT_EVAL), "--workspace", str(ROOT), "--allow-insufficient"
+    ])
+    insufficient_doc = json.loads(insufficient.stdout) if insufficient.stdout.strip().startswith("{") else {}
+    record(
+        results,
+        "project-corpus-insufficient-external-explicit",
+        insufficient.returncode == 0 and insufficient_doc.get("status") == "insufficient_evidence" and insufficient_doc.get("unavailable_external_projects") == 3,
+        insufficient.stdout + insufficient.stderr,
+    )
 
 
 def run_p1_cases(root: Path, task_dir: Path, results: list[dict[str, object]]) -> None:
@@ -364,6 +386,7 @@ def main() -> int:
         run_performance_perceptual_cases(root, task_dir, results)
         run_runtime_verifier_cases(root, results)
         run_attestation_cases(root, results)
+        run_project_corpus_cases(root, results)
 
     missing = expected - {str(item["id"]) for item in results}
     for case_id in sorted(missing):

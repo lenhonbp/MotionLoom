@@ -73,6 +73,8 @@
     "validate": "node bin/motionloom.mjs quality-gate --all",
     "doctor": "node bin/motionloom.mjs doctor --json",
     "docs:check": "python3 scripts/docs-audit.py",
+    "eval:projects": "python3 scripts/eval-projects.py --allow-insufficient",
+    "release:verify": "python3 scripts/release-verify.py",
     "report": "node bin/motionloom.mjs report",
     "report:check": "node bin/motionloom.mjs report-contract",
     "review": "node bin/motionloom.mjs review-hook",

@@ -10,9 +10,12 @@ in this context, never in assumptions.
 """
 
 import argparse
+import fnmatch
 import json
+import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -80,6 +83,112 @@ CATEGORIES = {
     },
 }
 
+DEFAULT_IGNORE_DIRS = {
+    ".git",
+    ".hg",
+    ".svn",
+    "node_modules",
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".motionloom",
+    "target",
+    "dist",
+    "build",
+    ".next",
+    ".turbo",
+    "coverage",
+}
+
+
+class ScanBudget:
+    """Bound repository traversal without hiding that the scan was partial."""
+
+    def __init__(
+        self,
+        root: Path,
+        *,
+        max_files: int | None = 2500,
+        max_bytes: int | None = 25_000_000,
+        max_seconds: float | None = 10.0,
+        ignore_dirs: set[str] | None = None,
+        ignore_globs: list[str] | None = None,
+    ) -> None:
+        self.root = root
+        self.max_files = max_files
+        self.max_bytes = max_bytes
+        self.max_seconds = max_seconds
+        self.ignore_dirs = set(DEFAULT_IGNORE_DIRS) | set(ignore_dirs or ())
+        self.ignore_globs = list(ignore_globs or [])
+        self.started = time.monotonic()
+        self.files_scanned = 0
+        self.bytes_scanned = 0
+        self.truncated = False
+        self.truncation_reasons: list[str] = []
+
+    def _mark(self, reason: str) -> None:
+        self.truncated = True
+        if reason not in self.truncation_reasons:
+            self.truncation_reasons.append(reason)
+
+    def _relative(self, path: Path) -> str:
+        return path.relative_to(self.root).as_posix()
+
+    def _ignored(self, path: Path) -> bool:
+        relative = self._relative(path)
+        if any(part in self.ignore_dirs for part in path.relative_to(self.root).parts):
+            return True
+        return any(fnmatch.fnmatch(relative, pattern) for pattern in self.ignore_globs)
+
+    def _limited(self, next_size: int = 0) -> bool:
+        if self.max_files is not None and self.files_scanned >= self.max_files:
+            self._mark("max_files")
+            return True
+        if self.max_bytes is not None and self.bytes_scanned + next_size > self.max_bytes:
+            self._mark("max_bytes")
+            return True
+        if self.max_seconds is not None and time.monotonic() - self.started >= self.max_seconds:
+            self._mark("max_seconds")
+            return True
+        return False
+
+    def files(self, suffixes: set[str] | None = None):
+        """Yield readable candidate files in stable order until a budget is hit."""
+        for directory, dirnames, filenames in os.walk(self.root, topdown=True):
+            directory_path = Path(directory)
+            dirnames[:] = sorted(
+                name for name in dirnames
+                if not self._ignored(directory_path / name)
+            )
+            for filename in sorted(filenames):
+                path = directory_path / filename
+                if self._ignored(path):
+                    continue
+                if suffixes and path.suffix.lower() not in suffixes:
+                    continue
+                try:
+                    size = path.stat().st_size
+                except OSError:
+                    continue
+                if self._limited(size):
+                    return
+                self.files_scanned += 1
+                self.bytes_scanned += size
+                yield path
+
+    def summary(self) -> dict:
+        return {
+            "max_files": self.max_files,
+            "max_bytes": self.max_bytes,
+            "max_seconds": self.max_seconds,
+            "files_scanned": self.files_scanned,
+            "bytes_scanned": self.bytes_scanned,
+            "ignored_directories": sorted(self.ignore_dirs),
+            "ignore_globs": self.ignore_globs,
+            "scan_truncated": self.truncated,
+            "truncation_reasons": self.truncation_reasons,
+        }
+
 
 def read_json(path: Path):
     try:
@@ -91,15 +200,25 @@ def read_json(path: Path):
 def detect_stack(project_root: Path, pkg: dict | None) -> dict:
     stack = {"framework": None, "react": False, "vue": False, "react_native": False, "native_web": False}
     deps = set()
+    package_name = ""
     if pkg:
+        package_name = str(pkg.get("name", "")).lower()
         deps.update(pkg.get("dependencies", {}).keys())
         deps.update(pkg.get("devDependencies", {}).keys())
     stack["react"] = bool({"react", "next", "framer-motion"} & deps)
     stack["vue"] = bool({"vue", "nuxt"} & deps)
     stack["react_native"] = bool({"react-native"} & deps)
     stack["native_web"] = bool({"lottie-web", "dotlottie-web", "gsap", "animejs"} & deps)
-    if "framer-motion" in deps:
+    # Prefer the package's own identity over a transitive/dev dependency in a
+    # monorepo. This prevents Motion One from being labeled GSAP merely
+    # because its root workspace uses GSAP for tests or tooling, and lets
+    # Rive packages expose a distinct runtime signal.
+    if package_name in {"motion", "motion-one"}:
+        stack["framework"] = "motion"
+    elif package_name == "framer-motion" or "framer-motion" in deps:
         stack["framework"] = "framer-motion"
+    elif package_name.startswith("rive") or any("rive" in dependency.lower() for dependency in deps):
+        stack["framework"] = "rive"
     elif "gsap" in deps:
         stack["framework"] = "gsap"
     elif "dotlottie-web" in deps or "lottie-web" in deps or "@lottiefiles/react-lottie-player" in deps:
@@ -113,7 +232,7 @@ def detect_stack(project_root: Path, pkg: dict | None) -> dict:
     return stack
 
 
-def extract_brand_tokens(project_root: Path) -> dict:
+def extract_brand_tokens(project_root: Path, scanner: ScanBudget | None = None) -> dict:
     tokens = {"primary": None, "accent": None, "palette": [], "fonts": []}
     # Tailwind config
     for candidate in ["tailwind.config.js", "tailwind.config.ts", "tailwind.config.mjs"]:
@@ -126,7 +245,7 @@ def extract_brand_tokens(project_root: Path) -> dict:
                 tokens["accent"] = m.group(1).upper()
     # package.json theme / CSS variables
     css_vars = {}
-    css_files = list(project_root.rglob("*.css")) + list(project_root.rglob("*.scss"))
+    css_files = list(scanner.files({".css", ".scss"})) if scanner else list(project_root.rglob("*.css")) + list(project_root.rglob("*.scss"))
     for f in css_files[:20]:
         text = f.read_text(encoding="utf-8", errors="ignore")
         for m in re.finditer(r"--([a-z0-9-]+):\s*(#[0-9a-fA-F]{3,8})", text):
@@ -137,14 +256,13 @@ def extract_brand_tokens(project_root: Path) -> dict:
     return tokens
 
 
-def detect_motion_language(project_root: Path) -> dict:
+def detect_motion_language(project_root: Path, scanner: ScanBudget | None = None) -> dict:
     """Gather existing easing/duration conventions from the project."""
     easings = set()
     durations = set()
-    for pattern in ("*.ts", "*.tsx", "*.js", "*.jsx", "*.css"):
-        for f in project_root.rglob(pattern):
-            if "node_modules" in f.parts:
-                continue
+    suffixes = {".ts", ".tsx", ".js", ".jsx", ".css"}
+    files = scanner.files(suffixes) if scanner else (f for suffix in suffixes for f in project_root.rglob(f"*{suffix}"))
+    for f in files:
             try:
                 text = f.read_text(encoding="utf-8", errors="ignore")
             except OSError:
@@ -160,30 +278,47 @@ def detect_motion_language(project_root: Path) -> dict:
     }
 
 
-def find_existing_animations(project_root: Path) -> list:
+def find_existing_animations(project_root: Path, scanner: ScanBudget | None = None) -> list:
     found = []
-    for ext in ("*.lottie", "*.json", "*.riv"):
-        for f in project_root.rglob(ext):
-            rel = str(f.relative_to(project_root))
-            if "node_modules" in rel or ".git" in rel:
+    suffixes = {".lottie", ".json", ".riv"}
+    files = scanner.files(suffixes) if scanner else (
+        f for suffix in (".lottie", ".json", ".riv") for f in project_root.rglob(f"*{suffix}")
+    )
+    for f in files:
+        rel = f.relative_to(project_root).as_posix()
+        if f.suffix.lower() == ".json":
+            text = f.read_text(encoding="utf-8", errors="ignore")[:200]
+            if '"v"' not in text and "anim" not in text.lower():
                 continue
-            if ext == "*.json":
-                text = f.read_text(encoding="utf-8", errors="ignore")[:200]
-                if '"v"' not in text and "anim" not in text.lower():
-                    continue
-            found.append(rel)
-            if len(found) >= 15:
-                return found
+        found.append(rel)
+        if len(found) >= 15:
+            return found
     return found
 
 
-def analyze(project_root: str) -> dict:
+def analyze(
+    project_root: str,
+    *,
+    max_files: int | None = 2500,
+    max_bytes: int | None = 25_000_000,
+    max_seconds: float | None = 10.0,
+    ignore_dirs: list[str] | None = None,
+    ignore_globs: list[str] | None = None,
+) -> dict:
     root = Path(project_root).resolve()
+    scanner = ScanBudget(
+        root,
+        max_files=max_files,
+        max_bytes=max_bytes,
+        max_seconds=max_seconds,
+        ignore_dirs=ignore_dirs,
+        ignore_globs=ignore_globs,
+    )
     pkg = read_json(root / "package.json")
     manifest = read_json(root / "project-manifest.json")
     readme = (root / "README.md").read_text(encoding="utf-8", errors="ignore")[:3000] if (root / "README.md").exists() else ""
 
-    brand = extract_brand_tokens(root)
+    brand = extract_brand_tokens(root, scanner)
     # project-manifest.json is the explicit project contract and therefore
     # overrides inferred values from Tailwind/CSS when both are present.
     manifest_brand = (manifest or {}).get("brand") or {}
@@ -198,8 +333,10 @@ def analyze(project_root: str) -> dict:
         "description": (manifest or {}).get("description") or (pkg or {}).get("description") or "",
         "stack": detect_stack(root, pkg),
         "brand": brand,
-        "motion_language": detect_motion_language(root),
-        "existing_animations": find_existing_animations(root),
+        "motion_language": detect_motion_language(root, scanner),
+        "existing_animations": find_existing_animations(root, scanner),
+        "scan": scanner.summary(),
+        "scan_truncated": scanner.truncated,
         "manifest_overrides": manifest or {},
         "source_authority": "project-manifest.json then assets/library/, never invented geometry",
     }
@@ -210,11 +347,23 @@ def main():
     parser = argparse.ArgumentParser(description="Analyze a host project and emit its binding context.")
     parser.add_argument("project_root", nargs="?", default=".")
     parser.add_argument("--output", help="Context path; defaults to <project_root>/project-context.json")
+    parser.add_argument("--max-files", type=int, default=2500)
+    parser.add_argument("--max-bytes", type=int, default=25_000_000)
+    parser.add_argument("--max-seconds", type=float, default=10.0)
+    parser.add_argument("--ignore-dir", action="append", default=[])
+    parser.add_argument("--ignore-glob", action="append", default=[])
     args = parser.parse_args()
     root = Path(args.project_root).resolve()
     if not root.is_dir():
         parser.error(f"project root is not a directory: {root}")
-    ctx = analyze(str(root))
+    ctx = analyze(
+        str(root),
+        max_files=args.max_files,
+        max_bytes=args.max_bytes,
+        max_seconds=args.max_seconds,
+        ignore_dirs=args.ignore_dir or None,
+        ignore_globs=args.ignore_glob or None,
+    )
     out = Path(args.output).resolve() if args.output else root / "project-context.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(ctx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

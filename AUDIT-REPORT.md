@@ -1,5 +1,7 @@
 # Animation Skill Kit — Audit Report
 
+> **Historical snapshot:** This report records the state audited on 2026-08-12. For current capability posture and evidence boundaries, read [`docs/STATUS.md`](docs/STATUS.md) first. Do not use this file as a current CI or framework-coverage status page.
+
 **Audit date:** 2026-08-12  
 **Scope:** `MotionLoom` — project analysis, motion specification, source/rig generation, Lottie/dotLottie validation, runtime snapshot, Dev Lab, quality gate, and confirm-to-PR flow.
 **Verdict:** **PASS for the audited Lottie/body-rig path**, with explicit limits for Rive/GSAP/Framer Motion runtime coverage described below.

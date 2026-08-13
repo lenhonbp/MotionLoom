@@ -11,6 +11,11 @@ on:
         options:
           - latest
           - next
+      release_version:
+        description: package version to verify and publish
+        required: true
+        default: 2.1.0
+        type: string
       create_github_release:
         description: Create a GitHub release after npm publication
         required: true
@@ -65,13 +70,14 @@ jobs:
       - name: Run release regression
         run: python3 tests/scripts/run_tests.py
 
-      - name: Verify version and tag
+      - name: Verify release traceability
         env:
-          EXPECTED_TAG: ${{ inputs.npm_tag }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
         run: |
-          version=$(node -p "require('./package.json').version")
-          echo "Publishing motionloom@$version with npm tag $EXPECTED_TAG"
-          test -n "$version"
+          python3 scripts/release-verify.py \
+            --expected-version "$RELEASE_VERSION" \
+            --release-note "docs/releases/$RELEASE_VERSION.md"
+          echo "Publishing motionloom@$RELEASE_VERSION with npm distribution tag ${{ inputs.npm_tag }}"
 
       - name: Publish to npm
         env:

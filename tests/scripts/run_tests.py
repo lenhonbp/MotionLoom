@@ -49,6 +49,45 @@ def test_analyzer_on_fixture():
         check("analyzer extracts brand primary", ctx.get("brand", {}).get("primary") == "#2563EB")
 
 
+def test_analyzer_scan_budget_and_ignore_rules():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        (root / "package.json").write_text(json.dumps({"name": "bounded-fixture", "dependencies": {"gsap": "^3.0.0"}}))
+        (root / "ignored-dir").mkdir()
+        (root / "ignored-dir" / "ignored.ts").write_text("duration: 999s")
+        (root / "src").mkdir()
+        for index in range(5):
+            (root / "src" / f"scene-{index}.tsx").write_text("const easing = 'ease-out';")
+        context = root / "context.json"
+        result = subprocess.run([
+            sys.executable, str(ROOT / "scripts/analyze.py"), str(root),
+            "--output", str(context), "--max-files", "2", "--max-bytes", "100000",
+            "--max-seconds", "10", "--ignore-dir", "ignored-dir",
+        ], capture_output=True, text=True)
+        data = json.loads(context.read_text())
+        scan = data.get("scan", {})
+        check("bounded analyzer exits cleanly", result.returncode == 0, result.stderr)
+        check("bounded analyzer emits scan metadata", scan.get("files_scanned") == 2)
+        check("bounded analyzer exposes truncation", data.get("scan_truncated") is True and scan.get("scan_truncated") is True)
+        check("bounded analyzer records file limit", "max_files" in scan.get("truncation_reasons", []))
+        check("bounded analyzer records ignored directory", "ignored-dir" in scan.get("ignored_directories", []))
+
+
+def test_project_corpus_harness_is_explicit_about_evidence():
+    result = subprocess.run([
+        sys.executable, str(ROOT / "scripts/eval-projects.py"),
+        "--workspace", str(ROOT), "--require-external", "0", "--allow-insufficient",
+    ], capture_output=True, text=True)
+    report = json.loads(result.stdout)
+    check("project corpus first-party evaluation passes", result.returncode == 0 and report.get("status") == "pass")
+    strict = subprocess.run([
+        sys.executable, str(ROOT / "scripts/eval-projects.py"),
+        "--workspace", str(ROOT), "--allow-insufficient",
+    ], capture_output=True, text=True)
+    strict_report = json.loads(strict.stdout)
+    check("project corpus missing external evidence is explicit", strict.returncode == 0 and strict_report.get("status") == "insufficient_evidence")
+
+
 def test_spec_generate_and_validate():
     with tempfile.TemporaryDirectory() as td:
         ctx = Path(td) / "project-context.json"
@@ -829,6 +868,8 @@ def test_observability_contract():
 if __name__ == "__main__":
     print("== MotionLoom engine tests ==")
     test_analyzer_on_fixture()
+    test_analyzer_scan_budget_and_ignore_rules()
+    test_project_corpus_harness_is_explicit_about_evidence()
     test_spec_generate_and_validate()
     test_rig_build_and_pose()
     test_lottie_scaffold_valid()

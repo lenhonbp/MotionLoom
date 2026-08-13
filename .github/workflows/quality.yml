@@ -1,5 +1,3 @@
-name: Animation Quality Gate
-
 name: MotionLoom Quality
 
 on:
@@ -267,3 +265,32 @@ jobs:
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
               --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
           done < /tmp/changed-scenes
+
+  project-corpus:
+    name: Project corpus evidence posture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Evaluate labeled corpus without fetching external projects
+        run: |
+          mkdir -p artifacts
+          python3 scripts/eval-projects.py \
+            --workspace . \
+            --allow-insufficient \
+            --output artifacts/project-corpus-report.json
+
+      - name: Upload corpus evidence posture
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-corpus-evidence-${{ github.run_id }}
+          path: artifacts/project-corpus-report.json
+          if-no-files-found: error
+          retention-days: 14

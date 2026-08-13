@@ -7,7 +7,7 @@ description: >-
   validate, review, or deliver animation inside an existing project.
 license: MIT
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   target_frameworks: "lottie,dotlottie,rive,gsap,framer-motion,spine,threejs"
   verified_runtimes: "lottie-json,dotlottie-package,svg-cutout-rig,rive,gsap,framer-motion"
 ---
@@ -18,19 +18,35 @@ Treat every animation request as a production task, not as an isolated asset-gen
 
 ## Required workflow
 
-1. **Understand** — read the host project manifest and run `bash scripts/analyze.sh <project-path>`. Load `project-context.json` from the audited project. If context is missing or ambiguous, stop at `needs_context`.
+1. **Understand** — read the host project manifest and run `motionloom analyze <project-path> --init-memory` (or `python scripts/analyze.py <project-path> --init-memory` in a repository checkout). Load `project-context.json` and `.motionloom/project-memory.json` from the audited project. If context is missing, stale or ambiguous, stop at `needs_context` and refresh before generation.
 2. **Plan** — classify the animation, select a framework, and generate a context-bound `motion-spec.json` with timing, easing, loop, accessibility, performance and source authority.
 3. **Source** — resolve an authoritative asset from the project or `assets/library/`. Record attribution, license and checksum in the scene manifest's required `source_binding`; the binding's SHA-256 must match the bytes referenced by `manifest.file`. Do not promote an unknown or placeholder asset to production.
 4. **Generate** — use the matching template or rig implementation. For body animation, preserve named anatomy, pivot and parent-first hierarchy.
-5. **Render** — run `bash scripts/render.sh <scene>` for scene output, or `node scripts/runtime-adapters.mjs` for the verified Rive/GSAP/Framer Motion adapter matrix. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
+5. **Render** — run the platform-neutral Node entrypoint for scene output, or `node scripts/runtime-adapters.mjs` for the verified Rive/GSAP/Framer Motion adapter matrix. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
 6. **Bind Intelligence Core** — build a framework-neutral `motion-ir.json`, `project-graph.json`, `provenance.json`, `replay-bundle.json`, `semantic-lint-report.json` and `semantic-lint-benchmark.json` with `python3 scripts/intelligence.py`. Select only a capability registry entry whose status is `verified`, whose evidence is fresh and whose compatibility matches the target environment. A confidence score or benchmark result can prioritize investigation; neither can replace deterministic or human acceptance.
 6a. **Harden the trust boundary** — keep artifact and task bundles inside the repository/task root, reject symlinked evidence, bind replay to its exact `task_dir`, `task_id` and scene, select one deterministic report bundle per scene, and require browser candidate/review identity and expiry checks before readiness. The Dev Lab must reject cross-origin or identity-mismatched artifact bases. In strict runtime-observability runs, capture `runtime-telemetry.json` and a read-only `evidence-verifier-report.json`; verifier output must preserve `approval: false`. These checks expose risk and prevent evidence mixing, but do not turn heuristics or evidence integrity into approval.
 6b. **Attest** — derive a canonical statement from the exact scene/task hashes, sign it with an Ed25519 key through `scripts/attestation.py`, and verify it with the independent `scripts/attestation-verifier.py` against a fail-closed `trust-policy.json`. DSSE/SLSA-compatible attestation proves signer and binding integrity only; `approval` must remain `false` and never replaces user review.
 7. **Browser review handoff** — run `python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>`. The hook prepares the exact candidate and emits a JSON action for a browser-capable Agent. Trigger or suggest that Agent to open the emitted URL, inspect frames 0/50/100, scrub the timeline and ask the user to review. This is not a separate Dev Lab Skill; it is a required post-render handoff.
 8. **Review capture** — the browser Agent calls `window.__lab.getReview()` after the user approves or requests changes, then persists it with `python3 scripts/report.py review --task-dir artifacts/<task-id> --candidate-id <id> --decision approved|changes_requested --reviewer user`. A change request returns to generation; no approval means no PR.
-9. **Validate** — run `python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>`, `python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>`, the independent attestation verifier, `python3 scripts/report-contract.py --root . --scenes-file <changed-scenes> --require-attestation`, `python3 scripts/quality-gate.py --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation`, and `python3 scripts/skill-doctor.py --json` when validating the Skill package itself.
+9. **Validate** — run `motionloom review-hook validate --task-dir artifacts/<task-id>`, `motionloom intelligence semantic-lint benchmark --task-dir artifacts/<task-id> --iterations 25 --threshold-ms 500`, `motionloom runtime-telemetry <scene> artifacts/<task-id>`, the independent attestation verifier, `motionloom report-contract --root . --scenes-file <changed-scenes> --require-attestation`, `motionloom quality-gate --scene <scene> --context <context-path> --task-dir artifacts/<task-id> --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation`, and `motionloom doctor --json` when validating the Skill package itself.
 10. **Report** — create or update an artifact bundle with `python3 scripts/report.py`. Record facts with `report.py add`, structural defects with `report.py structure`, collect checksums with `report.py collect`, and run `report.py check` before rendering the final report. The final report must state completed, verified, not completed, blocked/failed, structure problems, browser candidate/review evidence and the recommended next Agent/Skill.
-11. **Confirm** — only after approved browser review and a passing quality gate run `TASK_DIR=artifacts/<task-id> bash scripts/pr.sh <scene>`. Commit, push and open PR are explicit side effects.
+11. **Confirm** — only after approved browser review and a passing quality gate run the platform-neutral PR preparation command. Commit, push and open PR are explicit side effects.
+
+## Durable Project Memory
+
+MotionLoom does not treat chat history as durable project memory. At the beginning of an animation task, load `.motionloom/project-memory.json`, validate its project identity and freshness, then recover the current project context. The memory records motion principles, asset/runtime policy, accepted and rejected decisions, user-confirmed remediation outcomes and invalidation metadata. It must remain task/project-bound and must never be copied across projects merely because the files look similar.
+
+Use the cross-platform CLI surface:
+
+```text
+motionloom memory init --project-root <project>
+motionloom memory inspect --project-root <project> --json
+motionloom memory refresh --project-root <project> --json
+motionloom memory recover --project-root <project> --json
+motionloom memory validate --project-root <project> --json
+```
+
+Only user-confirmed decisions and outcomes may become durable remediation memory. A stale or mismatched memory must produce a machine-readable failure/recovery state; it must not silently influence generation or approval. Ubuntu, macOS and Windows are supported through the Node CLI wrapper and Python path APIs. Do not require Bash, fixed `/tmp` paths, POSIX separators or system `zip`/`unzip` in the npm command surface.
 
 ## Progressive disclosure
 
@@ -70,11 +86,18 @@ Every production `src/output/<scene>/manifest.json` must include a `source_bindi
 The Intelligence Core contracts are defined in `schemas/project-graph.schema.json`, `schemas/provenance.schema.json`, `schemas/capability-registry.schema.json`, `schemas/motion-ir.schema.json`, `schemas/signed-attestation.schema.json` and `schemas/trust-policy.schema.json`. They make project relationships, supply-chain steps, runtime selection, framework-neutral intent and signer trust inspectable without relying on prose.
 
 ```bash
-# Package a Lottie JSON scene as a dotLottie v2 archive.
-bash scripts/to-dotlottie.sh <scene> [output.lottie]
+# Package a Lottie JSON scene as a dotLottie v2 archive (Node/fflate; no system zip required).
+node scripts/to-dotlottie.mjs --scene-dir src/output/<scene> --output src/output/<scene>/animation.lottie
+
+# Initialize and recover durable project memory.
+motionloom memory init --project-root <project-path>
+motionloom memory recover --project-root <project-path> --json
 
 # Run the official runtime adapters in a real browser harness.
 node scripts/runtime-adapters.mjs
+
+# Capture and verify runtime telemetry without Bash dependencies.
+motionloom runtime-telemetry <scene> artifacts/<task-id>
 
 # Build the task-bound Intelligence Core artifacts.
 python3 scripts/intelligence.py motion-ir build --task-dir artifacts/<task-id>
@@ -96,7 +119,7 @@ python3 scripts/attestation-verifier.py --attestation artifacts/<task-id>/attest
 
 `runtime-evidence.json` records the runtime package, three scrub points, observed state and generated snapshots. A template alone is never enough to upgrade a framework from `scaffold_only` to `verified`.
 
-For an observability-enabled run, `bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>` regenerates the real-browser evidence and writes telemetry under the task bundle. `scripts/evidence-verifier.py` then checks task/scene/hash/path/age bindings with stable machine-readable output. A verifier pass means the evidence is internally consistent; it does not mean the animation is approved.
+For an observability-enabled run, use the platform-neutral runtime telemetry entrypoint exposed by the package. It regenerates the real-browser evidence and writes telemetry under the task bundle. `scripts/evidence-verifier.py` then checks task/scene/hash/path/age bindings with stable machine-readable output. A verifier pass means the evidence is internally consistent; it does not mean the animation is approved.
 
 ## Output contract
 

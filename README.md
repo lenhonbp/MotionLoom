@@ -17,8 +17,9 @@ The CLI requires **Node.js 18+** and **Python 3.11+**. Installation does not gra
 ## Quick start
 
 ```bash
-# 1. Understand the project
-bash scripts/analyze.sh /path/to/your/project
+# 1. Understand the project and create/refresh persistent memory
+motionloom analyze /path/to/your/project --init-memory
+motionloom memory inspect --project-root /path/to/your/project
 
 # 1b. Start a transparent task ledger for Agent/human handoff
 python3 scripts/report.py init --task-id onboarding-wave \
@@ -41,16 +42,16 @@ python3 scripts/manifest.py bind-source --scene my-scene \
   --authority "host project manifest" --license MIT
 
 # 4. Render runtime verification snapshots (0/50/100%; placeholders fail)
-bash scripts/render.sh my-scene
+motionloom render my-scene
 
 # 4b. Package the Lottie source as a dotLottie v2 archive when required
-bash scripts/to-dotlottie.sh my-scene
+node scripts/to-dotlottie.mjs my-scene
 
 # 4c. Verify Rive, GSAP and Framer Motion through the real browser harness
 node scripts/runtime-adapters.mjs
 
 # 4d. Capture runtime telemetry and verify evidence bindings externally
-bash scripts/capture-runtime-telemetry.sh my-scene artifacts/onboarding-wave
+motionloom runtime-telemetry my-scene artifacts/onboarding-wave
 
 # 4e. Derive and verify a signed task-bound statement against a managed trust policy
 python3 scripts/attestation.py statement --scene-dir src/output/my-scene \
@@ -63,8 +64,8 @@ python3 scripts/attestation-verifier.py --attestation artifacts/onboarding-wave/
   --trust-policy artifacts/onboarding-wave/trust-policy.json \
   --expected-task-id onboarding-wave --expected-scene my-scene
 
-# 5. Boot the Dev Lab to test & fix interactively
-bash scripts/devlab.sh my-scene
+# 5. Boot or prepare the Dev Lab to test & fix interactively
+motionloom devlab my-scene
 
 # 6. Run the acceptance gate, then confirm and ship
 python3 scripts/quality-gate.py --scene my-scene \
@@ -75,11 +76,11 @@ python3 scripts/quality-gate.py --scene my-scene \
 python3 scripts/report.py collect --task-dir artifacts/onboarding-wave
 python3 scripts/report.py render --task-dir artifacts/onboarding-wave
 
-# 7. Confirm and ship only after review
-bash scripts/pr.sh my-scene
+# 7. Confirm and ship only after review; local-only by default
+motionloom pr my-scene --task-dir artifacts/onboarding-wave
 ```
 
-The kit is intended to run from a Git clone. Copy `project-context.example.json` only as a schema reference; always generate the real context with `scripts/analyze.sh` against the host project. Do not commit a context containing a temporary path or another project's brand tokens.
+The kit is intended to run from a Git clone or the npm distribution. The `motionloom` commands above are the cross-platform surface for Ubuntu, macOS and Windows; they select `python3` on Unix and `python` on Windows, and use Node APIs instead of shell-only archive/process helpers. Copy `project-context.example.json` only as a schema reference; always generate the real context with `motionloom analyze` against the host project. Do not commit a context containing a temporary path or another project's brand tokens.
 
 For a reproducible review fixture, keep `project-context.json`, `quality-report.json`, `review.json`, `execution-report.json`, `handoff.json` and `artifact-manifest.json` under the repository's `artifacts/<task-id>/` directory. `scripts/pr.sh` rejects task bundles outside the repository, requires the task scene to match the requested scene, runs the semantic report check, and stages the evidence bundle together with the scene. This prevents a gate from consuming evidence that is omitted from the resulting commit.
 

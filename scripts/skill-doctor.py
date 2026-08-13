@@ -13,7 +13,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = ["SKILL.md", "agent-card.json", "package.json"]
 REQUIRED_DIRS = ["scripts", "templates", "references", "schemas"]
-REQUIRED_SCRIPT_FILES = ["scripts/report-contract.py", "scripts/review-hook.py", "scripts/quality-gate.py", "scripts/runtime-adapters.mjs"]
+REQUIRED_SCRIPT_FILES = [
+    "scripts/report-contract.py",
+    "scripts/review-hook.py",
+    "scripts/quality-gate.py",
+    "scripts/runtime-adapters.mjs",
+    "scripts/project-memory.py",
+    "scripts/project_memory_loader.py",
+    "scripts/analyze.py",
+    "scripts/devlab.py",
+]
 REQUIRED_SCHEMAS = [
     "task.schema.json",
     "execution-report.schema.json",
@@ -26,6 +35,7 @@ REQUIRED_SCHEMAS = [
     "provenance.schema.json",
     "capability-registry.schema.json",
     "motion-ir.schema.json",
+    "project-memory.schema.json",
 ]
 
 
@@ -121,7 +131,7 @@ def run() -> int:
     package_path = ROOT / "package.json"
     try:
         package = json.loads(package_path.read_text(encoding="utf-8"))
-        for script in ("test", "validate", "doctor", "report", "report:check", "review"):
+        for script in ("test", "validate", "doctor", "report", "report:check", "review", "memory:bootstrap", "memory:recover", "memory:validate", "devlab", "pack:dotlottie"):
             if script not in package.get("scripts", {}):
                 warnings.append({"code": "missing_package_script", "message": f"package.json has no {script} script."})
     except (FileNotFoundError, json.JSONDecodeError) as exc:

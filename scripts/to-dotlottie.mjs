@@ -6,9 +6,8 @@
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { strFromU8, zipSync, unzipSync } from "fflate";
 
 function arg(name, fallback = undefined) {
   const index = process.argv.indexOf(name);
@@ -43,17 +42,14 @@ if (!/^[a-zA-Z0-9._ -]+$/.test(animationId)) {
 }
 readJson(sourcePath);
 
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "animation-skill-dotlottie-"));
-const archiveRoot = path.join(tmp, "archive");
-fs.mkdirSync(path.join(archiveRoot, "a"), { recursive: true });
-fs.copyFileSync(sourcePath, path.join(archiveRoot, "a", `${animationId}.json`));
+const archive = {
+  [`a/${animationId}.json`]: fs.readFileSync(sourcePath),
+};
 
 const optionalDirectories = ["i", "t", "s", "f"];
 for (const directory of optionalDirectories) {
   const candidate = path.join(sceneDir, "dotlottie", directory);
-  if (fs.existsSync(candidate)) {
-    fs.cpSync(candidate, path.join(archiveRoot, directory), { recursive: true });
-  }
+  if (fs.existsSync(candidate)) addTree(candidate, directory);
 }
 
 const dotManifest = {
@@ -62,20 +58,13 @@ const dotManifest = {
   initial: { animation: animationId },
   animations: [{ id: animationId }],
 };
-fs.writeFileSync(
-  path.join(archiveRoot, "manifest.json"),
-  `${JSON.stringify(dotManifest, null, 2)}\n`,
-  "utf8",
-);
+archive["manifest.json"] = Buffer.from(`${JSON.stringify(dotManifest, null, 2)}\n`, "utf8");
 
 fs.mkdirSync(path.dirname(output), { recursive: true });
 if (fs.existsSync(output)) fs.rmSync(output, { force: true });
-execFileSync("zip", ["-X", "-q", "-r", output, "."], { cwd: archiveRoot });
+fs.writeFileSync(output, zipSync(archive, { level: 6 }));
 
-const entries = execFileSync("unzip", ["-Z1", output], { encoding: "utf8" })
-  .trim()
-  .split(/\r?\n/)
-  .filter(Boolean);
+const entries = Object.keys(unzipSync(fs.readFileSync(output))).sort();
 if (!entries.includes("manifest.json")) throw new Error("archive missing manifest.json");
 if (!entries.includes(`a/${animationId}.json`)) {
   throw new Error("archive missing initial animation payload");
@@ -95,5 +84,22 @@ console.log(JSON.stringify({
 }, null, 2));
 
 function readJsonFromZip(file, entry) {
-  return JSON.parse(execFileSync("unzip", ["-p", file, entry], { encoding: "utf8" }));
+  const payload = unzipSync(fs.readFileSync(file))[entry];
+  if (!payload) throw new Error(`archive entry is missing: ${entry}`);
+  return JSON.parse(strFromU8(payload));
+}
+
+function addTree(directory, archivePrefix) {
+  const entries = fs.readdirSync(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const sourceEntry = path.join(directory, entry.name);
+    const archiveEntry = `${archivePrefix}/${entry.name.replaceAll("\\", "/")}`;
+    const stat = fs.lstatSync(sourceEntry);
+    if (stat.isSymbolicLink()) continue;
+    if (stat.isDirectory()) {
+      addTree(sourceEntry, archiveEntry);
+    } else if (stat.isFile()) {
+      archive[archiveEntry] = fs.readFileSync(sourceEntry);
+    }
+  }
 }

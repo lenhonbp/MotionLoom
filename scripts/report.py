@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,6 +50,39 @@ def read_json(path: Path, default: dict | list | None = None):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def project_memory_path() -> Path:
+    return ROOT / ".motionloom" / "project-memory.json"
+
+
+def memory_summary() -> dict | None:
+    path = project_memory_path()
+    if not path.is_file():
+        return None
+    try:
+        memory = read_json(path)
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    except (OSError, json.JSONDecodeError):
+        return {"path": ".motionloom/project-memory.json", "status": "invalid"}
+    freshness = memory.get("freshness") if isinstance(memory, dict) else {}
+    return {
+        "path": ".motionloom/project-memory.json",
+        "snapshot_path": "project-memory.json",
+        "memory_id": memory.get("memory_id"),
+        "status": freshness.get("status", "invalid"),
+        "sha256": digest,
+        "updated_at": memory.get("updated_at"),
+    }
+
+
+def sync_memory_snapshot(task_dir: Path) -> dict | None:
+    source = project_memory_path()
+    if not source.is_file():
+        return None
+    destination = task_dir / "project-memory.json"
+    shutil.copy2(source, destination)
+    return memory_summary()
+
+
 def has_symlink_component(path: Path) -> bool:
     current = path
     while True:
@@ -78,6 +112,7 @@ def candidate_is_current(candidate: dict) -> bool:
 def init_task(args: argparse.Namespace) -> int:
     task_dir = Path(args.output or ROOT / "artifacts" / args.task_id).resolve()
     timestamp = now()
+    memory = memory_summary()
     task = {
         "schema_version": "1.0",
         "task_id": args.task_id,
@@ -92,6 +127,8 @@ def init_task(args: argparse.Namespace) -> int:
         "created_at": timestamp,
         "updated_at": timestamp,
     }
+    if memory:
+        task["project_memory"] = memory
     report = {
         "report_version": "1.0",
         "task_id": args.task_id,
@@ -103,7 +140,7 @@ def init_task(args: argparse.Namespace) -> int:
         "problems": [],
         "structure_review": {"missing_files": [], "broken_references": [], "untracked_artifacts": []},
         "browser_review": [],
-        "next_agent": [{"agent": args.agent, "action": "Run project analysis and populate context before generation."}],
+        "next_agent": [{"agent": args.agent, "action": "Recover Project Memory and run project analysis before generation.", "evidence_needed": ["project-memory.json", "project-context.json"]}],
         "generated_at": timestamp,
     }
     handoff = {
@@ -114,7 +151,7 @@ def init_task(args: argparse.Namespace) -> int:
         "state": "created",
         "summary": "New animation task initialized.",
         "next_actions": [{"action": "Analyze host project context", "skill": "motionloom", "evidence_needed": ["project-context.json"]}],
-        "required_artifacts": ["task.json", "execution-report.json", *EVIDENCE_ARTIFACTS],
+        "required_artifacts": ["task.json", "execution-report.json", *EVIDENCE_ARTIFACTS, *( ["project-memory.json"] if memory else [] )],
         "blockers": [],
     }
     write_json(task_dir / "task.json", task)
@@ -122,6 +159,8 @@ def init_task(args: argparse.Namespace) -> int:
     write_json(task_dir / "issue-register.json", {"version": "1.0", "task_id": args.task_id, "issues": []})
     write_json(task_dir / "handoff.json", handoff)
     write_json(task_dir / "artifact-manifest.json", {"manifest_version": "1.0", "task_id": args.task_id, "generated_at": timestamp, "artifacts": []})
+    if memory:
+        sync_memory_snapshot(task_dir)
     (task_dir / "decision-log.jsonl").write_text("", encoding="utf-8")
     print(json.dumps({"status": "created", "task_id": args.task_id, "task_dir": str(task_dir)}, ensure_ascii=False))
     return 0
@@ -130,6 +169,7 @@ def init_task(args: argparse.Namespace) -> int:
 def collect(args: argparse.Namespace) -> int:
     task_dir = Path(args.task_dir).resolve()
     task = read_json(task_dir / "task.json")
+    sync_memory_snapshot(task_dir)
     excluded = {"artifact-manifest.json", "execution-report.json", "decision-log.jsonl"}
     artifacts = []
     for path in sorted(task_dir.rglob("*")):
@@ -146,6 +186,8 @@ def collect(args: argparse.Namespace) -> int:
         handoff = read_json(handoff_path)
         required = set(handoff.get("required_artifacts", []))
         required.update(name for name in EVIDENCE_ARTIFACTS if (task_dir / name).is_file())
+        if (task_dir / "project-memory.json").is_file():
+            required.add("project-memory.json")
         handoff["required_artifacts"] = sorted(required)
         write_json(handoff_path, handoff)
     print(json.dumps({"status": "collected", "task_id": manifest["task_id"], "artifact_count": len(artifacts)}, ensure_ascii=False))

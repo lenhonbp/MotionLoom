@@ -202,3 +202,16 @@
 - [x] Chạy full regression sau hardening, cập nhật audit report và đề xuất roadmap giảm vòng chỉnh sửa animation sai.
 - [ ] Thêm visual-comparison contract có fixture/frame provenance và pixel/perceptual diff.
 - [ ] Thêm multi-project/browser/device corpus và remediation ledger để đo first-pass acceptance, correction count và rerender avoidance.
+
+## Project Memory and cross-platform execution
+
+- [x] Thiết kế và thêm `project-memory.schema.json` với version, project identity, motion principles, asset/runtime policy, decisions, rejected patterns, remediation summary và freshness/invalidation fields.
+- [x] Xây CLI `memory init`, `memory inspect`, `memory refresh`, `memory validate`, `memory record-decision` và `memory record-outcome` với path handling không phụ thuộc Bash/cwd.
+- [x] Tích hợp Project Memory vào project context, graph, provenance, continuity, fix-plan và next-agent handoff; chặn dùng memory stale hoặc cross-project memory.
+- [x] Thêm memory recovery test sau context compaction/phiên mới và test quyết định cũ, rejected approach, asset policy, runtime policy được khôi phục đúng.
+- [x] Chuẩn hóa npm CLI wrapper cho Ubuntu, macOS và Windows; dùng Node `spawn`/`spawnSync` cross-platform, Python executable discovery và không phụ thuộc `bash`, `sed`, `grep` hoặc `/tmp` cố định.
+- [x] Thêm CI matrix Ubuntu/macOS/Windows với Python/Node versions được hỗ trợ, path separator, Unicode path, spaces trong path, symlink/junction và missing dependency cases.
+- [x] Cập nhật SKILL.md, Agent Card, README, references và release notes để mô tả lifecycle Project Memory, giới hạn persistence và cách Codex load/recover memory.
+- [x] Chạy full acceptance, deep-stress memory recovery, cross-platform contract tests; tạo commit và chỉ push sau explicit confirmation.
+
+> Acceptance note: relocation với Git remote, Unicode path và path có khoảng trắng pass; `project.root_path` được rebind khi `memory recover`, còn các chỉnh sửa nội dung trực tiếp vẫn bị integrity guard chặn.

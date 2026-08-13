@@ -815,6 +815,16 @@ def test_observability_contract():
         attestation_tests.returncode == 0 and "attestation contract tests: PASS" in attestation_tests.stdout,
     )
 
+    memory_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_project_memory.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "project memory recovery and cross-platform contract passes",
+        memory_tests.returncode == 0 and "project memory contract tests: PASS" in memory_tests.stdout,
+    )
+
 
 if __name__ == "__main__":
     print("== MotionLoom engine tests ==")

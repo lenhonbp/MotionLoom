@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/project-memory.schema.json",
+  "title": "MotionLoom Project Memory",
+  "description": "Durable, relocatable project memory for recovering animation decisions and context across Agent sessions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "memory_id",
+    "created_at",
+    "updated_at",
+    "project",
+    "context",
+    "motion_principles",
+    "policies",
+    "decisions",
+    "rejected_patterns",
+    "remediation",
+    "freshness",
+    "recovery"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "memory_id": { "type": "string", "pattern": "^pm-[a-z0-9][a-z0-9._-]*$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "name", "root_path", "repository"],
+      "properties": {
+        "project_id": { "type": "string", "minLength": 3 },
+        "name": { "type": "string", "minLength": 1 },
+        "root_path": { "type": "string", "minLength": 1 },
+        "repository": { "type": ["string", "null"] },
+        "package_name": { "type": ["string", "null"] }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "schema_version"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": ["string", "null"], "pattern": "^$|^[a-f0-9]{64}$" },
+        "schema_version": { "type": ["string", "null"] },
+        "generated_at": { "type": ["string", "null"] }
+      }
+    },
+    "motion_principles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_ms", "easing", "rhythm", "reduced_motion", "notes"],
+      "properties": {
+        "duration_ms": { "type": ["number", "null"], "minimum": 0 },
+        "easing": { "type": ["string", "null"] },
+        "rhythm": { "type": ["string", "null"] },
+        "reduced_motion": { "type": ["string", "null"] },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "runtime"],
+      "properties": {
+        "asset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authoritative_sources", "license_required", "unknown_asset_policy"],
+          "properties": {
+            "authoritative_sources": { "type": "array", "items": { "type": "string" } },
+            "license_required": { "type": "boolean" },
+            "unknown_asset_policy": { "type": "string", "enum": ["block", "review", "allow"] }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["preferred_frameworks", "verified_runtimes", "browser_matrix"],
+          "properties": {
+            "preferred_frameworks": { "type": "array", "items": { "type": "string" } },
+            "verified_runtimes": { "type": "array", "items": { "type": "string" } },
+            "browser_matrix": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "rejected_patterns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rejectedPattern" }
+    },
+    "remediation": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/remediation" }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "checked_at", "context_hash", "project_fingerprint", "reason"],
+      "properties": {
+        "status": { "type": "string", "enum": ["fresh", "stale", "needs_context", "invalid"] },
+        "checked_at": { "type": "string", "format": "date-time" },
+        "context_hash": { "type": ["string", "null"], "pattern": "^$|^[a-f0-9]{64}$" },
+        "project_fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["last_task_id", "next_actions"],
+      "properties": {
+        "last_task_id": { "type": ["string", "null"] },
+        "next_actions": { "type": "array", "items": { "type": "string" } },
+        "last_review_state": { "type": ["string", "null"] }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_sha256"],
+      "properties": {
+        "canonical_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  },
+  "$defs": {
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "recorded_at", "status", "summary", "rationale", "user_confirmed", "source_task_id", "evidence"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["accepted", "rejected", "superseded"] },
+        "summary": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string" },
+        "user_confirmed": { "type": "boolean" },
+        "source_task_id": { "type": ["string", "null"] },
+        "evidence": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "rejectedPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "recorded_at", "pattern", "reason", "source_task_id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "pattern": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string" },
+        "source_task_id": { "type": ["string", "null"] }
+      }
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "recorded_at", "issue_id", "summary", "root_cause", "resolution", "result", "correction_count", "rerun_scope", "user_confirmed", "source_task_id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "issue_id": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "root_cause": { "type": "string" },
+        "resolution": { "type": "string" },
+        "result": { "type": "string", "enum": ["pass", "fail", "partial", "unknown"] },
+        "correction_count": { "type": "integer", "minimum": 0 },
+        "rerun_scope": { "type": "array", "items": { "type": "string" } },
+        "user_confirmed": { "type": "boolean" },
+        "source_task_id": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

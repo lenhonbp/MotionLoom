@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -68,6 +69,11 @@ def prepare(args: argparse.Namespace) -> int:
     if not scene:
         raise ValueError("task.json requires scene")
     scene_dir, source_path, render_meta, context_path = paths(task_dir, task)
+    memory_path = ROOT / ".motionloom" / "project-memory.json"
+    memory = read_json(memory_path, {}) if memory_path.is_file() else {}
+    memory_status = (memory.get("freshness") or {}).get("status")
+    if memory_path.is_file() and memory_status not in {"fresh", None}:
+        raise ValueError(f"project memory is {memory_status}; run motionloom memory refresh/analyze before browser review")
     spec = read_json(scene_dir / "motion-spec.json")
     context_hash = (spec.get("context_binding") or {}).get("context_sha256") or sha256(context_path)
     source_hash = sha256(source_path)
@@ -92,6 +98,9 @@ def prepare(args: argparse.Namespace) -> int:
         "prepared_at": now(),
         "expires_at": (datetime.now(timezone.utc) + CANDIDATE_TTL).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
     }
+    if memory_path.is_file():
+        candidate["project_memory_sha256"] = sha256(memory_path)
+        candidate["project_memory_id"] = memory.get("memory_id")
     (scene_dir / "browser-review.json").write_text(json.dumps(candidate, indent=2) + "\n", encoding="utf-8")
     task["state"] = "review_required"
     task["updated_at"] = now()
@@ -109,9 +118,11 @@ def prepare(args: argparse.Namespace) -> int:
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     handoff_path = task_dir / "handoff.json"
     handoff = read_json(handoff_path)
-    handoff.update({"state": "review_required", "to_agent": "browser-review-agent", "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.", "next_actions": [{"action": "Open internal Dev Lab candidate", "kind": "browser_review", "agent": "browser-review-agent", "skill": "browser-review", "url": url, "candidate_id": cid, "requires_user_approval": True, "evidence_needed": ["review.json"], "output_artifacts": ["review.json"]}], "required_artifacts": sorted(set(handoff.get("required_artifacts", []) + ["browser-review.json", "review.json", "semantic-lint-benchmark.json", "evidence-verifier-report.json", "runtime-adapters/runtime-evidence.json"]))})
+    if memory_path.is_file():
+        shutil.copy2(memory_path, task_dir / "project-memory.json")
+    handoff.update({"state": "review_required", "to_agent": "browser-review-agent", "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.", "next_actions": [{"action": "Open internal Dev Lab candidate", "kind": "browser_review", "agent": "browser-review-agent", "skill": "browser-review", "url": url, "candidate_id": cid, "requires_user_approval": True, "evidence_needed": ["review.json"], "output_artifacts": ["review.json"]}], "required_artifacts": sorted(set(handoff.get("required_artifacts", []) + ["browser-review.json", "review.json", "semantic-lint-benchmark.json", "evidence-verifier-report.json", "runtime-adapters/runtime-evidence.json"] + (["project-memory.json"] if memory_path.is_file() else [])))})
     handoff_path.write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    subprocess.run(["bash", str(ROOT / "scripts/devlab.sh"), scene, "--prepare-only", str(task_dir)], check=True, capture_output=True, text=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
     subprocess.run([sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
     print(json.dumps({"status": "review_required", "task_id": task["task_id"], "candidate_id": cid, "url": url, "agent": "browser-review-agent", "action": "Open this exact URL in the internal browser; ask the user to inspect frames 0/50/100 and approve or request changes.", "requires_user_approval": True, "output_artifacts": ["review.json"]}, ensure_ascii=False))
     return 0

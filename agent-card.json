@@ -1,10 +1,17 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.0.0",
-  "description": "Project-aware animation production with graph, provenance, framework-neutral motion IR, runtime verification and telemetry, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
+  "version": "2.1.0",
+  "description": "Project-aware animation production with durable Project Memory, graph, provenance, framework-neutral motion IR, runtime verification and telemetry, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "project.analyze",
+    "project.memory.init",
+    "project.memory.inspect",
+    "project.memory.refresh",
+    "project.memory.recover",
+    "project.memory.validate",
+    "project.memory.record-decision",
+    "project.memory.record-outcome",
     "project.graph.build",
     "project.graph.validate",
     "motion.plan",
@@ -80,6 +87,7 @@
     "semantic-lint-report",
     "semantic-lint-benchmark",
     "hardening-audit-report",
+    "project-memory",
     "continuity-report",
     "fix-plan",
     "pr-patch"
@@ -124,16 +132,23 @@
     }
   ],
   "entrypoints": {
-    "analyze": "bash scripts/analyze.sh <project-path>",
+    "analyze": "motionloom analyze <project-path> --init-memory",
+    "memory_init": "motionloom memory init --project-root <project-path>",
+    "memory_inspect": "motionloom memory inspect --project-root <project-path> --json",
+    "memory_refresh": "motionloom memory refresh --project-root <project-path> --json",
+    "memory_recover": "motionloom memory recover --project-root <project-path> --json",
+    "memory_validate": "motionloom memory validate --project-root <project-path> --json",
+    "memory_decision": "motionloom memory record-decision --project-root <project-path> --id <id> --status accepted|rejected --summary <summary> --user-confirmed",
+    "memory_outcome": "motionloom memory record-outcome --project-root <project-path> --id <id> --result <result> --user-confirmed",
     "report_init": "python3 scripts/report.py init --task-id <id>",
     "report_collect": "python3 scripts/report.py collect --task-dir <dir>",
     "report_render": "python3 scripts/report.py render --task-dir <dir>",
     "skill_doctor": "python3 scripts/skill-doctor.py --json",
     "quality_gate": "python3 scripts/quality-gate.py --scene <scene> --context <path>",
     "manifest_bind_source": "python3 scripts/manifest.py bind-source --scene <scene> --source <file> --kind <kind> --authority <authority> --license <license>",
-    "dotlottie_package": "bash scripts/to-dotlottie.sh <scene> [output.lottie]",
+    "dotlottie_package": "motionloom manifest package-dotlottie --scene <scene> [--output <output.lottie>]",
     "runtime_adapter_test": "node scripts/runtime-adapters.mjs",
-    "runtime_telemetry": "bash scripts/capture-runtime-telemetry.sh <scene> artifacts/<task-id>",
+    "runtime_telemetry": "node scripts/capture-runtime-telemetry.mjs <scene> artifacts/<task-id>",
     "evidence_verify": "python3 scripts/evidence-verifier.py --scene-dir src/output/<scene> --task-dir artifacts/<task-id> --runtime-evidence runtime-adapters/runtime-evidence.json --max-age-days 1 --output artifacts/<task-id>/evidence-verifier-report.json",
     "intelligence_graph": "python3 scripts/intelligence.py graph build --task-dir artifacts/<task-id>",
     "intelligence_provenance": "python3 scripts/intelligence.py provenance build --task-dir artifacts/<task-id>",
@@ -152,7 +167,7 @@
     "quality_gate_attestation": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation",
     "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
     "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
-    "pr_prepare": "bash scripts/pr.sh <scene>"
+    "pr_prepare": "node scripts/pr.mjs <scene>"
   },
   "report_contract": {
     "required_sections": ["completed", "verified", "not_completed", "problems", "structure_review", "next_agent", "browser_review"],

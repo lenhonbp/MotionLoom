@@ -20,6 +20,41 @@ on:
     branches: [main]
 
 jobs:
+  cross-platform-memory:
+    name: Project Memory / CLI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install package dependencies
+        run: npm install
+
+      - name: Run Project Memory recovery contract
+        run: python tests/scripts/test_project_memory.py
+
+      - name: Check cross-platform CLI routing
+        run: node bin/motionloom.mjs --help
+
+      - name: Inspect npm tarball
+        run: npm pack --dry-run --access public
+
   quality:
     runs-on: ubuntu-latest
     steps:

@@ -840,6 +840,18 @@ def test_observability_contract():
         ], capture_output=True, text=True)
         check("review rejects foreign task candidate", foreign_review.returncode != 0 and "task_id" in foreign_review.stderr)
 
+
+def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
+    workflow = (ROOT / ".github/workflows/quality.yml").read_text(encoding="utf-8")
+    capture = workflow.find("python3 scripts/intelligence.py replay capture")
+    render = workflow.find("- name: Render runtime snapshot frames for changed scenes")
+    gate = workflow.find("- name: Enforce context-bound quality gate")
+    check("quality workflow rebuilds replay bundle", capture >= 0)
+    check("replay rebuild follows runtime rendering", render >= 0 and render < capture)
+    check("replay rebuild precedes quality gate", gate >= 0 and capture < gate)
+    check("replay rebuild binds task directory and root", '--task-dir "$task_dir" --root .' in workflow)
+    check("replay rebuild writes canonical task bundle path", '--output "$task_dir/replay-bundle.json"' in workflow)
+
     doctor = subprocess.run([sys.executable, str(ROOT / "scripts/skill-doctor.py"), "--json"], capture_output=True, text=True)
     doctor_data = json.loads(doctor.stdout)
     check("skill doctor passes package structure", doctor.returncode == 0 and doctor_data.get("status") == "pass")
@@ -933,6 +945,7 @@ if __name__ == "__main__":
     sys.path.insert(0, str(ROOT))
     test_category_coverage()
     test_observability_contract()
+    test_quality_workflow_rebuilds_replay_after_generated_artifacts()
     print()
     if FAILED:
         print(f"{len(FAILED)} test(s) FAILED: {', '.join(FAILED)}")

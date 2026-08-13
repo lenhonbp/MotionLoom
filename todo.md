@@ -287,3 +287,10 @@
 - [x] Cập nhật SKILL.md, Agent Card, README, schemas, references, CHANGELOG/ROADMAP và report contracts theo progressive disclosure.
 - [x] Chạy skill validation, docs/workflow audit, full regression, runtime/browser smoke, package dry-run và cross-platform-compatible checks.
 - [x] Kiểm tra GitHub Actions mainline mới nhất; tạo commit local và chỉ push/merge/open PR sau explicit user confirmation là bước handoff còn lại.
+
+## CI replay remediation after d148f21
+- [x] Phân tích đầy đủ 11 replay mismatches trên GitHub Quality run và xác định artifact nào bị stale.
+- [x] Tái tạo replay bundle cùng các provenance-bound artifacts bằng pipeline canonical, không nới lỏng verifier hoặc quality gate.
+- [x] Bổ sung regression để thay đổi artifact/manifest/runtime evidence phải buộc replay rebuild trước khi Quality pass.
+- [x] Chạy full local validation, kiểm tra diff hygiene và tạo commit fix local.
+- [ ] Chỉ push commit fix sau explicit user confirmation; theo dõi lại Quality, Documentation/Package và Security trên commit fix.

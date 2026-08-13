@@ -255,6 +255,20 @@ jobs:
             bash scripts/render.sh "$scene"
           done < /tmp/changed-scenes
 
+      - name: Rebuild replay bundle after generated evidence
+        run: |
+          if [ ! -s /tmp/changed-scenes ]; then
+            echo "No changed scenes; replay rebuild is skipped."
+            exit 0
+          fi
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            task_dir="artifacts/${scene}-task"
+            python3 scripts/intelligence.py replay capture \
+              --task-dir "$task_dir" --root . \
+              --output "$task_dir/replay-bundle.json"
+          done < /tmp/changed-scenes
+
       - name: Enforce context-bound quality gate
         run: |
           if [ ! -s /tmp/changed-scenes ]; then

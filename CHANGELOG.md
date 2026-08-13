@@ -11,6 +11,10 @@ All notable MotionLoom changes are documented here. The project follows semantic
 - Visual Truth Contract with frame hashes, runtime/source provenance, deterministic perceptual signals, region explanations and review-required semantics.
 - Append-only, hash-chained Remediation Learning ledger for user-confirmed outcomes, correction counts, first-pass acceptance, issue-class outliers and benchmark provenance.
 
+### Fixed
+
+- Quality CI now rebuilds the context-bound replay bundle after runtime, report and attestation artifacts are generated, preventing stale replay hashes from rejecting an otherwise valid changed-scene gate.
+
 ### Boundary
 
 - These additions are local working-tree changes on top of the published `2.1.0` package. They do not change the published version and do not grant approval, push commits or open pull requests.

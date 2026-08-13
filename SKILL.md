@@ -14,6 +14,8 @@ metadata:
 
 # MotionLoom Skill
 
+> Public repository: [github.com/lenhonbp/MotionLoom](https://github.com/lenhonbp/MotionLoom) · npm: [motionloom](https://www.npmjs.com/package/motionloom) · release navigation: [CHANGELOG.md](CHANGELOG.md) · future work: [ROADMAP.md](ROADMAP.md)
+
 Treat every animation request as a production task, not as an isolated asset-generation prompt. Always bind the work to the host project's context, emit machine-readable artifacts, render through the target runtime, expose review evidence in Dev Lab, and stop before commit when a required gate or user confirmation is missing.
 
 ## Required workflow

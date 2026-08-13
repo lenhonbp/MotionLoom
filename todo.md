@@ -215,3 +215,13 @@
 - [x] Chạy full acceptance, deep-stress memory recovery, cross-platform contract tests; tạo commit và chỉ push sau explicit confirmation.
 
 > Acceptance note: relocation với Git remote, Unicode path và path có khoảng trắng pass; `project.root_path` được rebind khi `memory recover`, còn các chỉnh sửa nội dung trực tiếp vẫn bị integrity guard chặn.
+
+## Public repository professionalism upgrade
+
+- [x] Nâng README thành landing page của repo với positioning, badges, quick start, architecture, lifecycle, trust boundary, examples và links tài liệu.
+- [x] Thêm bộ tài liệu cộng đồng chuẩn: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `ROADMAP.md` và `LICENSE` references.
+- [x] Thêm GitHub issue/PR templates, CODEOWNERS và workflow hygiene để repo dễ đóng góp và review.
+- [x] Cập nhật package metadata, npm/GitHub links, version badges và release navigation nhất quán với MotionLoom 2.1.0.
+- [x] Chạy skill validation, docs link/structure checks, full regression, package dry-run và kiểm tra working tree trước commit.
+
+> Public repository acceptance: docs audit pass, Skill Doctor pass with 0 warnings, regression/intelligence/runtime checks pass, and npm dry-run produced `motionloom@2.1.0` with 132 files.

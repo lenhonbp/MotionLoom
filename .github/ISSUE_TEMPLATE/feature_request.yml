@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a contract-backed improvement to MotionLoom
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and affected workflow
+      description: What Agent or user failure mode should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed contract
+      description: Describe inputs, outputs, schemas, evidence and compatibility impact.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Acceptance and trust boundary
+      description: How will correctness be tested, and how will explicit user approval be preserved?
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched the roadmap and existing issues.
+          required: true

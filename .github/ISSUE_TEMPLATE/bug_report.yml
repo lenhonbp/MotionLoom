@@ -1,0 +1,48 @@
+name: Bug report
+description: Report a reproducible defect in MotionLoom
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove private project data, credentials, source assets and signing keys before submitting.
+  - type: input
+    id: version
+    attributes:
+      label: MotionLoom version or commit
+      placeholder: "2.1.0 or 81f4108"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Ubuntu/Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include the exact command, minimal synthetic fixture and expected/observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Sanitized output
+      description: Include exit code and relevant JSON/log output. Remove paths, tokens and private identifiers.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and removed sensitive data.
+          required: true

@@ -3,11 +3,18 @@
   "version": "2.1.0",
   "type": "module",
   "description": "MotionLoom: project-aware animation Skill with graph, provenance, Motion IR, runtime telemetry, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",
+  "author": "lenhonbp",
   "bin": {
     "motionloom": "bin/motionloom.mjs"
   },
   "files": [
     "README.md",
+    "CHANGELOG.md",
+    "ROADMAP.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
+    "SUPPORT.md",
     "SKILL.md",
     "LICENSE",
     "agent-card.json",
@@ -36,7 +43,13 @@
     "gsap",
     "framer-motion",
     "runtime-evidence",
-    "developer-tools"
+    "developer-tools",
+    "project-memory",
+    "motion-ir",
+    "provenance",
+    "attestation",
+    "browser-review",
+    "dev-lab"
   ],
   "repository": {
     "type": "git",

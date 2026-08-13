@@ -1,182 +1,209 @@
 # MotionLoom
 
-A coding-agent skill for professional animation development: motion, character body rigs and assets. It does not guess — it **understands the host project, plans from a signed motion spec, generates from vetted source assets, renders everything in the Dev Lab for live testing, and only then confirms into a pull request**.
+[![CI](https://github.com/lenhonbp/MotionLoom/actions/workflows/quality.yml/badge.svg)](https://github.com/lenhonbp/MotionLoom/actions/workflows/quality.yml)
+[![npm version](https://img.shields.io/npm/v/motionloom?logo=npm&logoColor=white)](https://www.npmjs.com/package/motionloom)
+[![npm downloads](https://img.shields.io/npm/dm/motionloom?logo=npm&logoColor=white)](https://www.npmjs.com/package/motionloom)
+[![License](https://img.shields.io/github/license/lenhonbp/MotionLoom)](LICENSE)
+[![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skill-compatible-5B5BD6)](https://agentskills.io/specification)
 
-## Install from npm
+**Project-aware animation production and runtime verification for coding agents.**
 
-MotionLoom is distributed as the `motionloom` npm package. The package ships the installable Skill contract, framework adapters, Intelligence Core schemas, evidence verifiers and a small CLI wrapper around the canonical Python scripts.
+MotionLoom is an independent open-source Agent Skill for building UI motion, Lottie and dotLottie scenes, Rive/GSAP/Framer Motion experiences, character body rigs and traceable animation assets inside an existing project. It does not treat animation as an isolated prompt: it binds the work to the host project's context, records decisions and provenance, renders through a real runtime, hands the exact candidate to an internal Dev Lab, and stops before Git side effects until the user approves.
 
-```bash
-npm install --global motionloom
-motionloom doctor
-motionloom --help
+> **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
+
+## Why MotionLoom
+
+Most animation helpers optimize for generating one asset quickly. That breaks down when an Agent has to work in a real product: it can lose the project's motion language, select an untraceable asset, render a placeholder instead of the target runtime, mix evidence from another task, or open a PR before the user has inspected the result.
+
+MotionLoom turns that fragile sequence into a bounded production system. Its durable Project Memory survives long gaps between animation tasks and project relocation; its Intelligence Core keeps context, provenance, capability selection and Motion IR connected; its runtime adapters produce evidence instead of prose claims; and its Dev Lab is a mandatory review handoff rather than a separate Agent or a static demo catalog.
+
+## What it provides
+
+| Capability | What the Agent gets | What MotionLoom refuses to do |
+|---|---|---|
+| **Project binding** | Project context, package/design-token discovery and durable `.motionloom/project-memory.json` | Reuse memory across projects or silently continue through missing context |
+| **Motion planning** | Framework-aware Motion Spec, timing/easing/accessibility budgets and framework selection | Present a template as a project-integrated result |
+| **Asset provenance** | Required `source_binding`, authority, license and SHA-256 traceability | Promote unknown, unlicensed or placeholder production assets |
+| **Runtime truth** | Lottie/dotLottie, SVG cutout rig, Rive, GSAP and Framer Motion evidence from real runtime paths | Call scaffold, static validation or a heuristic score visual approval |
+| **Agent intelligence** | Project graph, provenance, Motion IR, replay, semantic lint, continuity and fix plan | Convert confidence, benchmark output or warnings into approval |
+| **Human review** | Exact candidate URL, frame checkpoints, checklist, review artifact and handoff report in Dev Lab | Confirm, push or open a PR without explicit user authorization |
+
+## The production contract
+
+```mermaid
+flowchart LR
+    A[Host project] --> B[Analyze + Project Memory]
+    B --> C[Context-bound Motion Spec]
+    C --> D[Source binding + asset provenance]
+    D --> E[Generate / rig / adapt]
+    E --> F[Real runtime render]
+    F --> G[Intelligence Core + evidence]
+    G --> H[Dev Lab browser review]
+    H --> I{User approved?}
+    I -- changes requested --> D
+    I -- no --> J[Report blocked / needs fix]
+    I -- yes --> K[Quality gate + attestation]
+    K --> L[PR preflight; side effects still explicit]
 ```
 
-The CLI requires **Node.js 18+** and **Python 3.11+**. Installation does not grant approval, commit changes or open a pull request; browser review and explicit repository-side-effect confirmation remain mandatory.
+Every handoff is machine-readable. The typical bundle under `artifacts/<task-id>/` includes the task ledger, context hash, motion spec, manifest, runtime snapshots, telemetry, project graph, provenance, lint and continuity reports, fix plan, browser-review candidate, review decision, execution report and next-Agent handoff.
 
 ## Quick start
 
-```bash
-# 1. Understand the project and create/refresh persistent memory
-motionloom analyze /path/to/your/project --init-memory
-motionloom memory inspect --project-root /path/to/your/project
-
-# 1b. Start a transparent task ledger for Agent/human handoff
-python3 scripts/report.py init --task-id onboarding-wave \
-  --scene my-scene --intent "Character wave in onboarding" \
-  --project-name your-project
-
-# 2. Plan & sign a spec (example: a loading animation)
-python3 src/core/spec.py generate loading --context /path/to/your/project/project-context.json \
-  --output motion-spec.json --loop
-
-# 3. Generate a body rig, then pose it
-python3 src/rig/cutout_rig.py build \
-  --input assets/library/avatar-base.svg --output rigged.svg
-python3 src/rig/cutout_rig.py pose rigged.svg --pose walk \
-  --duration 1.2 --fps 30 --out walk.json
-
-# 3b. Bind the scene source to an authoritative provenance record
-python3 scripts/manifest.py bind-source --scene my-scene \
-  --source animation.json --kind project \
-  --authority "host project manifest" --license MIT
-
-# 4. Render runtime verification snapshots (0/50/100%; placeholders fail)
-motionloom render my-scene
-
-# 4b. Package the Lottie source as a dotLottie v2 archive when required
-node scripts/to-dotlottie.mjs my-scene
-
-# 4c. Verify Rive, GSAP and Framer Motion through the real browser harness
-node scripts/runtime-adapters.mjs
-
-# 4d. Capture runtime telemetry and verify evidence bindings externally
-motionloom runtime-telemetry my-scene artifacts/onboarding-wave
-
-# 4e. Derive and verify a signed task-bound statement against a managed trust policy
-python3 scripts/attestation.py statement --scene-dir src/output/my-scene \
-  --task-dir artifacts/onboarding-wave --context /path/to/your/project/project-context.json \
-  --output artifacts/onboarding-wave/attestation-statement.json
-python3 scripts/attestation.py build --statement artifacts/onboarding-wave/attestation-statement.json \
-  --private-key <managed-ed25519-key> --key-id <key-id> \
-  --output artifacts/onboarding-wave/attestation.json
-python3 scripts/attestation-verifier.py --attestation artifacts/onboarding-wave/attestation.json \
-  --trust-policy artifacts/onboarding-wave/trust-policy.json \
-  --expected-task-id onboarding-wave --expected-scene my-scene
-
-# 5. Boot or prepare the Dev Lab to test & fix interactively
-motionloom devlab my-scene
-
-# 6. Run the acceptance gate, then confirm and ship
-python3 scripts/quality-gate.py --scene my-scene \
-  --context /path/to/your/project/project-context.json \
-  --task-dir artifacts/onboarding-wave --require-telemetry --require-attestation
-
-# 6. Collect evidence and render the user-facing report
-python3 scripts/report.py collect --task-dir artifacts/onboarding-wave
-python3 scripts/report.py render --task-dir artifacts/onboarding-wave
-
-# 7. Confirm and ship only after review; local-only by default
-motionloom pr my-scene --task-dir artifacts/onboarding-wave
-```
-
-The kit is intended to run from a Git clone or the npm distribution. The `motionloom` commands above are the cross-platform surface for Ubuntu, macOS and Windows; they select `python3` on Unix and `python` on Windows, and use Node APIs instead of shell-only archive/process helpers. Copy `project-context.example.json` only as a schema reference; always generate the real context with `motionloom analyze` against the host project. Do not commit a context containing a temporary path or another project's brand tokens.
-
-For a reproducible review fixture, keep `project-context.json`, `quality-report.json`, `review.json`, `execution-report.json`, `handoff.json` and `artifact-manifest.json` under the repository's `artifacts/<task-id>/` directory. `scripts/pr.sh` rejects task bundles outside the repository, requires the task scene to match the requested scene, runs the semantic report check, and stages the evidence bundle together with the scene. This prevents a gate from consuming evidence that is omitted from the resulting commit.
-
-Runtime adapter evidence can be bound to a scene and its exact source/manifest bytes:
+### Install the public CLI
 
 ```bash
-RUNTIME_SCENE=my-scene \
-RUNTIME_SOURCE_PATH=src/output/my-scene/animation.json \
-RUNTIME_MANIFEST_PATH=src/output/my-scene/manifest.json \
-node scripts/runtime-adapters.mjs
+npm install --global motionloom
+motionloom doctor --json
+motionloom --help
 ```
 
-When these variables are supplied, `runtime-evidence.json` records `scene`, `source_sha256` and `manifest_sha256`; the quality gate rejects evidence copied from another scene or generated against an older manifest.
+MotionLoom supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. The npm wrapper is the cross-platform surface: it discovers the platform Python executable and delegates to the same canonical contracts used by a repository checkout.
 
-### Intelligence Core v0.1 + P1 feedback intelligence + trust-boundary hardening + evidence interoperability + signed attestation
+### Start from a real project
 
-After render and before strict acceptance, build the task-bound Intelligence Core artifacts. They give an Agent a single relationship graph, step-level provenance, framework-neutral Motion IR, capability selection policy and deterministic replay inventory instead of requiring it to infer relationships from prose and unrelated files:
+Run the first commands from the project that owns the animation. Do not copy the example context into production; generate a fresh context from the host project.
 
 ```bash
-python3 scripts/intelligence.py motion-ir build --task-dir artifacts/onboarding-wave
-python3 scripts/intelligence.py graph build --task-dir artifacts/onboarding-wave
-python3 scripts/intelligence.py provenance build --task-dir artifacts/onboarding-wave
-python3 scripts/intelligence.py replay capture --root . --task-dir artifacts/onboarding-wave
-python3 scripts/intelligence.py semantic-lint build --task-dir artifacts/onboarding-wave
-python3 scripts/intelligence.py semantic-lint benchmark --task-dir artifacts/onboarding-wave \
-  --iterations 25 --threshold-ms 500
-bash scripts/capture-runtime-telemetry.sh my-scene artifacts/onboarding-wave
-python3 scripts/intelligence.py continuity build --task-dirs artifacts/onboarding-wave
-python3 scripts/intelligence.py fix-plan build --task-dir artifacts/onboarding-wave \
-  --reports semantic-lint-report.json continuity-report.json
-python3 scripts/quality-gate.py --scene my-scene \
-  --context /path/to/your/project/project-context.json \
-  --task-dir artifacts/onboarding-wave \
-  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation
-python3 scripts/eval-intelligence.py
+cd /path/to/your/project
+
+# Understand the project and bootstrap/recover durable memory.
+motionloom analyze . --init-memory
+motionloom memory inspect --project-root . --json
+
+# Plan and generate the scene using the selected framework.
+python3 /path/to/MotionLoom/src/core/spec.py generate loading \
+  --context project-context.json --output motion-spec.json --loop
+
+# Render real runtime evidence and prepare the Dev Lab review handoff.
+motionloom render loading
+motionloom devlab loading
+
+# Validate the exact task bundle before any Git side effect.
+motionloom quality-gate --scene loading \
+  --context project-context.json \
+  --task-dir artifacts/loading-task \
+  --require-browser-review --require-intelligence --require-p1 \
+  --require-benchmark --require-telemetry --require-attestation
+
+# Local-only by default. A user must review and explicitly authorize side effects.
+motionloom pr loading --task-dir artifacts/loading-task
 ```
 
-Semantic lint reports intent, timing, easing, accessibility and performance findings with severity, confidence and evidence. The benchmark records rule coverage and p95 execution time against a 500 ms default threshold; it does not claim to measure human visual quality. Continuity analysis checks context and transition drift across an ordered scene set. `fix-plan.json` converts findings into root cause, affected artifacts, selective rerun scope and verification commands; it does not auto-approve a scene. The 1.8.0 hardening layer rejects symlinked or cross-task Intelligence artifacts, binds replay to task identity, chooses one deterministic passing report bundle per scene, and makes the Dev Lab reject cross-origin or mismatched task/candidate evidence. The 1.9.0 evidence layer captures scrub-point, RAF timing, runtime-state and source/manifest/Motion IR hash bindings, then lets a read-only external verifier reject stale, tampered, cross-task or path-escaped evidence. The 2.0.0 attestation layer signs canonical task-bound hashes with a DSSE-compatible Ed25519 envelope and checks signer lifecycle through fail-closed trust policy. A verifier pass still means integrity only: runtime assertions, Dev Lab review and user consent remain mandatory; `approval` is always `false`. See [Intelligence Core](references/intelligence-core.md), [signed attestation reference](references/signed-attestation.md), the [1.9.0 threat model](docs/audits/1.9.0-evidence-interoperability-threat-model.md) and the [2.0.0 release note](docs/releases/2.0.0.md).
+For a source checkout, use `git clone https://github.com/lenhonbp/MotionLoom.git`, run `npm install`, and replace the global command with `node bin/motionloom.mjs` or the corresponding Python/Node script shown in the [development guide](CONTRIBUTING.md).
 
-For a repeatable deep audit, run `npm run audit:deep`. The default deterministic matrix expands a requested 5,000-case budget into **6,900 logical trials** across canonicalization, DSSE, statement validation, attestation boundaries, strict gates, replay, semantic/continuity checks, approval invariants and controlled fault injection. It reports false positives, false negatives and p95/max latency per contract. These are real repository validator/helper executions against canonical or mutated artifacts, not 6,900 browser renders or a substitute for visual review. Read the [2.1.0 deep-stress evaluation](docs/audits/2.1.0-deep-stress-evaluation.md) for the scorecard, limitations and next milestone.
+## Durable Project Memory
 
-## Pipeline
+Project Memory is the continuity layer for Agents that return to animation after many unrelated tasks or a new context window. It stores project identity, motion principles, asset and runtime policy, accepted/rejected decisions, user-confirmed outcomes and freshness/invalidation state in `.motionloom/project-memory.json`.
 
-| Step | Module | What it does |
-|------|--------|--------------|
-| 01 · Understand | `src/core/analyzer.py` | Reads package.json, design tokens and existing motion language; emits `project-context.json` inside the target project |
-| 02 · Plan | `src/core/spec.py` | Generates & validates the motion spec against the framework matrix, easing canon and performance budget |
-| 03 · Source | `assets/library/` | Vetted, traceable source assets with an attribution table — the authoritative geometry |
-| 04 · Generate | `src/rig/cutout_rig.py`, `templates/` | Canonical templates per framework; 20-bone cutout body rigs with parent-first order |
-| 05 · Dev Lab | `dev-lab/` | Self-contained static workbench: preview rendered evidence, scrub, quality checklist, fix notes, review export |
-| 06 · Confirm → PR | `scripts/pr.sh` | Commits scene + spec + snapshots, opens the PR with an evidence body |
+```bash
+motionloom memory init --project-root <project>
+motionloom memory inspect --project-root <project> --json
+motionloom memory refresh --project-root <project> --json
+motionloom memory recover --project-root <project> --json
+motionloom memory validate --project-root <project> --json
+```
 
-## Repository layout
+The memory integrity hash excludes only the mutable checkout path; Git remote or package identity remains the project binding. Direct edits to durable content fail closed. A stale, invalid, missing or cross-project memory produces a machine-readable recovery state and cannot silently influence generation or approval. Durable decisions and outcomes require `--user-confirmed`.
+
+Read the [Project Memory schema](schemas/project-memory.schema.json), [2.1.0 release note](docs/releases/2.1.0.md) and [Skill instructions](SKILL.md) for the full lifecycle.
+
+## Verified runtime matrix
+
+| Runtime or format | Capability level | Evidence path |
+|---|---:|---|
+| Lottie JSON | Verified | Runtime snapshot renderer and manifest validation |
+| dotLottie v2 | Verified | Node/`fflate` packaging, manifest entry and checksum validation |
+| SVG cutout body rig | Verified | Parent-first hierarchy, named anatomy and pose evidence |
+| Rive Canvas | Verified | Browser adapter, state-machine/input binding and snapshots |
+| GSAP | Verified | Browser adapter, deterministic timeline scrub and snapshots |
+| Framer Motion | Verified | Browser adapter, reduced-motion checks and snapshots |
+| Spine | Scaffold only | Requires a framework-specific runtime adapter and evidence |
+| Three.js | Scaffold only | Requires a framework-specific runtime adapter and evidence |
+
+Capability selection uses `agent-card.json` and the capability registry. A runtime is not promoted from `scaffold_only` to `verified` because a template exists; its adapter evidence and CI contract must pass.
+
+## Evidence, trust and review
+
+MotionLoom keeps distinct layers distinct:
+
+| Layer | It proves | It does not prove |
+|---|---|---|
+| Runtime evidence | The selected runtime produced the declared snapshots and observed state | That the motion is aesthetically correct or user-approved |
+| Provenance | Which source/material/product bytes were used and how they hash | That the source is appropriate beyond the declared authority/license contract |
+| Semantic lint and benchmark | Bounded rule findings, risk signals and performance measurements | Human visual quality or intent acceptance |
+| Signed attestation | A trusted signer signed the same task-bound hashes under the policy | Reviewer consent, accessibility approval or PR authorization |
+| Dev Lab review | The user saw the exact candidate and recorded a decision | A future candidate is automatically approved |
+
+`approval` remains `false` in attestation and verifier artifacts. The default PR mode is local-only (`OPEN_PR=0`); commit, push and pull-request operations remain explicit side effects.
+
+## How an Agent uses the Skill
+
+The public integration surfaces are intentionally small and inspectable:
+
+1. `SKILL.md` gives the Agent the imperative workflow, progressive-disclosure references and non-negotiable contracts.
+2. `agent-card.json` advertises inputs, outputs, verified capabilities, recommended integrations and side-effect policy.
+3. `motionloom` exposes a cross-platform command surface for analysis, memory, rendering, Dev Lab, evidence, quality and PR preflight.
+4. `artifacts/<task-id>/` provides a durable, machine-readable handoff instead of requiring another Agent to infer state from chat.
+
+The Skill can trigger or suggest an internal browser-capable Agent to open the Dev Lab after rendering. Dev Lab is post-render review infrastructure, not a competing Skill. The user can request changes, receive a structured fix plan and rerender selectively, or explicitly confirm the PR path.
+
+## Repository map
 
 | Path | Purpose |
-|------|---------|
-| `SKILL.md` | The agent-skill definition (installable into any coding agent) |
-| `src/core/` | Analyzer, spec validator, snapshot renderer |
-| `src/rig/` | Cutout character body rig engine |
-| `templates/` | Canonical Lottie / Rive / GSAP / Framer Motion templates |
-| `assets/library/` | Vetted source assets + attribution, including the MIT Rive adapter fixture |
-| `scripts/` | Pipeline CLI plus Intelligence Core (`analyze`, `render`, `devlab`, `pr`, `quality-gate`, `validate-lottie`, `to-dotlottie`, `runtime-adapters`, `capture-runtime-telemetry`, `evidence-verifier`, `attestation`, `attestation-verifier`, `attestation-keygen`, `skill-doctor`, `report`, `report-contract`, `intelligence`, `eval-intelligence`) |
-| `dev-lab/` | Self-contained static Dev Lab + Playwright snapshot harness |
-| `agent-card.json` | Capability discovery, runtime levels and side-effect policy for other Agents |
-| `schemas/` | Task, report, artifact-manifest, scene-manifest, handoff, Intelligence Core, signed-attestation and trust-policy JSON Schemas |
-| `references/` | Progressive-disclosure contracts for reporting, runtime capability, dotLottie packaging and Intelligence Core |
-| `artifacts/<task-id>/` | Per-task ledger, evidence, review, issue register and handoff bundle |
-| `tests/` | Deterministic engine tests |
-| `.github/workflows/quality.yml` | CI that re-runs the quality gate on every PR |
+|---|---|
+| `SKILL.md` | Installable Agent Skill contract |
+| `agent-card.json` | Capability discovery and side-effect policy |
+| `bin/motionloom.mjs` | Cross-platform npm CLI entrypoint |
+| `src/core/` | Analyzer, Motion Spec and runtime snapshot engine |
+| `src/rig/` | Character body rig and pose engine |
+| `templates/` | Lottie, Rive, GSAP and Framer Motion templates |
+| `scripts/` | Analysis, rendering, evidence, memory, intelligence, reports and PR preflight |
+| `schemas/` | Versioned machine-readable contracts |
+| `references/` | Progressive-disclosure implementation references |
+| `docs/` | Framework selection, checklists, audits and release notes |
+| `dev-lab/` | Self-contained browser review workbench and harness |
+| `artifacts/<task-id>/` | Per-task evidence, report and handoff bundle |
+| `tests/` | Regression, adversarial and deep-stress evaluation harnesses |
 
-## The quality gate
+## Documentation map
 
-A scene is only "ready" when, together, the Dev Lab checklist passes, runtime snapshot frames exist at 0/50/100%, the context-bound JSON spec matches the implementation, brand tokens come from the target project's `project-context.json`, the required `source_binding` traces `manifest.file` to an authoritative source with a matching checksum, the P1 reports have been validated and the semantic-lint benchmark is below threshold. For strict observability runs, runtime telemetry and the external verifier report must also pass their identity, freshness and hash checks; for production trust runs, the signed attestation must verify against an active trust-policy key and bind the same task/scene/material hashes. A warning or valid signature may require human review and a selective fix; neither is silently converted into approval. CI reproduces these checks on every PR — see [CHECKLIST.md](docs/CHECKLIST.md).
+| Need | Start here |
+|---|---|
+| Install or understand the full lifecycle | [SKILL.md](SKILL.md) |
+| Choose a runtime | [Framework selection](docs/FRAMEWORK-SELECTION.md) and [runtime capability reference](references/runtime-capability.md) |
+| Run a review-ready scene | [Production checklist](docs/CHECKLIST.md) and [browser review contract](references/browser-review-contract.md) |
+| Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
+| Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
+| Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Report a vulnerability or request help | [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md) |
+| See version history | [CHANGELOG.md](CHANGELOG.md) and [release notes](docs/releases/) |
 
-## Transparent task reporting
+## Development and release checks
 
-The Skill does not end with a prose claim that an animation is complete. Each task can be represented by `artifacts/<task-id>/`, which records the lifecycle state, decisions, changed artifacts, checksums, quality result, review decision, open problems and the next Agent handoff. Generate the report with `python3 scripts/report.py render --task-dir artifacts/<task-id>`.
+```bash
+npm install
+python3 scripts/skill-doctor.py --json
+python3 tests/scripts/run_tests.py
+python3 scripts/eval-intelligence.py
+npm run runtime:test
+npm run audit:deep
+npm publish --dry-run --access public
+```
 
-The report must distinguish **completed**, **verified**, **not completed**, **blocked/failed**, **structure problems** and **recommended next Agent/Skill**. A scaffold-only runtime must be reported as `scaffold`; it cannot be described as `runtime-verified` until its adapter test has produced evidence.
-
-Run `python3 scripts/skill-doctor.py --json` when changing the Skill package. It checks the frontmatter, required directories, schemas, Agent Card and references. CI also requires a task report/handoff bundle for changed scenes, so a future Agent cannot silently modify a scene without leaving a reviewable trail.
-
-## Agent interoperability and public skills
-
-`agent-card.json` is the discovery surface. It declares inputs, outputs, verified versus scaffold-only runtimes and Git side effects. Use official or public skills as focused references and adapters rather than copying their prompts into this repository: [LottieFiles dotLottie Web](https://github.com/LottieFiles/dotlottie-web/blob/main/SKILL.md) for runtime APIs, [Diffusion Studio text-to-lottie](https://github.com/diffusionstudio/lottie) for optional scene scaffolding, [Claude Lottie Skill](https://github.com/b1rdmania/claude-lottie-skill/blob/main/SKILL.md) for optional brand-aware asset discovery, and the [Agent Skills specification](https://agentskills.io/specification) plus [GitHub Agent Skills documentation](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) for packaging and portability.
-
-The project-specific value remains in context binding, Motion Spec, asset provenance, runtime evidence, quality policy, review memory and handoff artifacts. The runtime adapter harness delegates rendering to the official packages; it does not reimplement Lottie/Rive runtimes, MCP transport or GitHub authentication inside this Skill.
-
-### Important trust boundary
-
-`ALLOW_PLACEHOLDER=1 bash scripts/render.sh <scene>` is diagnostic only. It creates visibly marked placeholder frames and the quality gate rejects them. A PR cannot be confirmed until the official runtime or the Dev Lab browser renderer has produced `snapshot/.render-meta.json` with `mode: runtime`.
-
-## Standards basis
-
-The audit and templates are grounded in first-party references: [LottieFiles runtimes](https://docs.lottiefiles.com/en/runtimes), the [dotLottie v2 specification](https://dotlottie.io/spec/2.0/), [Rive Web runtime](https://rive.app/docs/runtimes/web/web-js), [Rive state machines](https://rive.app/docs/runtimes/state-machines), and [GSAP accessibility guidance](https://gsap.com/resources/a11y/). End-to-end adapter evidence currently covers **Lottie JSON, dotLottie packaging, SVG cutout rigs, Rive, GSAP and Framer Motion**. Spine and Three.js remain scaffold-only until framework-specific runtime adapters are implemented.
+The GitHub Actions workflow runs the Project Memory and CLI contract on Ubuntu, macOS and Windows, then runs the full evidence-aware quality suite on Ubuntu. A package dry-run is part of release preparation. See [CONTRIBUTING.md](CONTRIBUTING.md) for the clean-checkout procedure and [CHANGELOG.md](CHANGELOG.md) for release discipline.
 
 ## License
 
-MIT
+MotionLoom is released under the [MIT License](LICENSE). Third-party runtime packages and source assets retain their own licenses and attribution requirements.
+
+## References
+
+[1]: https://agentskills.io/specification "Agent Skills specification"
+[2]: https://docs.lottiefiles.com/en/runtimes "LottieFiles runtimes"
+[3]: https://dotlottie.io/spec/2.0/ "dotLottie v2 specification"
+[4]: https://rive.app/docs/runtimes/web/web-js "Rive Web runtime"
+[5]: https://gsap.com/resources/a11y/ "GSAP accessibility guidance"

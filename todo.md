@@ -138,3 +138,11 @@
 - [x] Tích hợp fixture/benchmark vào regression, eval, strict quality gate, report contract và CI.
 - [x] Chạy full acceptance, cập nhật tài liệu/release note và tạo commit release local trước khi push.
 - [ ] Xác nhận remote target, branch và commit SHA lần cuối trước thao tác push GitHub.
+
+## Merge completion: fix/browser-review-smoke
+
+- [ ] Kiểm tra branch feature không có thay đổi chưa commit và không xung đột với `origin/main`.
+- [ ] Mở Pull Request từ `fix/browser-review-smoke` vào `main` với mô tả đầy đủ và acceptance evidence.
+- [ ] Chờ GitHub Actions/checks chạy và xử lý mọi blocker trước merge.
+- [ ] Merge Pull Request vào `main` theo chính sách review/CI của repository.
+- [ ] Xác minh `origin/main`, PR merge SHA, branch state và các artifact chính sau merge.

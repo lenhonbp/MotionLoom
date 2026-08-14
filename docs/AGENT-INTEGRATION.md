@@ -6,11 +6,12 @@ MotionLoom is distributed as one Skill with several **discovery surfaces**, not 
 
 | Source | Typical command | Verification | Provenance to retain |
 |---|---|---|---|
+| One-command onboarding | `npx --yes motionloom setup` | `npx --no-install motionloom status --json` | project lockfile, setup JSON and generated project identity |
 | npm registry | `npm install --save-dev motionloom` | `motionloom discovery check --root . --json` | lockfile and resolved package version |
 | Git checkout | `git clone https://github.com/lenhonbp/MotionLoom.git` | `node bin/motionloom.mjs discovery check --root . --json` | remote URL and commit SHA |
 | Local source | invoke `<checkout>/bin/motionloom.mjs` | `python3 scripts/discovery.py check --root . --json` | source path and local commit if present |
 
-The check is offline and read-only. Installation, source identity and capability compatibility are separate from network authentication. A passing check means that the package is structurally discoverable; it does not mean that a scene is runtime-verified or approved.
+The check is offline and read-only. Installation, source identity and capability compatibility are separate from network authentication. A passing check means that the package is structurally discoverable; it does not mean that a scene is runtime-verified or approved. For a new host project, prefer `npx --yes motionloom setup`; use `--dry-run --json` to preview and `status --json` to inspect without mutation. `repair --yes` only restores missing managed pieces.
 
 ## Agent surfaces
 
@@ -36,7 +37,7 @@ Support here means that the repository exposes a deterministic discovery contrac
 
 ## Required first-run sequence
 
-Run `motionloom discovery check --root <checkout> --json`, inspect `source`, then run project analysis with `motionloom analyze <project> --init-memory`. Load the project context and durable Project Memory before planning. After selecting or generating an asset, create `asset-provenance.json` and run the runtime-mode check before ingest. An AI-generated pilot may proceed to the real runtime and Dev Lab, but it must remain non-production-eligible. After rendering, prepare a task-bound browser candidate and suggest or trigger the internal Dev Lab. Capture user feedback separately from runtime evidence. A valid signature, quality gate or screenshot is not a user approval.
+For a new host project, run `npx --yes motionloom setup --json`, inspect the returned `status`, then use `npx --no-install motionloom status --json` before planning. Setup performs project analysis, discovery and durable-memory bootstrap without copying artifacts from the MotionLoom checkout. For an existing installation, run `motionloom discovery check --root <checkout> --json`, then refresh with `motionloom analyze <project> --init-memory` when needed. Load the project context and durable Project Memory before planning. After selecting or generating an asset, create `asset-provenance.json` and run the runtime-mode check before ingest. An AI-generated pilot may proceed to the real runtime and Dev Lab, but it must remain non-production-eligible. After rendering, prepare a task-bound browser candidate and suggest or trigger the internal Dev Lab. Capture user feedback separately from runtime evidence. A valid signature, quality gate or screenshot is not a user approval.
 
 ## AI-first asset workflow
 

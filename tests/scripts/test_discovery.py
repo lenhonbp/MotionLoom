@@ -31,8 +31,8 @@ def main() -> int:
         errors.append(f"discovery check failed: {payload}")
     if payload.get("surface_count") != 4:
         errors.append("expected four Agent discovery surfaces")
-    if payload.get("installation_count") != 3:
-        errors.append("expected npm, git and local installation sources")
+    if payload.get("installation_count") != 4:
+        errors.append("expected npx, npm, git and local installation sources")
 
     manifest = json.loads((ROOT / "agent-surfaces.json").read_text(encoding="utf-8"))
     if manifest.get("rules", {}).get("approval_is_never_inferred") is not True:
@@ -57,7 +57,7 @@ def main() -> int:
     matrix_payload = json.loads(matrix.stdout)
     if matrix.returncode != 0 or matrix_payload.get("status") != "pass":
         errors.append("installation matrix is not available")
-    if {row.get("source_kind") for row in matrix_payload.get("matrix", [])} != {"npm", "git", "local"}:
+    if {row.get("source_kind") for row in matrix_payload.get("matrix", [])} != {"npm", "npx", "git", "local"}:
         errors.append("installation matrix source kinds drifted")
 
     if errors:

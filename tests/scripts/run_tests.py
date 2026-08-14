@@ -256,6 +256,10 @@ def test_runtime_evidence_binding():
         root = Path(td)
         scene = root / "src/output/browser-review-smoke"
         shutil.copytree(ROOT / "src/output/browser-review-smoke", scene)
+        candidate_path = scene / "browser-review.json"
+        candidate = json.loads(candidate_path.read_text())
+        candidate["expires_at"] = "2099-01-01T00:00:00Z"
+        candidate_path.write_text(json.dumps(candidate, indent=2) + "\n")
         context = root / "project-context.json"
         shutil.copy(ROOT / "artifacts/browser-review-smoke-task/project-context.json", context)
 
@@ -901,6 +905,16 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
     check(
         "cross-platform installation matrix contract passes",
         matrix_tests.returncode == 0 and "installation matrix tests: PASS" in matrix_tests.stdout,
+    )
+    setup_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_setup.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "one-command onboarding is idempotent and project-bound",
+        setup_tests.returncode == 0 and "setup onboarding tests: PASS" in setup_tests.stdout,
+        setup_tests.stdout.strip() or setup_tests.stderr.strip(),
     )
     visual_tests = subprocess.run(
         [sys.executable, str(ROOT / "tests/scripts/test_visual_truth.py")],

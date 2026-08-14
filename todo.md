@@ -319,3 +319,11 @@
 - [x] Thêm fixture AI-generated pilot, report contract và regression chống self-asserted artist authority.
 - [x] Cập nhật SKILL.md, Agent Card, README, schema references và docs về AI-first human-governed asset workflow.
 - [x] Chạy full validation; commit local và chỉ push sau explicit user confirmation.
+
+## Approved installation UX simplification
+- [x] Audit toàn bộ install guide, npm scripts, CLI help và Agent integration để xác định điểm gây khó tiếp cận.
+- [x] Thiết kế safe defaults cho one-command install, project detection, dry-run và local-only behavior.
+- [x] Triển khai lệnh setup/init cross-platform để cài MotionLoom vào dự án thật mà không cần người dùng tự sao chép nhiều file.
+- [x] Thêm doctor/repair/status output thân thiện, giải thích lỗi bằng ngôn ngữ dễ hiểu và không tự mở PR/push.
+- [x] Cập nhật README, installation guide, Agent integration và regression cho luồng cài đặt rút gọn.
+- [x] Chạy full validation; commit local và chỉ push sau explicit user confirmation.

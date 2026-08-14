@@ -40,6 +40,12 @@ const PYTHON_COMMANDS = {
   "asset-provenance": "scripts/asset-provenance.py",
 };
 
+const NODE_COMMANDS = {
+  setup: "scripts/setup.mjs",
+  status: "scripts/setup.mjs",
+  repair: "scripts/setup.mjs",
+};
+
 function printHelp() {
   console.log(`MotionLoom 2.2.0 — project-aware animation production and evidence contracts
 
@@ -67,6 +73,9 @@ Commands:
   visual-truth           Build or validate provenance-bound visual comparisons
   remediation-learning   Record or summarize user-confirmed remediation and benchmark history
   asset-provenance       Validate, classify or report asset origin and production readiness
+  setup                  Install and bootstrap MotionLoom in the current project
+  status                 Read-only project readiness report
+  repair                 Re-apply safe missing setup pieces
 
 Cross-platform examples:
   motionloom analyze . --init-memory
@@ -91,7 +100,7 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
   process.exit(0);
 }
 
-const script = PYTHON_COMMANDS[command];
+const script = NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
 if (!script) {
   console.error(`Unknown MotionLoom command: ${command}`);
   printHelp();
@@ -99,7 +108,8 @@ if (!script) {
 }
 
 const executable = script.endsWith(".mjs") ? process.execPath : PYTHON;
-const result = spawnSync(executable, [resolve(ROOT, script), ...args], {
+const delegatedArgs = NODE_COMMANDS[command] && command !== "setup" ? [command, ...args] : args;
+const result = spawnSync(executable, [resolve(ROOT, script), ...delegatedArgs], {
   cwd: ROOT,
   stdio: "inherit",
   env: process.env,

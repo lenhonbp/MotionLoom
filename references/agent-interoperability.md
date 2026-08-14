@@ -16,6 +16,17 @@ Do not put divergent workflow rules into an Agent-specific file. Add reusable do
 
 The JSON result contains `status`, `source`, `surface_count`, `installation_count`, `errors` and `warnings`. `status=pass` means the local package has the expected files and contract values. It does not assert that the host project has been analyzed, that runtime dependencies are installed, that a candidate rendered correctly or that a user approved a change.
 
+## One-command onboarding
+
+For a host project that has not installed MotionLoom, prefer:
+
+```bash
+npx --yes motionloom setup --project-root <project-path>
+npx --no-install motionloom status --project-root <project-path> --json
+```
+
+`setup` is idempotent. It detects the project root and package manager, installs a local development dependency when needed, merges only the managed router block in `AGENTS.md`, runs discovery and bootstraps project context plus `.motionloom/project-memory.json`. Use `--dry-run --json` to preview and `repair --yes --json` to restore missing managed pieces. A setup result of `blocked` is actionable failure, not permission to continue with guessed context. Setup never commits, pushes, opens a PR or infers approval.
+
 ## Adding a new Agent surface
 
 Add one manifest entry with a safe relative path, a supported agent identifier, `canonical: SKILL.md` and either `load_mode: alias` or `load_mode: router`. Create a short file at that path. Add or update the installation/discovery test and run `motionloom discovery check --root . --json`, `python3 scripts/docs-audit.py` and the full test suite. Never silently overwrite an existing surface with a copied version of `SKILL.md`.

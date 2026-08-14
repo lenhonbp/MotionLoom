@@ -17,7 +17,7 @@ def main() -> int:
     if data.get("supported_platforms") != ["ubuntu", "macos", "windows"]:
         errors.append("supported platform order or values changed")
     ids = {item.get("id") for item in data.get("commands", [])}
-    required_ids = {"npm-cli-help", "discovery-check-python", "discovery-check-npm", "memory-contract", "discovery-regression"}
+    required_ids = {"npm-cli-help", "setup-dry-run", "status-read-only", "repair-safe-defaults", "discovery-check-python", "discovery-check-npm", "memory-contract", "discovery-regression"}
     if ids != required_ids:
         errors.append(f"installation command set mismatch: {sorted(ids)}")
     for item in data.get("commands", []):

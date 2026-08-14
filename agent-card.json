@@ -4,6 +4,9 @@
   "version": "2.2.0",
   "description": "Project-aware animation production with durable Project Memory, graph, step-level provenance, tiered asset provenance, framework-neutral motion IR, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, external evidence verification, semantic feedback, continuity checks, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
+    "project.setup",
+    "project.status",
+    "project.repair",
     "agent.discovery.check",
     "agent.discovery.source",
     "agent.discovery.install-matrix",
@@ -151,6 +154,10 @@
     }
   ],
   "entrypoints": {
+    "setup": "npx --yes motionloom setup --project-root <project-path>",
+    "setup_dry_run": "npx --yes motionloom setup --project-root <project-path> --dry-run --json",
+    "status": "npx --no-install motionloom status --project-root <project-path> --json",
+    "repair": "npx --no-install motionloom repair --project-root <project-path> --yes --json",
     "discovery_check": "motionloom discovery check --root <motionloom-checkout> --json",
     "discovery_source": "motionloom discovery source --root <motionloom-checkout> --json",
     "discovery_install_matrix": "motionloom discovery install-matrix --root <motionloom-checkout> --json",

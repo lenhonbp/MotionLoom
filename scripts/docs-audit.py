@@ -42,6 +42,9 @@ for required_surface in [".agents", ".claude", ".codex", "AGENTS.md", "agent-sur
 for required_path in ["scripts/asset-provenance.py", "schemas/asset-provenance.schema.json", "examples/agent-consumer/ai-generated-pilot-provenance.json"]:
     if required_path not in package.get("files", []):
         errors.append(f"package.json: files must include asset provenance contract {required_path}")
+for onboarding_script in ["setup", "setup:dry", "status", "repair"]:
+    if onboarding_script not in package.get("scripts", {}):
+        errors.append(f"package.json: missing onboarding script {onboarding_script}")
 
 sys.path.insert(0, str(ROOT))
 try:
@@ -60,6 +63,10 @@ readme = (ROOT / "README.md").read_text(encoding="utf-8")
 for heading in ["Why MotionLoom", "Quick start", "Durable Project Memory", "Evidence, trust and review", "Asset provenance tiers", "Documentation map"]:
     if f"## {heading}" not in readme:
         errors.append(f"README.md: missing heading {heading}")
+if "npx --yes motionloom setup" not in readme:
+    errors.append("README.md: missing one-command onboarding recipe")
+if "npx --yes motionloom setup" not in (ROOT / "docs/AGENT-INTEGRATION.md").read_text(encoding="utf-8"):
+    errors.append("docs/AGENT-INTEGRATION.md: missing one-command onboarding recipe")
 
 workflow_dir = ROOT / ".github" / "workflows"
 for workflow in sorted(workflow_dir.glob("*.yml")):

@@ -22,6 +22,7 @@ REQUIRED_SCRIPT_FILES = [
     "scripts/project_memory_loader.py",
     "scripts/analyze.py",
     "scripts/devlab.py",
+    "scripts/setup.mjs",
 ]
 REQUIRED_SCHEMAS = [
     "task.schema.json",
@@ -131,7 +132,7 @@ def run() -> int:
     package_path = ROOT / "package.json"
     try:
         package = json.loads(package_path.read_text(encoding="utf-8"))
-        for script in ("test", "validate", "doctor", "report", "report:check", "review", "memory:bootstrap", "memory:recover", "memory:validate", "devlab", "pack:dotlottie"):
+        for script in ("test", "validate", "doctor", "setup", "setup:dry", "status", "repair", "report", "report:check", "review", "memory:bootstrap", "memory:recover", "memory:validate", "devlab", "pack:dotlottie"):
             if script not in package.get("scripts", {}):
                 warnings.append({"code": "missing_package_script", "message": f"package.json has no {script} script."})
     except (FileNotFoundError, json.JSONDecodeError) as exc:

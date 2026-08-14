@@ -14,6 +14,21 @@
       "purpose": "entrypoint can start without a POSIX shell"
     },
     {
+      "id": "setup-dry-run",
+      "command": ["node", "bin/motionloom.mjs", "setup", "--project-root", "<temporary-project>", "--motionloom-root", ".", "--dry-run", "--json"],
+      "purpose": "one-command onboarding previews changes without network or file mutation"
+    },
+    {
+      "id": "status-read-only",
+      "command": ["node", "bin/motionloom.mjs", "status", "--project-root", "<temporary-project>", "--motionloom-root", ".", "--json"],
+      "purpose": "readiness status is machine-readable and does not install or mutate the host project"
+    },
+    {
+      "id": "repair-safe-defaults",
+      "command": ["node", "bin/motionloom.mjs", "repair", "--project-root", "<temporary-project>", "--motionloom-root", ".", "--yes", "--json"],
+      "purpose": "repair re-applies only managed onboarding pieces and keeps Git side effects disabled"
+    },
+    {
       "id": "discovery-check-python",
       "command": ["python", "scripts/discovery.py", "check", "--root", ".", "--json"],
       "purpose": "offline discovery contract works with native Python launcher"

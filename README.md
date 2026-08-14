@@ -55,15 +55,26 @@ Every handoff is machine-readable. The typical bundle under `artifacts/<task-id>
 
 ## Quick start
 
-### Install the public CLI
+### Recommended: one command from the project
 
 ```bash
-npm install --global motionloom
-motionloom doctor --json
-motionloom --help
+cd /path/to/your/project
+npx --yes motionloom setup
+npx --no-install motionloom status
 ```
 
-MotionLoom supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. The npm wrapper is the cross-platform surface: it discovers the platform Python executable and delegates to the same canonical contracts used by a repository checkout.
+This is the easiest path for a project owner. The wizard detects the host project, installs MotionLoom locally as a development dependency, merges an idempotent `AGENTS.md` router, runs discovery and creates fresh project context plus durable `.motionloom/project-memory.json`. It never commits, pushes, opens a PR or grants asset approval.
+
+Preview or repair the same flow without memorizing low-level commands:
+
+```bash
+npx --yes motionloom setup --dry-run --json   # preview; no install or file changes
+npx --yes motionloom setup --yes              # accept safe defaults
+npx --no-install motionloom status --json     # read-only readiness report
+npx --no-install motionloom repair --yes      # restore only missing managed pieces
+```
+
+MotionLoom supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
 
 ### Start from a real project
 
@@ -72,30 +83,30 @@ Run the first commands from the project that owns the animation. Do not copy the
 ```bash
 cd /path/to/your/project
 
-# Understand the project and bootstrap/recover durable memory.
-motionloom analyze . --init-memory
-motionloom memory inspect --project-root . --json
+# Setup already analyzed the project and bootstrapped durable memory.
+npx --no-install motionloom status --json
+npx --no-install motionloom memory inspect --project-root . --json
 
 # Bound traversal when the host project is large; truncation is reported, never hidden.
-motionloom analyze . --max-files 2500 --max-bytes 25000000 --max-seconds 10
+npx --no-install motionloom analyze . --max-files 2500 --max-bytes 25000000 --max-seconds 10
 
 # Plan and generate the scene using the selected framework.
 python3 /path/to/MotionLoom/src/core/spec.py generate loading \
   --context project-context.json --output motion-spec.json --loop
 
 # Render real runtime evidence and prepare the Dev Lab review handoff.
-motionloom render loading
-motionloom devlab loading
+npx --no-install motionloom render loading
+npx --no-install motionloom devlab loading
 
 # Validate the exact task bundle before any Git side effect.
-  motionloom quality-gate --scene loading \
+npx --no-install motionloom quality-gate --scene loading \
   --context project-context.json \
   --task-dir artifacts/loading-task \
   --require-browser-review --require-intelligence --require-p1 \
   --require-benchmark --require-telemetry --require-attestation --require-asset-provenance
 
 # Local-only by default. A user must review and explicitly authorize side effects.
-motionloom pr loading --task-dir artifacts/loading-task
+npx --no-install motionloom pr loading --task-dir artifacts/loading-task
 ```
 
 For a source checkout, use `git clone https://github.com/lenhonbp/MotionLoom.git`, run `npm install`, and replace the global command with `node bin/motionloom.mjs` or the corresponding Python/Node script shown in the [development guide](CONTRIBUTING.md).

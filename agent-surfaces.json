@@ -43,6 +43,13 @@
   ],
   "installations": [
     {
+      "id": "npx-onboarding",
+      "source_kind": "npx",
+      "command": "npx --yes motionloom setup",
+      "verification": "npx --no-install motionloom status --json",
+      "provenance": "npm-registry-resolution-and-project-lockfile"
+    },
+    {
       "id": "npm-registry",
       "source_kind": "npm",
       "command": "npm install --save-dev motionloom",

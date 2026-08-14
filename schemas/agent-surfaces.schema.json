@@ -43,7 +43,7 @@
         "required": ["id", "source_kind", "command", "verification", "provenance"],
         "properties": {
           "id": {"type": "string"},
-          "source_kind": {"type": "string", "enum": ["npm", "git", "local"]},
+          "source_kind": {"type": "string", "enum": ["npm", "npx", "git", "local"]},
           "command": {"type": "string"},
           "verification": {"type": "string"},
           "provenance": {"type": "string"}

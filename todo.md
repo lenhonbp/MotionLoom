@@ -327,3 +327,11 @@
 - [x] Thêm doctor/repair/status output thân thiện, giải thích lỗi bằng ngôn ngữ dễ hiểu và không tự mở PR/push.
 - [x] Cập nhật README, installation guide, Agent integration và regression cho luồng cài đặt rút gọn.
 - [x] Chạy full validation; commit local và chỉ push sau explicit user confirmation.
+
+## Approved release 2.3.0: one-command onboarding
+- [x] Khóa release scope gồm setup/status/repair, Agent discovery recipe, docs và cross-platform regression.
+- [x] Cập nhật package version, changelog, release note và các metadata liên quan lên `2.3.0`.
+- [x] Chạy release verifier, full regression, docs/Skill validation và npm tarball audit.
+- [ ] Push commit onboarding `6568b2d` cùng release commit lên `origin/main` sau xác nhận của user.
+- [ ] Tạo tag và GitHub Release `v2.3.0` với release note đã kiểm chứng.
+- [ ] Publish `motionloom@2.3.0` lên npm và xác minh dist-tag, tarball contents và traceability.

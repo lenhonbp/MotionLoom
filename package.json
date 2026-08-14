@@ -1,6 +1,6 @@
 {
   "name": "motionloom",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "type": "module",
   "packageManager": "pnpm@11.20.0",
   "description": "MotionLoom: project-aware animation Skill with Agent interoperability, graph, provenance, Motion IR, runtime telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",

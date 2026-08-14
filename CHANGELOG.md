@@ -4,14 +4,30 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+No unreleased changes are recorded.
+
+## [2.3.0] - 2026-08-14
+
 ### Added
 
 - AI-first, human-governed asset provenance contract with explicit authority/origin tiers, readiness states, generator/derivation metadata, per-file SHA-256, license/source records, runtime evidence and human-review boundaries.
 - Cross-platform `motionloom asset-provenance` commands for validation, classification, reporting and runtime/production checks, plus a transparent AI-generated pilot fixture.
+- One-command `npx --yes motionloom setup` onboarding for real projects, with package-manager detection, local devDependency installation, project-bound context and durable Project Memory bootstrap.
+- Read-only `motionloom status`, safe `motionloom repair`, dry-run JSON output and an idempotent managed `AGENTS.md` router for Agent integration.
+- Canonical `npx` installation recipe in Agent discovery plus Ubuntu/macOS/Windows onboarding regressions and package/docs guards.
 
 ### Fixed
 
 - Production quality and PR preflight now fail closed when an asset is unknown, self-asserted as artist-authored, not production-eligible or missing a manifest-bound provenance record; `production_approved` remains human-only.
+- Setup JSON output no longer mixes package-manager logs with machine-readable results, and repair/status routing does not trigger an unintended full setup.
+
+### Verified
+
+- Full regression, onboarding and installation-matrix tests, discovery contract, docs audit, Skill Doctor, skill-creator validation, quality validation, npm tarball dry-run and diff hygiene pass.
+
+### Boundary
+
+- Setup never commits, pushes, opens a PR, grants approval or promotes asset provenance. User review remains required before any PR handoff.
 
 ## [2.2.0] - 2026-08-13
 
@@ -71,5 +87,6 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
 [2.2.0]: docs/releases/2.2.0.md
+[2.3.0]: docs/releases/2.3.0.md
 [2.1.0]: docs/releases/2.1.0.md
 [2.0.0]: docs/releases/2.0.0.md

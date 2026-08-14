@@ -14,7 +14,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** `motionloom@2.2.0` is the current public npm release and GitHub release baseline. The asset provenance tier contract in this working tree is tracked as an unreleased contract change until its validation and maintainer release process completes.
+> **Release posture:** `motionloom@2.3.0` is the current release target and packages one-command onboarding, project-bound setup/status/repair and the AI-first human-governed asset provenance contract. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
 
 ## Why MotionLoom
 

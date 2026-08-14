@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/runtime-candidate.schema.json",
+  "title": "MotionLoom runtime candidate bridge",
+  "description": "Binds artifact intake evidence to deterministic consistency contracts before an asset may enter runtime testing. It never grants production eligibility, production approval or a pull request.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "candidate_id", "asset_id", "created_at", "artifact_intake", "consistency", "runtime"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "asset_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "artifact_intake": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "receipt", "controls", "export_manifest"],
+      "properties": {
+        "registry": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "receipt": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "controls": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "export_manifest": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"}
+      }
+    },
+    "consistency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_identity", "action_set"],
+      "properties": {
+        "asset_identity": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "action_set": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "frame_geometry": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "atlas": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "layered_map": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "review_required"],
+      "properties": {
+        "target": {"type": "string", "enum": ["sprite", "canvas", "lottie", "dotlottie", "rive", "gsap", "framer-motion", "spine", "three"]},
+        "runtime_evidence_ref": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "review_required": {"const": true}
+      }
+    }
+  }
+}

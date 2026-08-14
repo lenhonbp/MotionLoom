@@ -955,6 +955,36 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
         asset_consistency_tests.returncode == 0 and "asset consistency contract tests: PASS" in asset_consistency_tests.stdout,
         asset_consistency_tests.stdout.strip() or asset_consistency_tests.stderr.strip(),
     )
+    artifact_intake_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_artifact_intake.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Artifact intake preserves provider-neutral controls, hash binding and approval boundaries",
+        artifact_intake_tests.returncode == 0 and "artifact intake contract tests: PASS" in artifact_intake_tests.stdout,
+        artifact_intake_tests.stdout.strip() or artifact_intake_tests.stderr.strip(),
+    )
+    runtime_candidate_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_runtime_candidate.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Runtime candidate bridge binds intake exports, consistency and human review boundaries",
+        runtime_candidate_tests.returncode == 0 and "runtime candidate contract tests: PASS" in runtime_candidate_tests.stdout,
+        runtime_candidate_tests.stdout.strip() or runtime_candidate_tests.stderr.strip(),
+    )
+    rig_compatibility_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_rig_compatibility.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Rig compatibility preserves skeleton, socket, event, runtime evidence and review boundaries",
+        rig_compatibility_tests.returncode == 0 and "rig compatibility contract tests: PASS" in rig_compatibility_tests.stdout,
+        rig_compatibility_tests.stdout.strip() or rig_compatibility_tests.stderr.strip(),
+    )
 
 
 if __name__ == "__main__":

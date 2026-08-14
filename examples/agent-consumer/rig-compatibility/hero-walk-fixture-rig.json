@@ -1,0 +1,13 @@
+{
+  "schema_version": "0.1",
+  "rig_id": "hero-walk-fixture-rig",
+  "asset_id": "character/hero-male",
+  "authority": "ai_generated",
+  "source": {"kind": "fixture_contract", "path": "examples/agent-consumer/artifact-intake/hero-motion-controls.json", "sha256": "12248cf9644e1ed65dd75d4a513345b7a37fe1f5029386de38f8cc09a15bdf5b"},
+  "candidate": {"path": "examples/agent-consumer/runtime-candidate/hero-walk-candidate.json", "sha256": "c9abbfc77a6a4cc61e1554dae465110cd4eaf6652c74d85279c8c1ab970eb044"},
+  "bones": [{"id": "root"}, {"id": "torso", "parent": "root"}, {"id": "hand.r", "parent": "torso"}, {"id": "foot.l", "parent": "root"}, {"id": "foot.r", "parent": "root"}],
+  "sockets": [{"id": "hand.r", "bone": "hand.r"}, {"id": "foot.l", "bone": "foot.l"}, {"id": "foot.r", "bone": "foot.r"}],
+  "actions": [{"id": "walk", "events": ["footstep.left", "footstep.right"]}],
+  "requirements": {"sockets": ["hand.r", "foot.l", "foot.r"], "actions": ["walk"], "events": ["footstep.left", "footstep.right"]},
+  "runtime": {"adapter_id": "motionloom.sprite-frame-sequence", "target": "sprite", "review_required": true}
+}

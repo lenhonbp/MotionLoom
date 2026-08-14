@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.1",
+  "registry_id": "motionloom-artifact-adapters",
+  "generated_at": "2026-08-15T00:00:00Z",
+  "selection_policy": {"require_verified": true, "allow_scaffold_only": false},
+  "adapters": [
+    {
+      "adapter_id": "fixture.local-artifact-intake",
+      "kind": "fixture",
+      "status": "static_validated",
+      "adapter_version": "0.1",
+      "invocation_mode": "none",
+      "cost_class": "included",
+      "inputs": ["hash-bound-fixture", "control-track"],
+      "outputs": ["generation-receipt", "export-manifest"],
+      "compatibility": {"os": ["linux", "macos", "windows"]},
+      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
+      "limitations": ["Fixture adapter is regression evidence only and never generates an asset."],
+      "risk_level": "low",
+      "side_effect_level": "read"
+    },
+    {
+      "adapter_id": "internal.imagegen",
+      "kind": "internal_skill",
+      "status": "scaffold_only",
+      "adapter_version": "0.1",
+      "invocation_mode": "agent-mediated",
+      "cost_class": "included",
+      "inputs": ["reference-images", "control-track", "prompt-hash"],
+      "outputs": ["image", "frame-sequence", "generation-receipt"],
+      "compatibility": {"os": ["linux", "macos", "windows"]},
+      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
+      "limitations": ["Adapter imports Agent-mediated ImageGen output only; it does not invoke ImageGen or prove a model, seed, license, rig compatibility, runtime quality or human approval."],
+      "risk_level": "medium",
+      "side_effect_level": "user_review_required"
+    }
+  ]
+}

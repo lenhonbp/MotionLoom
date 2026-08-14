@@ -9,14 +9,19 @@ All notable MotionLoom changes are documented here. The project follows semantic
 - Deterministic Asset Consistency Compiler with identity, action-set, frame-geometry, atlas and layered-map schemas.
 - Standard-library PNG measurement for alpha bounds, pivot/footline/bbox drift, frame/atlas contamination, region overlap, tile seams, parallax ordering and camera-safe bounds.
 - Cross-platform `motionloom asset-consistency validate|analyze|report` commands, npm smoke scripts, public examples and regression coverage.
+- Provider-neutral Artifact Intake contracts for generation receipts, control tracks, export manifests and hash-bound adapter registry evidence, including an internal-ImageGen-shaped scaffold that makes no provider API call.
+- Control-to-runtime `runtime-candidate` bridge, rig compatibility contracts/registry, public fixtures and cross-platform CLI smoke scripts for skeleton/socket/action/event/export bindings.
+- Dev Lab evidence rail and Pipeline handoff support for Artifact Intake, runtime candidate and rig compatibility findings before a user review decision.
 
 ### Fixed
 
 - Quality Gate and task reports can validate an explicitly declared `consistency_ref` without forcing legacy scenes to invent a contract; strict production runs fail closed on a non-ready contract.
+- Quality Gate and reports accept explicitly declared Artifact Intake evidence without breaking legacy scenes, and preserve `review_required` rather than flattening adapter/candidate/rig findings to a pass.
 
 ### Boundary
 
 - Consistency evidence measures and reports artifact agreement only. It never grants artist authority, production eligibility, production approval or PR authorization.
+- A provider name, internal-skill metadata, generation receipt, control plan, compatible rig or runtime candidate never grants artist authority, production eligibility, production approval or PR authorization.
 
 ## [2.3.0] - 2026-08-14
 

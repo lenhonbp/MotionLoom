@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/control-track.schema.json",
+  "title": "MotionLoom generation control track",
+  "description": "Hash-bound generation controls. It stores no prompt plaintext, API token or approval assertion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "control_id", "asset_id", "references", "tracks", "output_profile", "created_at"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "control_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "asset_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "references": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["id", "path", "sha256", "role"], "properties": {"id": {"type": "string", "minLength": 1}, "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "role": {"type": "string", "enum": ["identity", "style", "pose", "camera", "motion", "palette", "lighting", "other"]}}}},
+    "tracks": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["id", "kind", "binding", "value_hash"], "properties": {"id": {"type": "string", "minLength": 1}, "kind": {"type": "string", "enum": ["identity", "style", "camera", "motion", "pose", "seed", "negative_prompt", "lighting"]}, "binding": {"type": "string", "enum": ["required", "advisory", "not_applicable"]}, "value_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "samples": {"type": "integer", "minimum": 0}}}},
+    "output_profile": {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"type": "string", "enum": ["image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d"]}, "fps": {"type": "number", "exclusiveMinimum": 0}, "expected_frame_count": {"type": "integer", "minimum": 1}, "loop": {"type": "boolean"}}}
+  }
+}

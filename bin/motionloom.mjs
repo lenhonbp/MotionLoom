@@ -39,6 +39,9 @@ const PYTHON_COMMANDS = {
   "remediation-learning": "scripts/remediation-learning.py",
   "asset-provenance": "scripts/asset-provenance.py",
   "asset-consistency": "scripts/asset-consistency.py",
+  "artifact-intake": "scripts/artifact-intake.py",
+  "runtime-candidate": "scripts/runtime-candidate.py",
+  "rig-compatibility": "scripts/rig-compatibility.py",
 };
 
 const NODE_COMMANDS = {
@@ -75,6 +78,9 @@ Commands:
   remediation-learning   Record or summarize user-confirmed remediation and benchmark history
   asset-provenance       Validate, classify or report asset origin and production readiness
   asset-consistency      Validate frame geometry, atlas contamination and layered-map contracts
+  artifact-intake        Bind generation controls, provenance, adapter metadata and exported bytes
+  runtime-candidate      Bind intake exports to consistency contracts before runtime testing
+  rig-compatibility      Validate rig bones, sockets, actions, events and runtime adapter evidence
   setup                  Install and bootstrap MotionLoom in the current project
   status                 Read-only project readiness report
   repair                 Re-apply safe missing setup pieces
@@ -91,6 +97,8 @@ Cross-platform examples:
   motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --json
   motionloom asset-provenance check --input <asset-provenance.json> --root <scene-dir> --mode runtime --json
   motionloom asset-consistency validate --kind frame-geometry --input <frame-geometry.json> --root <scene-dir> --json
+  motionloom artifact-intake intake --root <asset-dir> --registry artifact-adapter-registry.json \\
+    --receipt <generation-receipt.json> --controls <control-track.json> --export-manifest <export-manifest.json> --json
 
 The CLI never grants approval or opens a pull request by itself. User review
 and explicit repository side-effect confirmation remain separate gates.

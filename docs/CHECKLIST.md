@@ -35,6 +35,13 @@ A scene is only ready for the confirm-into-PR step when every item below passes.
 - [ ] Layered maps declare unique layer IDs/z-order, intentional parallax order, tile seam policy, layer/world bounds and camera-safe bounds.
 - [ ] Consistency output is stored with the task evidence and remains separate from provenance authority, production eligibility and user approval.
 
+## Provider-neutral intake and runtime candidate
+- [ ] Every Agent/internal-skill/provider output used by the scene has a hash-bound generation receipt, control track and export manifest; no receipt stores secrets or self-asserts approval.
+- [ ] The selected artifact adapter is declared in `artifact-adapter-registry.json`; `scaffold` or `static-validated` status is not presented as runtime verification or production eligibility.
+- [ ] `runtime-candidate.json` binds the intake bundle to the matching asset identity, action-set and frame geometry/atlas/map contracts; mismatched refs or hashes block the candidate.
+- [ ] A rigmed or motion-capture candidate declares skeleton, sockets, action/event coverage, export target and adapter evidence in `rig-compatibility.json`.
+- [ ] Artifact Intake, runtime candidate and rig findings are present in the task handoff/Dev Lab rail and visibly retain `review_required` until the user records a decision.
+
 ## PR readiness
 - [ ] Snapshot PNGs exist for 0/50/100%.
 - [ ] `visual-truth.json` binds real baseline/candidate frames to source, manifest and available runtime/Motion IR hashes; `approval` remains `false`.
@@ -42,4 +49,5 @@ A scene is only ready for the confirm-into-PR step when every item below passes.
 - [ ] Dev Lab URL tested on mobile viewport and desktop.
 - [ ] The production provenance check passes with `--mode production` and reports `production_eligible: true`.
 - [ ] If `manifest.json` declares `consistency_ref`, `quality-gate.py --require-asset-consistency` passes for its declared `consistency_kind`.
+- [ ] If `manifest.json` declares an Artifact Intake bundle, `quality-gate.py --require-artifact-intake` passes and the selected adapter/runtime evidence meets the requested mode.
 - [ ] `production_approved` and browser-review approval are recorded only from the user's explicit review; attestation approval remains `false`.

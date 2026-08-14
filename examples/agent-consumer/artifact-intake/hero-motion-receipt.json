@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "hero-motion-pilot-receipt",
+  "created_at": "2026-08-15T00:00:00Z",
+  "asset": {"id": "character/hero-male", "kind": "frame_sequence", "intended_use": "runtime_candidate"},
+  "authority": "ai_generated",
+  "provider": {"adapter_id": "fixture.local-artifact-intake", "kind": "fixture", "invocation_mode": "none", "task_id": "artifact-intake-example", "model": "fixture-model", "generated_at": "2026-08-15T00:00:00Z", "cost_class": "included", "prompt_hash": "65e32d0806160325a1cb3936963bbab4e2bdf1f65ee6d544fd484b5cb844cd9f"},
+  "control_track_ref": "examples/agent-consumer/artifact-intake/hero-motion-controls.json",
+  "provenance_ref": "examples/agent-consumer/artifact-intake/hero-motion-provenance.json",
+  "outputs": [
+    {"path": "examples/agent-consumer/asset-consistency/assets/hero-frame-00.png", "role": "frame-00", "sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248", "bytes": 97},
+    {"path": "examples/agent-consumer/asset-consistency/assets/hero-frame-01.png", "role": "frame-01", "sha256": "1eaf21df83ed49e490ceb7db1e1a14c58e5227bcb4f1fd79a70e8ad3ee7d38ad", "bytes": 97},
+    {"path": "examples/agent-consumer/asset-consistency/assets/hero-frame-02.png", "role": "frame-02", "sha256": "de88659cb7a57ae9c10b6e3e84e04e54bdc07e9971d5c42160a315d41b38fbc3", "bytes": 97},
+    {"path": "examples/agent-consumer/asset-consistency/assets/hero-frame-03.png", "role": "frame-03", "sha256": "161d906dc850cd3d3ee970b97406fc36bcdf1c34222ac94171a05672bf64d957", "bytes": 97}
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "0.1",
+  "registry_id": "motionloom-rig-adapters",
+  "generated_at": "2026-08-15T00:00:00Z",
+  "adapters": [
+    {
+      "adapter_id": "motionloom.sprite-frame-sequence",
+      "target": "sprite",
+      "framework": "sprite",
+      "status": "static_validated",
+      "evidence": [{"path": "scripts/runtime-candidate.py", "sha256": "a4f608358801156e882a8f90bcd448ce925dcf0b389b774713ee959d75b176a0"}],
+      "limitations": ["Contract-only adapter; requires runtime evidence before runtime verification."]
+    },
+    {
+      "adapter_id": "motionloom.rive-runtime",
+      "target": "rive",
+      "framework": "rive",
+      "status": "project_integrated",
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89"}],
+      "limitations": ["Runtime harness evidence must be captured for the concrete scene and source bytes."]
+    },
+    {
+      "adapter_id": "motionloom.gsap-runtime",
+      "target": "gsap",
+      "framework": "gsap",
+      "status": "project_integrated",
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89"}],
+      "limitations": ["Runtime harness evidence must be captured for the concrete scene and source bytes."]
+    },
+    {
+      "adapter_id": "motionloom.framer-motion-runtime",
+      "target": "framer-motion",
+      "framework": "framer-motion",
+      "status": "project_integrated",
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89"}],
+      "limitations": ["Runtime harness evidence must be captured for the concrete scene and source bytes."]
+    }
+  ]
+}

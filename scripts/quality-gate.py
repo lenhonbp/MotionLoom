@@ -72,6 +72,15 @@ def _load_asset_consistency():
     return module
 
 
+def _load_artifact_intake():
+    path = ROOT / "scripts" / "artifact-intake.py"
+    loader = importlib.util.spec_from_file_location("artifact_intake", path)
+    module = importlib.util.module_from_spec(loader)
+    sys.modules[loader.name] = module
+    loader.loader.exec_module(module)
+    return module
+
+
 def _json(path: Path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -91,7 +100,7 @@ def _telemetry_bundle_sha256(task_dir: Path) -> str:
     return hashlib.sha256(json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None, require_visual_truth: bool = False, require_asset_provenance: bool = False, asset_provenance_path: Path | None = None, require_asset_consistency: bool = False, asset_consistency_path: Path | None = None) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None, require_visual_truth: bool = False, require_asset_provenance: bool = False, asset_provenance_path: Path | None = None, require_asset_consistency: bool = False, asset_consistency_path: Path | None = None, require_artifact_intake: bool = False) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -173,6 +182,39 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                     issues.append("asset consistency contract is not ready")
             except (OSError, ValueError, AttributeError, KeyError, TypeError) as exc:
                 issues.append(f"asset consistency contract: {exc}")
+
+    intake = manifest.get("artifact_intake")
+    if require_artifact_intake and not isinstance(intake, dict):
+        issues.append("artifact intake gate requires manifest.artifact_intake")
+    if intake is not None:
+        required_intake_keys = ("registry", "receipt", "controls", "export_manifest")
+        if not isinstance(intake, dict) or any(not isinstance(intake.get(key), str) for key in required_intake_keys):
+            issues.append("manifest.artifact_intake requires registry, receipt, controls and export_manifest relative paths")
+        else:
+            resolved_intake = {key: (scene_dir / intake[key]).resolve() for key in required_intake_keys}
+            if any(scene_dir.resolve() not in path.parents or not path.is_file() for path in resolved_intake.values()):
+                issues.append("manifest.artifact_intake paths must point to existing files inside the scene directory")
+            else:
+                try:
+                    intake_module = _load_artifact_intake()
+                    intake_result = intake_module.evaluate_bundle(
+                        argparse.Namespace(
+                            root=scene_dir,
+                            registry=resolved_intake["registry"],
+                            receipt=resolved_intake["receipt"],
+                            controls=resolved_intake["controls"],
+                            export_manifest=resolved_intake["export_manifest"],
+                            strict=require_artifact_intake,
+                        )
+                    )
+                    issues.extend(
+                        f"artifact intake: {item.get('code', 'issue')} — {item.get('message', 'contract violation')}"
+                        for item in intake_result.get("errors", [])
+                    )
+                    if require_artifact_intake and not intake_result.get("ready"):
+                        issues.append("artifact intake contract is not runtime-ready")
+                except (OSError, ValueError, AttributeError, KeyError, TypeError) as exc:
+                    issues.append(f"artifact intake contract: {exc}")
 
     checks = manifest.get("checks")
     if not isinstance(checks, list) or not checks:
@@ -452,6 +494,7 @@ def main() -> int:
     parser.add_argument("--asset-provenance")
     parser.add_argument("--require-asset-consistency", action="store_true")
     parser.add_argument("--asset-consistency")
+    parser.add_argument("--require-artifact-intake", action="store_true")
     parser.add_argument("--attestation")
     parser.add_argument("--trust-policy")
     args = parser.parse_args()
@@ -474,7 +517,7 @@ def main() -> int:
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path, args.require_visual_truth, args.require_asset_provenance, asset_provenance_path, args.require_asset_consistency, asset_consistency_path)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path, args.require_visual_truth, args.require_asset_provenance, asset_provenance_path, args.require_asset_consistency, asset_consistency_path, args.require_artifact_intake)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")
@@ -488,6 +531,8 @@ def main() -> int:
                 suffixes.append("asset provenance production eligibility")
             if args.require_asset_consistency:
                 suffixes.append("asset consistency contract")
+            if args.require_artifact_intake:
+                suffixes.append("runtime-ready artifact intake")
             suffix = f" + {' + '.join(suffixes)}" if suffixes else ""
             print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + browser-review candidate + checklist{suffix}")
     return 1 if failed else 0

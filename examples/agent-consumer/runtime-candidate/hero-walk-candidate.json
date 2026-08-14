@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1",
+  "candidate_id": "hero-walk-fixture-candidate",
+  "asset_id": "character/hero-male",
+  "created_at": "2026-08-15T00:00:00Z",
+  "artifact_intake": {
+    "registry": "artifact-adapter-registry.json",
+    "receipt": "examples/agent-consumer/artifact-intake/hero-motion-receipt.json",
+    "controls": "examples/agent-consumer/artifact-intake/hero-motion-controls.json",
+    "export_manifest": "examples/agent-consumer/artifact-intake/hero-motion-export.json"
+  },
+  "consistency": {
+    "asset_identity": "examples/agent-consumer/asset-consistency/hero-identity.json",
+    "action_set": "examples/agent-consumer/asset-consistency/hero-walk-action-set.json",
+    "frame_geometry": "examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json"
+  },
+  "runtime": {"target": "sprite", "review_required": true}
+}

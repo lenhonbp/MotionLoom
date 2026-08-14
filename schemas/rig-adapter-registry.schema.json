@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/rig-adapter-registry.schema.json",
+  "title": "MotionLoom rig runtime adapter registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "generated_at", "adapters"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "adapters": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["adapter_id", "target", "framework", "status", "evidence", "limitations"], "properties": {"adapter_id": {"type": "string", "minLength": 1}, "target": {"type": "string", "minLength": 1}, "framework": {"type": "string", "minLength": 1}, "status": {"type": "string", "enum": ["verified", "project_integrated", "static_validated", "scaffold_only", "disabled"]}, "evidence": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}, "additionalProperties": true}}, "limitations": {"type": "array", "items": {"type": "string"}}}}}
+  }
+}

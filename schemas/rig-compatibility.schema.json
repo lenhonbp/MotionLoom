@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/rig-compatibility.schema.json",
+  "title": "MotionLoom rig compatibility evidence",
+  "description": "Describes a specific rig/export and checks its sockets, actions, events and runtime adapter compatibility. This is evidence only and never proves artist authority or production approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "rig_id", "asset_id", "authority", "source", "candidate", "bones", "sockets", "actions", "runtime"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "rig_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "asset_id": {"type": "string", "minLength": 1},
+    "authority": {"type": "string", "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"]},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "sha256"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["fixture_contract", "procedural_definition", "spine_json", "spine_skel", "rive_file", "lottie_json", "three_asset", "other"]},
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "bones": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string", "minLength": 1}, "parent": {"type": "string", "minLength": 1}}, "additionalProperties": true}
+    },
+    "sockets": {"type": "array", "items": {"type": "object", "required": ["id", "bone"], "properties": {"id": {"type": "string", "minLength": 1}, "bone": {"type": "string", "minLength": 1}}, "additionalProperties": true}},
+    "actions": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string", "minLength": 1}, "events": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": true}},
+    "requirements": {"type": "object", "properties": {"sockets": {"type": "array", "items": {"type": "string"}}, "actions": {"type": "array", "items": {"type": "string"}}, "events": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false},
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_id", "target", "review_required"],
+      "properties": {
+        "adapter_id": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "minLength": 1},
+        "runtime_evidence_ref": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "review_required": {"const": true}
+      }
+    }
+  }
+}

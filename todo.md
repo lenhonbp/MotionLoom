@@ -352,3 +352,28 @@
 - [x] Thêm fixture nhiều frame hành động và map nhiều lớp; nối CLI, quality gate, report và regression evidence.
 - [x] Cập nhật SKILL.md, Agent Card, README, references và docs về AI-generated asset consistency.
 - [x] Chạy full validation và chuẩn bị commit local; push vẫn chờ explicit user confirmation.
+
+## Research AI animation and asset tools
+- [x] Xác định nhóm công cụ cần khảo sát: AI pixel/game asset, image-to-video, text-to-video, 2D rig/character, motion capture/body animation và runtime/vector animation.
+- [x] Thu thập nguồn chính thức cho PixelLab AI và các công cụ đại diện; ghi lại chức năng, input/output, export, consistency controls, API/automation và giới hạn license/provenance.
+- [x] Phân tích pipeline tạo animation/asset của từng công cụ theo các lớp: concept, reference, generation, temporal consistency, rig/action, export, runtime preview và human review.
+- [x] Đối chiếu bài học với MotionLoom contracts: project memory, identity, action-set, frame geometry, atlas, layered map, provenance, runtime evidence và Dev Lab.
+- [x] Xác định khoảng trống, rủi ro và đề xuất roadmap có acceptance criteria; không biến khả năng marketing hoặc heuristic thành production approval.
+- [x] Viết báo cáo nghiên cứu có trích dẫn nguồn chính thức và lưu URL/evidence để có thể audit lại trong `docs/research/ai-animation-tools-2026-{notes,report}.md`.
+
+## Phase A — Provider-neutral artifact intake and internal-skill adapters
+- [x] Rà soát skill/công cụ nội bộ miễn phí của Agent có thể tạo hoặc biến đổi asset, bắt đầu với ImageGen; ghi rõ capability, artifact output và giới hạn provenance.
+- [x] Thiết kế `generation-receipt`, `control-track` và `export-manifest` schemas để bind provider/source controls với output hashes mà không lưu secrets hoặc tạo approval.
+- [x] Thiết kế registry adapter provider-neutral, với adapter `local-fixture` static-validated và adapter `internal-imagegen` scaffold; không gọi provider API hoặc yêu cầu credential trong core path.
+- [x] Triển khai validator/CLI fail-closed cho receipt, control track, export manifest và adapter registry; định nghĩa trạng thái evidence, `scaffold`, `blocked` theo evidence.
+- [x] Tạo fixtures/regression bao phủ hash tampering, missing controls/output, unknown adapter, self-asserted approval và ImageGen-style receipt metadata.
+- [x] Nối optional artifact intake evidence vào quality gate/report mà không làm scene cũ fail và không thay user review/production approval.
+- [x] Cập nhật SKILL.md, Agent Card, README, references, docs/research và npm whitelist; chạy full validation, commit local và chỉ push sau explicit user confirmation.
+
+## Post-Artifact Intake hardening phases
+- [x] Xây cầu nối từ control track/export manifest sang asset identity, action-set, frame geometry, atlas và layered-map evidence; chỉ tạo runtime candidate khi tất cả ref/hash tương thích.
+- [x] Thiết kế và triển khai rig compatibility contract cho runtime adapters, sockets/events/action coverage và export-to-runtime compatibility; không giả lập rig production khi không có source hợp lệ.
+- [x] Nối artifact intake và runtime/rig evidence vào Dev Lab handoff để user thấy adapter status, controls, hashes, kiểm tra pass/block và lý do review-required trước confirm.
+- [x] Chạy regression mở rộng cho toàn bộ contracts, CLI cross-platform smoke, quality/report/Dev Lab integration, package tarball và CI workflows.
+- [x] Audit toàn repo về schema drift, unsafe paths, hash/evidence binding, approval bypass, docs/version drift, CLI/package surface, dependency và workflow mistakes; chủ động sửa lỗi an toàn được xác nhận bằng evidence. `pnpm audit --prod` báo 0 advisory; `npm audit` không áp dụng vì repo chỉ có `pnpm-lock.yaml`.
+- [x] Thực hiện full validation sau mỗi đợt sửa, lưu audit report và commit local cuối; không push, open PR hoặc publish nếu không có xác nhận riêng.

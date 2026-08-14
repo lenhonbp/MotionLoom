@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1",
+  "control_id": "hero-motion-pilot-controls",
+  "asset_id": "character/hero-male",
+  "created_at": "2026-08-15T00:00:00Z",
+  "references": [
+    {"id": "hero-frame-zero", "path": "examples/agent-consumer/asset-consistency/assets/hero-frame-00.png", "sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248", "role": "identity"}
+  ],
+  "tracks": [
+    {"id": "hero-identity-lock", "kind": "identity", "binding": "required", "value_hash": "c24b2cb26f222d5b5febf77d8c79fca50e0dcf0d0b6961f52e58d8ee60e0d351"},
+    {"id": "hero-style-lock", "kind": "style", "binding": "required", "value_hash": "5a8430e6968ec460c5ed504d216e82ccdb923369b2ba5c284ed6328fae2a36cc"},
+    {"id": "hero-walk-poses", "kind": "pose", "binding": "required", "value_hash": "2eb4b7dcbf9ae8e41ae4178205616152fa40c2d5cc55617e6e0d32d832e0d9c9", "samples": 4}
+  ],
+  "output_profile": {"kind": "frame_sequence", "fps": 12, "expected_frame_count": 4, "loop": true}
+}

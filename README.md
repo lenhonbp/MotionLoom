@@ -218,6 +218,29 @@ For a production scene, add `consistency_ref` and `consistency_kind` to `manifes
 
 The repository keeps pass/fail examples under [`examples/agent-consumer/asset-consistency/`](examples/agent-consumer/asset-consistency/) and regression coverage in [`tests/scripts/test_asset_consistency.py`](tests/scripts/test_asset_consistency.py). The npm package exposes `asset:consistency` and `asset:audit` for a quick local smoke check.
 
+## Provider-neutral Artifact Intake and runtime candidates
+
+An AI image, video, pixel-art, rigging or motion-capture tool can contribute an asset without becoming the source of truth for production. MotionLoom records a **generation receipt** (what generated or transformed the asset), a **control track** (reference/style/pose/camera/action controls) and an **export manifest** (exact emitted files and hashes). The provider-neutral registry then checks whether the adapter is evidence-backed, scaffold-only or blocked; it does not invoke a provider API or hold provider credentials.
+
+```bash
+# Bind an Agent-managed ImageGen-style output or another provider to deterministic artifacts.
+motionloom artifact-intake intake --root <project-root> \
+  --registry artifact-adapter-registry.json \
+  --receipt <generation-receipt.json> \
+  --controls <control-track.json> \
+  --export-manifest <export-manifest.json> --json
+
+# Permit only an intake bundle and consistency contracts whose refs/hashes agree.
+motionloom runtime-candidate validate --root <project-root> \
+  --input <runtime-candidate.json> --json
+
+# Validate skeleton/action/socket/event/export compatibility against an adapter registry.
+motionloom rig-compatibility validate --root <project-root> \
+  --registry rig-adapter-registry.json --input <rig-compatibility.json> --json
+```
+
+The public bundle under [`examples/agent-consumer/artifact-intake/`](examples/agent-consumer/artifact-intake/) demonstrates an ImageGen-shaped receipt without relying on an external API. It advances only to **`runtime_test_ready`** when hashes and corresponding identity/action/frame contracts agree. The companion rig contract demonstrates adapter/skeleton/socket/event checks. Both evidence classes remain **review-required**: they never promote `ai_generated` material, claim `artist_authored`, replace real runtime evidence or approve a pull request. Dev Lab displays their adapter status, bound paths and findings before the user can record review.
+
 ## How an Agent uses the Skill
 
 The public integration surfaces are intentionally small and inspectable:
@@ -249,6 +272,9 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | `schemas/visual-truth.schema.json`, `scripts/visual-truth.py` | Provenance-bound visual comparison and review explanation contract |
 | `schemas/remediation-history.schema.json`, `scripts/remediation-learning.py` | Append-only remediation/benchmark ledger and aggregate learning metrics |
 | `schemas/asset-provenance.schema.json`, `scripts/asset-provenance.py` | Tiered origin, authority, readiness, license, hash and human-review gate for asset candidates |
+| `schemas/generation-receipt.schema.json`, `scripts/artifact-intake.py` | Provider-neutral receipt/control/export intake with hash-bound adapter evidence |
+| `schemas/runtime-candidate.schema.json`, `scripts/runtime-candidate.py` | Control-to-consistency bridge that permits only hash-compatible runtime test candidates |
+| `schemas/rig-compatibility.schema.json`, `scripts/rig-compatibility.py` | Skeleton/socket/action/event/export compatibility evidence for runtime adapters |
 | `tests/` | Regression, adversarial and deep-stress evaluation harnesses |
 
 ## Documentation map
@@ -262,6 +288,8 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
 | Classify AI-generated or assisted assets | [Asset provenance tiers](schemas/asset-provenance.schema.json), `motionloom asset-provenance`, and the [production checklist](docs/CHECKLIST.md) |
+| Bind an internal skill or provider output before runtime testing | [Artifact Intake examples](examples/agent-consumer/artifact-intake/), `motionloom artifact-intake`, and [AI/Agent research](docs/research/ai-animation-tools-2026-report.md) |
+| Check control-to-runtime and rig compatibility | `motionloom runtime-candidate`, `motionloom rig-compatibility`, and [production checklist](docs/CHECKLIST.md) |
 | Validate visual truth before review/PR | `motionloom visual-truth build|validate` and [production checklist](docs/CHECKLIST.md) |
 | Check current evidence posture | [Current status](docs/STATUS.md), [external corpus evidence](docs/audits/external-project-corpus-2026-08-13.md) and [historical audit snapshot](AUDIT-REPORT.md) |
 | Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |

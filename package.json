@@ -47,7 +47,25 @@
     "schemas/frame-geometry.schema.json",
     "schemas/atlas-contract.schema.json",
     "schemas/layered-map.schema.json",
-    "tests/scripts/test_asset_consistency.py"
+    "tests/scripts/test_asset_consistency.py",
+    "scripts/artifact-intake.py",
+    "schemas/generation-receipt.schema.json",
+    "schemas/control-track.schema.json",
+    "schemas/export-manifest.schema.json",
+    "schemas/artifact-adapter-registry.schema.json",
+    "artifact-adapter-registry.json",
+    "examples/agent-consumer/artifact-intake",
+    "tests/scripts/test_artifact_intake.py",
+    "scripts/runtime-candidate.py",
+    "schemas/runtime-candidate.schema.json",
+    "examples/agent-consumer/runtime-candidate",
+    "tests/scripts/test_runtime_candidate.py",
+    "scripts/rig-compatibility.py",
+    "schemas/rig-compatibility.schema.json",
+    "schemas/rig-adapter-registry.schema.json",
+    "rig-adapter-registry.json",
+    "examples/agent-consumer/rig-compatibility",
+    "tests/scripts/test_rig_compatibility.py"
   ],
   "keywords": [
     "animation",
@@ -71,7 +89,13 @@
     "agent-interoperability",
     "asset-consistency",
     "sprite-atlas",
-    "layered-map"
+    "layered-map",
+    "artifact-intake",
+    "generation-receipt",
+    "runtime-candidate",
+    "rig-compatibility",
+    "provider-neutral",
+    "agent-skills"
   ],
   "repository": {
     "type": "git",
@@ -137,7 +161,10 @@
     "asset-provenance:validate": "node bin/motionloom.mjs asset-provenance validate --input examples/agent-consumer/ai-generated-pilot-provenance.json --json",
     "asset-provenance:check": "node bin/motionloom.mjs asset-provenance check --input examples/agent-consumer/ai-generated-pilot-provenance.json --root examples/agent-consumer --mode runtime --json",
     "asset:consistency": "node bin/motionloom.mjs asset-consistency validate --kind frame-geometry --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json --root examples/agent-consumer/asset-consistency --json",
-    "asset:audit": "node bin/motionloom.mjs asset-consistency report --kind frame-geometry --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json --root examples/agent-consumer/asset-consistency --json"
+    "asset:audit": "node bin/motionloom.mjs asset-consistency report --kind frame-geometry --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json --root examples/agent-consumer/asset-consistency --json",
+    "artifact:intake": "node bin/motionloom.mjs artifact-intake intake --root . --registry artifact-adapter-registry.json --receipt examples/agent-consumer/artifact-intake/hero-motion-receipt.json --controls examples/agent-consumer/artifact-intake/hero-motion-controls.json --export-manifest examples/agent-consumer/artifact-intake/hero-motion-export.json --json",
+    "runtime:candidate": "node bin/motionloom.mjs runtime-candidate validate --root . --input examples/agent-consumer/runtime-candidate/hero-walk-candidate.json --json",
+    "rig:compatibility": "node bin/motionloom.mjs rig-compatibility validate --root . --registry rig-adapter-registry.json --input examples/agent-consumer/rig-compatibility/hero-walk-fixture-rig.json --json"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",

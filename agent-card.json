@@ -28,6 +28,10 @@
     "asset.provenance.validate",
     "asset.provenance.report",
     "asset.provenance.production-gate",
+    "asset.consistency.validate",
+    "asset.consistency.frame-geometry",
+    "asset.consistency.atlas",
+    "asset.consistency.layered-map",
     "provenance.emit",
     "provenance.verify",
     "capability.discover",
@@ -76,8 +80,9 @@
     "host-project",
     "project-manifest",
     "animation-request",
-    "source-asset"
-    ,"asset-provenance"
+    "source-asset",
+    "asset-provenance",
+    "asset-consistency-contract"
   ],
   "output_artifacts": [
     "agent-discovery-report",
@@ -86,6 +91,7 @@
     "runtime-scene",
     "source-binding",
     "asset-provenance",
+    "asset-consistency-report",
     "dotlottie-package",
     "runtime-evidence",
     "runtime-telemetry",
@@ -192,7 +198,9 @@
     "asset_provenance_classify": "motionloom asset-provenance classify --input <asset-provenance.json> --json",
     "asset_provenance_validate": "motionloom asset-provenance validate --input <asset-provenance.json> --json",
     "asset_provenance_report": "motionloom asset-provenance report --input <asset-provenance.json> --json",
-    "quality_gate_p1": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-asset-provenance",
+    "asset_consistency_validate": "motionloom asset-consistency validate --kind <identity|action-set|frame-geometry|atlas|layered-map> --input <contract.json> --root <asset-root> --json",
+    "asset_consistency_report": "motionloom asset-consistency report --kind <identity|action-set|frame-geometry|atlas|layered-map> --input <contract.json> --root <asset-root> --strict --json",
+    "quality_gate_p1": "python3 scripts/quality-gate.py --scene <scene> --context <path> --task-dir artifacts/<task-id> --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-asset-provenance --require-asset-consistency",
     "attestation_statement": "python3 scripts/attestation.py statement --scene-dir src/output/<scene> --task-dir artifacts/<task-id> --context <project-context.json> --output artifacts/<task-id>/attestation-statement.json",
     "attestation_build": "python3 scripts/attestation.py build --statement artifacts/<task-id>/attestation-statement.json --private-key <key> --key-id <key-id> --output artifacts/<task-id>/attestation.json",
     "attestation_verify": "python3 scripts/attestation-verifier.py --attestation artifacts/<task-id>/attestation.json --trust-policy artifacts/<task-id>/trust-policy.json --expected-task-id <task-id> --expected-scene <scene>",

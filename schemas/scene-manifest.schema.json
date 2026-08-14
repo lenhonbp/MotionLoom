@@ -13,6 +13,13 @@
     "runtime_evidence": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
     "visual_truth": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
     "asset_provenance": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "asset_identity": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "action_set": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "frame_geometry": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "atlas_contract": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "layered_map": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "consistency_ref": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\.\\.).+$"},
+    "consistency_kind": {"type": "string", "enum": ["identity", "action-set", "frame-geometry", "atlas", "layered-map"]},
     "source_binding": {
       "type": "object",
       "required": ["kind", "source_path", "authority", "license", "sha256"],

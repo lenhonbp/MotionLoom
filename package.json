@@ -40,7 +40,14 @@
     ".claude",
     ".codex",
     "AGENTS.md",
-    "agent-surfaces.json"
+    "agent-surfaces.json",
+    "scripts/asset-consistency.py",
+    "schemas/asset-identity.schema.json",
+    "schemas/action-set.schema.json",
+    "schemas/frame-geometry.schema.json",
+    "schemas/atlas-contract.schema.json",
+    "schemas/layered-map.schema.json",
+    "tests/scripts/test_asset_consistency.py"
   ],
   "keywords": [
     "animation",
@@ -61,7 +68,10 @@
     "dev-lab",
     "visual-truth",
     "remediation-learning",
-    "agent-interoperability"
+    "agent-interoperability",
+    "asset-consistency",
+    "sprite-atlas",
+    "layered-map"
   ],
   "repository": {
     "type": "git",
@@ -125,7 +135,9 @@
     "discovery:show": "node bin/motionloom.mjs discovery show --root . --json",
     "install:matrix": "node bin/motionloom.mjs discovery install-matrix --root . --json",
     "asset-provenance:validate": "node bin/motionloom.mjs asset-provenance validate --input examples/agent-consumer/ai-generated-pilot-provenance.json --json",
-    "asset-provenance:check": "node bin/motionloom.mjs asset-provenance check --input examples/agent-consumer/ai-generated-pilot-provenance.json --root examples/agent-consumer --mode runtime --json"
+    "asset-provenance:check": "node bin/motionloom.mjs asset-provenance check --input examples/agent-consumer/ai-generated-pilot-provenance.json --root examples/agent-consumer --mode runtime --json",
+    "asset:consistency": "node bin/motionloom.mjs asset-consistency validate --kind frame-geometry --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json --root examples/agent-consumer/asset-consistency --json",
+    "asset:audit": "node bin/motionloom.mjs asset-consistency report --kind frame-geometry --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json --root examples/agent-consumer/asset-consistency --json"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",

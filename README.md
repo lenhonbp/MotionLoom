@@ -29,6 +29,7 @@ MotionLoom turns that fragile sequence into a bounded production system. Its dur
 | **Project binding** | Project context, package/design-token discovery and durable `.motionloom/project-memory.json` | Reuse memory across projects or silently continue through missing context |
 | **Motion planning** | Framework-aware Motion Spec, timing/easing/accessibility budgets and framework selection | Present a template as a project-integrated result |
 | **Asset provenance** | Required `source_binding`, authority, license and SHA-256 traceability | Promote unknown, unlicensed or placeholder production assets |
+| **Asset consistency** | Measured multi-frame geometry, pivot/footline stability, atlas boundaries and layered-map contracts | Treat a heuristic warning or deterministic pass as artist approval or production authorization |
 | **Runtime truth** | Lottie/dotLottie, SVG cutout rig, Rive, GSAP and Framer Motion evidence from real runtime paths | Call scaffold, static validation or a heuristic score visual approval |
 | **Agent intelligence** | Project graph, provenance, Motion IR, replay, semantic lint, continuity and fix plan | Convert confidence, benchmark output or warnings into approval |
 | **Human review** | Exact candidate URL, frame checkpoints, checklist, review artifact and handoff report in Dev Lab | Confirm, push or open a PR without explicit user authorization |
@@ -61,6 +62,12 @@ Every handoff is machine-readable. The typical bundle under `artifacts/<task-id>
 cd /path/to/your/project
 npx --yes motionloom setup
 npx --no-install motionloom status
+
+# For AI-generated multi-frame assets, compile measured contracts before runtime review.
+npx --no-install motionloom asset-consistency validate \
+  --kind frame-geometry \
+  --input src/output/<scene>/hero-walk-frame-geometry.json \
+  --root src/output/<scene> --json
 ```
 
 This is the easiest path for a project owner. The wizard detects the host project, installs MotionLoom locally as a development dependency, merges an idempotent `AGENTS.md` router, runs discovery and creates fresh project context plus durable `.motionloom/project-memory.json`. It never commits, pushes, opens a PR or grants asset approval.
@@ -183,6 +190,33 @@ motionloom asset-provenance check --input src/output/<scene>/asset-provenance.js
 ```
 
 The [AI-generated pilot fixture](examples/agent-consumer/ai-generated-pilot-provenance.json) demonstrates the intended boundary: it is transparent and runtime-ingestible, but it cannot pass a production gate merely because an Agent declared it complete.
+
+## Asset consistency compiler
+
+When an Agent creates a character action across many frames, packs a sprite atlas or builds a parallax background, visual plausibility is not enough. MotionLoom accepts a machine-readable contract and measures the referenced artifacts instead of trusting declared dimensions. The standard-library analyzer supports RGBA, RGB with `tRNS`, indexed PNG palettes and grayscale-with-alpha PNGs, so the npm package remains usable on Ubuntu, macOS and Windows without Pillow or native image dependencies.
+
+| Contract | Deterministic checks | Typical failure surfaced |
+|---|---|---|
+| `identity` | Asset ID, style profile, palette/camera/scale/pivot and reference hash | Frame set silently changes character identity or visual rules |
+| `action-set` | FPS, frame count, explicit loop seam, pose timeline, sockets and events | A loop claims continuity without matching first/last frame or required event contract |
+| `frame-geometry` | Canvas size, alpha bounds, SHA-256, pivot/footline drift, bbox drift and opaque pixels outside frame rect | One frame contains bleed from a neighboring frame or shifts the feet/pivot |
+| `atlas` | Region bounds/overlap, rotation policy and opaque pixels outside declared regions | Packing leaves contamination, overlap or ambiguous UV ownership |
+| `layered-map` | Z-order uniqueness, parallax ordering, tile seams, layer/world bounds and camera-safe bounds | A background layer seams at loop edges or the camera can leave world bounds |
+
+Run one contract at a time and keep its JSON result in the task bundle:
+
+```bash
+motionloom asset-consistency validate --kind action-set \
+  --input src/output/<scene>/hero-walk-action-set.json --root src/output/<scene> --json
+motionloom asset-consistency validate --kind atlas \
+  --input src/output/<scene>/hero-atlas-contract.json --root src/output/<scene> --strict --json
+motionloom asset-consistency report --kind layered-map \
+  --input src/output/<scene>/forest-layered-map.json --root src/output/<scene> --json
+```
+
+For a production scene, add `consistency_ref` and `consistency_kind` to `manifest.json`. The quality gate and report then bind the contract to the scene only when it is declared; use `--require-asset-consistency` when the task requires the contract to pass. Consistency results expose measured evidence and block mismatches, but they do not grant `artist_authored`, `production_eligible`, `production_approved` or PR authorization.
+
+The repository keeps pass/fail examples under [`examples/agent-consumer/asset-consistency/`](examples/agent-consumer/asset-consistency/) and regression coverage in [`tests/scripts/test_asset_consistency.py`](tests/scripts/test_asset_consistency.py). The npm package exposes `asset:consistency` and `asset:audit` for a quick local smoke check.
 
 ## How an Agent uses the Skill
 

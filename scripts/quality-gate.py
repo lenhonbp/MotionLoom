@@ -63,6 +63,15 @@ def _load_asset_provenance():
     return module
 
 
+def _load_asset_consistency():
+    path = ROOT / "scripts" / "asset-consistency.py"
+    loader = importlib.util.spec_from_file_location("asset_consistency", path)
+    module = importlib.util.module_from_spec(loader)
+    sys.modules[loader.name] = module
+    loader.loader.exec_module(module)
+    return module
+
+
 def _json(path: Path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -82,7 +91,7 @@ def _telemetry_bundle_sha256(task_dir: Path) -> str:
     return hashlib.sha256(json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
-def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None, require_visual_truth: bool = False, require_asset_provenance: bool = False, asset_provenance_path: Path | None = None) -> list[str]:
+def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = False, task_dir: Path | None = None, require_intelligence: bool = False, require_p1: bool = False, require_benchmark: bool = False, require_telemetry: bool = False, require_attestation: bool = False, attestation_path: Path | None = None, trust_policy_path: Path | None = None, require_visual_truth: bool = False, require_asset_provenance: bool = False, asset_provenance_path: Path | None = None, require_asset_consistency: bool = False, asset_consistency_path: Path | None = None) -> list[str]:
     issues = []
     manifest_path = scene_dir / "manifest.json"
     spec_path = scene_dir / "motion-spec.json"
@@ -137,6 +146,33 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                     issues.append("asset provenance is not production_eligible; human approval remains separate")
             except (OSError, ValueError, AttributeError) as exc:
                 issues.append(f"asset provenance contract: {exc}")
+
+    consistency_name = manifest.get("consistency_ref")
+    if require_asset_consistency and not isinstance(consistency_name, str) and asset_consistency_path is None:
+        issues.append("asset consistency gate requires manifest.consistency_ref")
+    if consistency_name or asset_consistency_path:
+        resolved_consistency = asset_consistency_path or (scene_dir / str(consistency_name)).resolve()
+        if scene_dir.resolve() not in resolved_consistency.parents or not resolved_consistency.is_file():
+            issues.append("manifest.consistency_ref must point to an existing file inside the scene directory")
+        else:
+            try:
+                consistency_kind = manifest.get("consistency_kind", "frame-geometry")
+                consistency_module = _load_asset_consistency()
+                consistency_document = _json(resolved_consistency)
+                consistency_result = consistency_module.run(
+                    consistency_kind,
+                    consistency_document,
+                    scene_dir,
+                    strict=require_asset_consistency,
+                )
+                issues.extend(
+                    f"asset consistency: {item.get('code', 'issue')} — {item.get('message', 'contract violation')}"
+                    for item in consistency_result.get("errors", [])
+                )
+                if require_asset_consistency and not consistency_result.get("ready"):
+                    issues.append("asset consistency contract is not ready")
+            except (OSError, ValueError, AttributeError, KeyError, TypeError) as exc:
+                issues.append(f"asset consistency contract: {exc}")
 
     checks = manifest.get("checks")
     if not isinstance(checks, list) or not checks:
@@ -414,6 +450,8 @@ def main() -> int:
     parser.add_argument("--require-visual-truth", action="store_true")
     parser.add_argument("--require-asset-provenance", action="store_true")
     parser.add_argument("--asset-provenance")
+    parser.add_argument("--require-asset-consistency", action="store_true")
+    parser.add_argument("--asset-consistency")
     parser.add_argument("--attestation")
     parser.add_argument("--trust-policy")
     args = parser.parse_args()
@@ -429,13 +467,14 @@ def main() -> int:
     attestation_path = Path(args.attestation).resolve() if args.attestation else None
     trust_policy_path = Path(args.trust_policy).resolve() if args.trust_policy else None
     asset_provenance_path = Path(args.asset_provenance).resolve() if args.asset_provenance else None
+    asset_consistency_path = Path(args.asset_consistency).resolve() if args.asset_consistency else None
     scenes = [root / "src" / "output" / args.scene] if args.scene else sorted(p for p in output_root.iterdir() if p.is_dir()) if output_root.exists() else []
     if not scenes:
         print("QUALITY GATE: no scene outputs found")
         return 0
     failed = False
     for scene_dir in scenes:
-        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path, args.require_visual_truth, args.require_asset_provenance, asset_provenance_path)
+        issues = validate_scene(scene_dir, context, args.require_browser_review, task_dir, args.require_intelligence, args.require_p1, args.require_benchmark, args.require_telemetry, args.require_attestation, attestation_path, trust_policy_path, args.require_visual_truth, args.require_asset_provenance, asset_provenance_path, args.require_asset_consistency, asset_consistency_path)
         if issues:
             failed = True
             print(f"REJECTED {scene_dir.name}:")
@@ -447,6 +486,8 @@ def main() -> int:
                 suffixes.append("visual-truth contract")
             if args.require_asset_provenance:
                 suffixes.append("asset provenance production eligibility")
+            if args.require_asset_consistency:
+                suffixes.append("asset consistency contract")
             suffix = f" + {' + '.join(suffixes)}" if suffixes else ""
             print(f"ACCEPTED {scene_dir.name}: context + spec + runtime snapshots + browser-review candidate + checklist{suffix}")
     return 1 if failed else 0

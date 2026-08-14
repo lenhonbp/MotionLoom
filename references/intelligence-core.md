@@ -9,6 +9,7 @@ Use this reference when an Agent needs to understand or extend MotionLoom's task
 | `project-graph.json` | `python3 scripts/intelligence.py graph build --task-dir <task>` | Links project, intent, scene, context, artifacts and review with task identity and hashes. |
 | `provenance.json` | `python3 scripts/intelligence.py provenance build --task-dir <task>` | Records step actor, builder, materials, products, policy, result and parent chain hash. |
 | `asset-provenance.json` | `motionloom asset-provenance check --input <path> --root <scene-dir> --mode runtime|production` | Classifies asset origin/authority and effective readiness, binds file hashes and license/source metadata, and fails closed before production eligibility. It never grants `production_approved`. |
+| `asset-consistency-report` | `motionloom asset-consistency validate|analyze|report --kind <kind> --input <path> --root <asset-root> --json` | Measures declared identity, action timing, frame geometry, atlas ownership or layered-map bounds against real artifacts. It reports deterministic errors/warnings and never grants provenance authority or approval. |
 | `capability-registry.json` | `python3 scripts/intelligence.py capabilities build --output <path>` | Describes verified/scaffold-only adapters, evidence freshness, compatibility, fallback and side effects. |
 | `motion-ir.json` | `python3 scripts/intelligence.py motion-ir build --task-dir <task>` | Binds framework-neutral tracks and accessibility policy to task, scene, context and source. |
 | `replay-bundle.json` | `python3 scripts/intelligence.py replay capture --root <root> --task-dir <task>` | Captures clean-root artifact hashes and environment metadata; verification fails on mutation or omission. |
@@ -28,6 +29,8 @@ Use this reference when an Agent needs to understand or extend MotionLoom's task
 ## Agent operating rules
 
 The Agent must build the graph, Motion IR, step-level provenance, asset provenance, replay bundle, P1 feedback reports and semantic-lint benchmark after render and before the strict quality gate. For a strict observability run it must also capture runtime telemetry and run the external verifier before `--require-telemetry`. For a production trust run it must derive/sign `attestation.json`, copy or resolve a managed `trust-policy.json`, run the independent attestation verifier and use `--require-attestation` plus `--require-asset-provenance`. It must run the report completeness contract for changed scenes; that contract selects one deterministic passing task bundle and fails on ambiguous ties. It may use a verified capability only when the registry evidence is fresh, its hash matches the referenced file and the target environment is compatible. `scaffold_only` is a planning option, never a production acceptance result.
+
+When the task includes multi-frame, atlas or layered-map material, the Agent must also build the applicable consistency contract and preserve its JSON result in the task bundle. The Agent should use `--strict` for a production-bound check, but must keep warnings and measurements visible in the report. A consistency pass is evidence that declared artifact boundaries agree; it is not a claim about aesthetics, provenance, artist authorship or user consent.
 
 The graph and provenance are evidence indexes, not approval tokens. A valid graph cannot bypass source binding, runtime assertions, browser review, reviewer consent or the `OPEN_PR=0` default. A confidence or risk value can prioritize investigation but cannot replace a deterministic rule or human decision.
 
@@ -73,7 +76,11 @@ python3 scripts/quality-gate.py \
   --scene <scene> \
   --context <project-context.json> \
   --task-dir artifacts/<task-id> \
-  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-asset-provenance
+  --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-asset-provenance --require-asset-consistency
+motionloom asset-consistency validate \
+  --kind frame-geometry \
+  --input src/output/<scene>/hero-walk-frame-geometry.json \
+  --root src/output/<scene> --strict --json
 motionloom asset-provenance check \
   --input src/output/<scene>/asset-provenance.json \
   --root src/output/<scene> --mode production \
@@ -104,5 +111,6 @@ The replay policy excludes generated reports and manifests because `report.py co
 | `runtime telemetry verification failed` | Scrub-point evidence is stale, tampered, missing, cross-task, path-escaped or bound to different source/manifest/Motion IR bytes | Re-run the real runtime capture from the canonical scene/task bundle, then verify again; never treat the verifier as approval. |
 | `attestation verification failed` | Payload hash, DSSE signature, signer validity/revocation, policy lookup, path binding or expected task/scene binding failed | Regenerate the statement from current artifacts, re-run the external verifier against a managed policy and investigate signer lifecycle; never flip `approval` or bypass user review. |
 | `asset provenance is blocked` or `production_eligible: false` | Origin is unknown/AI-generated without the required review, a file hash/license/runtime/full-gate record is missing, or an Agent self-asserted artist authority/approval | Keep the candidate runtime-only, fix the provenance record or obtain the required human review; never rewrite the authority tier or set `production_approved` automatically. |
+| `asset consistency is blocked` | Declared frame, atlas or map geometry disagrees with the referenced bytes, or a required image/contract is missing | Inspect the measured path/code, regenerate only the affected asset/contract, rerun the deterministic check and return to Dev Lab review; never bypass the finding with provenance or attestation. |
 
 The public eval corpus is `tests/evals/intelligence-cases.json`. It covers positive verified selection plus scaffold-only, stale evidence, tampering, graph corruption, replay tamper and foreign-task candidate failures. P1 extends the acceptance surface with semantic warning preservation, generic-intent detection, multi-scene context drift, selective rerun binding, performance budget/frame-rate warnings, perceptual easing/reduced-motion warnings and benchmark execution time. The 1.9.0 slice adds runtime telemetry happy-path, state tamper, cross-task identity, stale evidence and symlink escape cases. The 2.0.0 slice adds clean attestation, payload tamper, binding mismatch, revoked signer and unknown signer cases without weakening the approval=false and human-review invariants.

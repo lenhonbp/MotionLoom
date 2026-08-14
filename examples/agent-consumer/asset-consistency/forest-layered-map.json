@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.1",
+  "map_id": "forest-demo",
+  "coordinate_system": "world_y_up",
+  "world_bounds": {"x": 0, "y": 0, "width": 128, "height": 72},
+  "camera": {
+    "viewport_width": 32,
+    "viewport_height": 18,
+    "safe_bounds": {"x": 16, "y": 8, "width": 96, "height": 56},
+    "seam_tolerance": 0.08
+  },
+  "layers": [
+    {
+      "layer_id": "forest.back",
+      "role": "far",
+      "image": "assets/forest-back.png",
+      "z_index": 0,
+      "parallax": {"x": 0.2, "y": 0.2, "reference": "camera"},
+      "anchor": "top_left",
+      "tileable": {"x": true, "y": false},
+      "world_bounds": {"x": 0, "y": 0, "width": 128, "height": 72},
+      "camera_safe_bounds": {"x": 16, "y": 8, "width": 96, "height": 56},
+      "blend": "normal",
+      "opacity": 1
+    },
+    {
+      "layer_id": "forest.mid",
+      "role": "mid",
+      "image": "assets/forest-mid.png",
+      "z_index": 1,
+      "parallax": {"x": 0.5, "y": 0.5, "reference": "camera"},
+      "anchor": "center",
+      "tileable": {"x": false, "y": false},
+      "world_bounds": {"x": 0, "y": 0, "width": 128, "height": 72},
+      "camera_safe_bounds": {"x": 16, "y": 8, "width": 96, "height": 56},
+      "blend": "normal",
+      "opacity": 0.85
+    },
+    {
+      "layer_id": "forest.front",
+      "role": "foreground",
+      "image": "assets/forest-front.png",
+      "z_index": 2,
+      "parallax": {"x": 0.8, "y": 0.8, "reference": "camera"},
+      "anchor": "bottom_left",
+      "tileable": {"x": false, "y": false},
+      "world_bounds": {"x": 0, "y": 0, "width": 128, "height": 72},
+      "camera_safe_bounds": {"x": 16, "y": 8, "width": 96, "height": 56},
+      "blend": "normal",
+      "opacity": 1
+    }
+  ]
+}

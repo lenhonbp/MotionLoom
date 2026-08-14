@@ -63,6 +63,15 @@ def asset_provenance_module():
     return module
 
 
+def asset_consistency_module():
+    path = ROOT / "scripts" / "asset-consistency.py"
+    loader = importlib.util.spec_from_file_location("motionloom_asset_consistency", path)
+    module = importlib.util.module_from_spec(loader)
+    sys.modules[loader.name] = module
+    loader.loader.exec_module(module)
+    return module
+
+
 def asset_provenance_result(scene_manifest_path: Path, scene_manifest: dict, mode: str = "runtime") -> dict:
     name = scene_manifest.get("asset_provenance")
     if not name:
@@ -79,6 +88,24 @@ def asset_provenance_result(scene_manifest_path: Path, scene_manifest: dict, mod
         )
     except (OSError, ValueError, AttributeError) as exc:
         return {"status": "fail", "errors": [f"asset provenance contract: {exc}"]}
+
+
+def asset_consistency_result(scene_manifest_path: Path, scene_manifest: dict, strict: bool = False) -> dict:
+    name = scene_manifest.get("consistency_ref")
+    if not name:
+        return {"status": "not-run", "ready": False, "errors": []}
+    scene_dir = scene_manifest_path.parent.resolve()
+    consistency_path = (scene_dir / str(name)).resolve()
+    if scene_dir not in consistency_path.parents or not consistency_path.is_file():
+        return {"status": "fail", "ready": False, "errors": ["scene manifest consistency_ref points to a missing or unsafe artifact"]}
+    try:
+        document = read_json(consistency_path)
+        kind = scene_manifest.get("consistency_kind", "frame-geometry")
+        result = asset_consistency_module().run(kind, document, scene_dir, strict=strict)
+        result["status"] = "pass" if result.get("ready") else "fail"
+        return result
+    except (OSError, ValueError, AttributeError, KeyError, TypeError) as exc:
+        return {"status": "fail", "ready": False, "errors": [f"asset consistency contract: {exc}"]}
 
 
 def memory_summary() -> dict | None:
@@ -475,6 +502,12 @@ def check_report(args: argparse.Namespace) -> int:
             errors.append("ready-for-PR or confirmed task requires a passing asset provenance production check")
         elif not provenance.get("summary", {}).get("production_eligible"):
             errors.append("ready-for-PR or confirmed task requires asset provenance production_eligible")
+    consistency = asset_consistency_result(scene_manifest_path, scene_manifest, strict=state in {"ready_for_pr", "confirmed"})
+    if consistency.get("status") == "fail":
+        errors.extend(f"asset consistency: {error}" for error in consistency.get("errors", []))
+    if state in {"ready_for_pr", "confirmed"} and scene_manifest_path.is_file() and scene_manifest.get("consistency_ref"):
+        if consistency.get("status") != "pass" or not consistency.get("ready"):
+            errors.append("ready-for-PR or confirmed task requires a passing asset consistency contract")
     if state in {"validated", "ready_for_pr", "confirmed"}:
         quality = read_json(task_dir / "quality-report.json")
         if quality.get("status") != "pass":
@@ -576,6 +609,11 @@ def render(args: argparse.Namespace) -> int:
         scene_manifest,
         "production" if task.get("state") in {"ready_for_pr", "confirmed"} else "runtime",
     )
+    consistency = asset_consistency_result(
+        ROOT / "src" / "output" / str(task.get("scene", "")) / "manifest.json",
+        scene_manifest,
+        strict=task.get("state") in {"ready_for_pr", "confirmed"},
+    )
     lines = [
         f"# Animation Task Report — {task.get('task_id', task_dir.name)}",
         "",
@@ -609,6 +647,8 @@ def render(args: argparse.Namespace) -> int:
         "## Asset provenance",
         f"- Status: **{provenance.get('status', 'not-run')}**; authority: **{provenance.get('summary', {}).get('authority', 'unknown')}**; declared readiness: **{provenance.get('summary', {}).get('declared_readiness', 'blocked')}**; effective readiness: **{provenance.get('summary', {}).get('effective_readiness', 'blocked')}**",
         f"- Production eligible: **{provenance.get('summary', {}).get('production_eligible', False)}**; production approved: **{provenance.get('summary', {}).get('production_approved', False)}**; errors: **{len(provenance.get('errors', []))}**",
+        "## Asset consistency",
+        f"- Status: **{consistency.get('status', 'not-run')}**; contract: **{consistency.get('contract', scene_manifest.get('consistency_kind', 'not-declared'))}**; ready: **{consistency.get('ready', False)}**; errors: **{len(consistency.get('errors', []))}**; warnings: **{len(consistency.get('warnings', []))}**",
         "## Semantic motion lint",
         f"- Status: **{lint.get('status', 'not-run')}**; errors: **{lint.get('summary', {}).get('errors', 0)}**; warnings: **{lint.get('summary', {}).get('warnings', 0)}**; blocking: **{lint.get('summary', {}).get('blocking', 0)}**",
         md_table(lint.get("findings", []), [("Rule", "rule_id"), ("Severity", "severity"), ("Confidence", "confidence"), ("Message", "message"), ("Basis", "basis")]),

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/frame-geometry.schema.json",
+  "title": "MotionLoom Frame Geometry Contract",
+  "description": "Measured geometry for action frames; measurements are validated against pixels, not trusted from AI self-reporting.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "asset_identity", "canvas", "invariants", "frames"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "asset_identity": { "type": "string", "minLength": 1 },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "color_space", "alpha_mode"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "color_space": { "enum": ["srgb", "linear-srgb"] },
+        "alpha_mode": { "enum": ["straight", "premultiplied"] }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pivot_tolerance_px", "footline_tolerance_px", "bbox_drift_tolerance_px", "min_alpha_pixels"],
+      "properties": {
+        "pivot_tolerance_px": { "type": "number", "minimum": 0 },
+        "footline_tolerance_px": { "type": "number", "minimum": 0 },
+        "bbox_drift_tolerance_px": { "type": "number", "minimum": 0 },
+        "min_alpha_pixels": { "type": "integer", "minimum": 1 },
+        "allow_external_opaque_pixels": { "type": "boolean" }
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frame_id", "image", "rect", "alpha_bbox", "pivot", "footline_px", "safe_rect", "sha256"],
+        "properties": {
+          "frame_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+          "image": { "type": "string", "minLength": 1 },
+          "rect": { "$ref": "#/$defs/rect" },
+          "alpha_bbox": { "$ref": "#/$defs/rect" },
+          "pivot": { "$ref": "#/$defs/point" },
+          "footline_px": { "type": "number" },
+          "safe_rect": { "$ref": "#/$defs/rect" },
+          "bleed_margin_px": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 },
+        "y": { "type": "integer", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "space"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "space": { "enum": ["pixels", "normalized"] }
+      }
+    }
+  }
+}

@@ -4,7 +4,19 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
-No unreleased changes are recorded.
+### Added
+
+- Deterministic Asset Consistency Compiler with identity, action-set, frame-geometry, atlas and layered-map schemas.
+- Standard-library PNG measurement for alpha bounds, pivot/footline/bbox drift, frame/atlas contamination, region overlap, tile seams, parallax ordering and camera-safe bounds.
+- Cross-platform `motionloom asset-consistency validate|analyze|report` commands, npm smoke scripts, public examples and regression coverage.
+
+### Fixed
+
+- Quality Gate and task reports can validate an explicitly declared `consistency_ref` without forcing legacy scenes to invent a contract; strict production runs fail closed on a non-ready contract.
+
+### Boundary
+
+- Consistency evidence measures and reports artifact agreement only. It never grants artist authority, production eligibility, production approval or PR authorization.
 
 ## [2.3.0] - 2026-08-14
 

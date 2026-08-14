@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1",
+  "asset_identity": "character/hero-male",
+  "canvas": {
+    "width": 8,
+    "height": 8,
+    "color_space": "srgb",
+    "alpha_mode": "straight"
+  },
+  "invariants": {
+    "pivot_tolerance_px": 0.01,
+    "footline_tolerance_px": 0.01,
+    "bbox_drift_tolerance_px": 0,
+    "min_alpha_pixels": 1,
+    "allow_external_opaque_pixels": false
+  },
+  "frames": [
+    {
+      "frame_id": "walk.00",
+      "image": "assets/hero-frame-00.png",
+      "rect": {"x": 0, "y": 0, "width": 8, "height": 8},
+      "alpha_bbox": {"x": 2, "y": 1, "width": 4, "height": 5},
+      "pivot": {"x": 4, "y": 7, "space": "pixels"},
+      "footline_px": 6,
+      "safe_rect": {"x": 1, "y": 0, "width": 6, "height": 7},
+      "bleed_margin_px": 1,
+      "sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248"
+    },
+    {
+      "frame_id": "walk.01",
+      "image": "assets/hero-frame-01.png",
+      "rect": {"x": 0, "y": 0, "width": 8, "height": 8},
+      "alpha_bbox": {"x": 2, "y": 1, "width": 4, "height": 5},
+      "pivot": {"x": 4, "y": 7, "space": "pixels"},
+      "footline_px": 6,
+      "safe_rect": {"x": 1, "y": 0, "width": 6, "height": 7},
+      "bleed_margin_px": 1,
+      "sha256": "1eaf21df83ed49e490ceb7db1e1a14c58e5227bcb4f1fd79a70e8ad3ee7d38ad"
+    },
+    {
+      "frame_id": "walk.02",
+      "image": "assets/hero-frame-02.png",
+      "rect": {"x": 0, "y": 0, "width": 8, "height": 8},
+      "alpha_bbox": {"x": 2, "y": 1, "width": 4, "height": 5},
+      "pivot": {"x": 4, "y": 7, "space": "pixels"},
+      "footline_px": 6,
+      "safe_rect": {"x": 1, "y": 0, "width": 6, "height": 7},
+      "bleed_margin_px": 1,
+      "sha256": "de88659cb7a57ae9c10b6e3e84e04e54bdc07e9971d5c42160a315d41b38fbc3"
+    },
+    {
+      "frame_id": "walk.03",
+      "image": "assets/hero-frame-03.png",
+      "rect": {"x": 0, "y": 0, "width": 8, "height": 8},
+      "alpha_bbox": {"x": 2, "y": 1, "width": 4, "height": 5},
+      "pivot": {"x": 4, "y": 7, "space": "pixels"},
+      "footline_px": 6,
+      "safe_rect": {"x": 1, "y": 0, "width": 6, "height": 7},
+      "bleed_margin_px": 1,
+      "sha256": "161d906dc850cd3d3ee970b97406fc36bcdf1c34222ac94171a05672bf64d957"
+    }
+  ]
+}

@@ -28,10 +28,18 @@ A scene is only ready for the confirm-into-PR step when every item below passes.
 - [ ] `ai_generated` assets may be runtime-ready but are not production-eligible; `unknown` assets are blocked.
 - [ ] `artist_authored` is backed by a verifiable human/artist record and is not merely an Agent-authored field.
 
+## Asset consistency
+- [ ] Multi-frame actions declare an `identity` and `action-set` contract when the asset has shared character/style identity or loop/event requirements.
+- [ ] `frame-geometry` measures the real PNG bytes: canvas size, alpha bounds, frame SHA-256, pivot/footline drift and opaque pixels outside each frame rect.
+- [ ] Sprite atlases declare non-overlapping regions, explicit rotation policy and transparent pixels outside regions; contamination is blocking in strict runs.
+- [ ] Layered maps declare unique layer IDs/z-order, intentional parallax order, tile seam policy, layer/world bounds and camera-safe bounds.
+- [ ] Consistency output is stored with the task evidence and remains separate from provenance authority, production eligibility and user approval.
+
 ## PR readiness
 - [ ] Snapshot PNGs exist for 0/50/100%.
 - [ ] `visual-truth.json` binds real baseline/candidate frames to source, manifest and available runtime/Motion IR hashes; `approval` remains `false`.
 - [ ] `motion-spec.json` is bound to the exact `project-context.json` hash (implements == planned).
 - [ ] Dev Lab URL tested on mobile viewport and desktop.
 - [ ] The production provenance check passes with `--mode production` and reports `production_eligible: true`.
+- [ ] If `manifest.json` declares `consistency_ref`, `quality-gate.py --require-asset-consistency` passes for its declared `consistency_kind`.
 - [ ] `production_approved` and browser-review approval are recorded only from the user's explicit review; attestation approval remains `false`.

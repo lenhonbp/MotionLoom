@@ -16,10 +16,11 @@ The current repository baseline includes project-aware analysis, durable Project
 | **2.5** | Agent Interoperability | Versioned schemas, compatibility matrix and replayable task bundles across Agents | Included in 2.2.0 candidate |
 | **2.6** | Agent-created Asset Provenance | Explicit origin/authority/readiness tiers; runtime ingest without automatic production approval; fail-closed production gate | Included in 2.3.0 release target |
 | **2.7** | One-command Onboarding | Project-bound setup/status/repair, Agent router merge, durable memory bootstrap and cross-platform installation recipe | Included in 2.3.0 release target |
+| **2.8** | Asset Consistency Compiler | Measured frame geometry, atlas contamination and layered-map contracts with fail-closed regression and optional scene quality-gate binding | Implemented in working tree; pending validation/release |
 
 ## Working-tree implementation status
 
-The current implementation pass has delivered the contracts behind milestones 2.2, 2.3, 2.5, 2.6 and 2.7: canonical Agent discovery/install surfaces, consumer fixtures and a Ubuntu/macOS/Windows matrix; Visual Truth is bound into scene manifests, Dev Lab handoff and the review-first quality gate; Remediation Learning records hash-chained benchmark/outcome history; CI replay evidence is rebuilt after generated artifacts; asset provenance remains production fail-closed; and `npx --yes motionloom setup` bootstraps a project without overwriting its Agent guidance. The remaining work is maintainer release verification and paired evaluation on additional real projects.
+The current implementation pass has delivered the contracts behind milestones 2.2, 2.3, 2.5, 2.6 and 2.7, and has implemented the 2.8 compiler in the working tree: canonical Agent discovery/install surfaces, consumer fixtures and a Ubuntu/macOS/Windows matrix; Visual Truth is bound into scene manifests, Dev Lab handoff and the review-first quality gate; Remediation Learning records hash-chained benchmark/outcome history; CI replay evidence is rebuilt after generated artifacts; asset provenance remains production fail-closed; `npx --yes motionloom setup` bootstraps a project without overwriting its Agent guidance; and consistency contracts measure actual frame/atlas/map artifacts. The remaining work is full validation, maintainer release verification and paired evaluation on additional real projects.
 
 ## Product principles
 

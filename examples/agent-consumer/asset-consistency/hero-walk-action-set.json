@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.1",
+  "asset_identity": "character/hero-male",
+  "actions": [
+    {
+      "action_id": "walk",
+      "fps": 12,
+      "frames": [
+        "assets/hero-frame-00.png",
+        "assets/hero-frame-01.png",
+        "assets/hero-frame-02.png",
+        "assets/hero-frame-03.png"
+      ],
+      "loop": true,
+      "events": ["footstep.left", "footstep.right"],
+      "required_sockets": ["hand.r", "foot.l", "foot.r"]
+    }
+  ],
+  "invariants": {
+    "canvas_width": 8,
+    "canvas_height": 8,
+    "pivot_tolerance_px": 0.01,
+    "footline_tolerance_px": 0.01,
+    "bbox_drift_tolerance_px": 0,
+    "min_alpha_pixels": 1
+  }
+}

@@ -342,3 +342,13 @@
 - [x] Cập nhật publication troubleshooting và release checklist với hướng xử lý E404/E401 đã xác minh.
 - [x] Hướng dẫn user sửa quyền npm trên workstation nếu cần; không lấy hoặc yêu cầu npm token trong chat.
 - [x] Xác minh `motionloom@2.3.0`, `latest`, tarball URL/hash và traceability sau publish thành công.
+
+## Proposed AI asset consistency and layered-map pipeline
+- [x] Audit các contract hiện tại cho asset identity, frame/atlas, runtime evidence, collision/socket và map/background layers.
+- [x] Thiết kế asset identity manifest cho character/style/camera/pivot/scale/palette/lighting và derivation chain qua nhiều frame.
+- [x] Thiết kế frame geometry contract với canvas, trim, transparent padding, pivot, bbox, safe rect, bleed và frame-to-frame invariants.
+- [x] Triển khai analyzer đo alpha bounds, phát hiện frame overlap/contamination, crop lệch, scale drift, pivot drift và atlas UV sai.
+- [x] Triển khai layered-map schema/validator cho z-order, parallax, anchor, tileability, seam/overlap, occlusion và camera-safe bounds.
+- [x] Thêm fixture nhiều frame hành động và map nhiều lớp; nối CLI, quality gate, report và regression evidence.
+- [x] Cập nhật SKILL.md, Agent Card, README, references và docs về AI-generated asset consistency.
+- [x] Chạy full validation và chuẩn bị commit local; push vẫn chờ explicit user confirmation.

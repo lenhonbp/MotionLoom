@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/asset-identity.schema.json",
+  "title": "MotionLoom Asset Identity Contract",
+  "description": "Stable identity and derivation locks shared by AI-generated asset variants.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "asset_id", "asset_kind", "identity", "derivation"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "asset_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._/-]{2,127}$" },
+    "asset_kind": {
+      "type": "string",
+      "enum": ["character", "prop", "effect", "background", "tile", "ui", "rig"]
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_id", "reference_hashes", "camera", "coordinate_system", "scale", "pivot", "palette_lock"],
+      "properties": {
+        "subject_id": { "type": "string", "minLength": 1 },
+        "reference_hashes": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "camera": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["projection", "width", "height", "focal_length"],
+          "properties": {
+            "projection": { "enum": ["orthographic", "perspective"] },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "focal_length": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "coordinate_system": { "enum": ["screen_y_down", "world_y_up"] },
+        "scale": { "type": "number", "exclusiveMinimum": 0 },
+        "pivot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "space"],
+          "properties": {
+            "x": { "type": "number", "minimum": 0, "maximum": 1 },
+            "y": { "type": "number", "minimum": 0, "maximum": 1 },
+            "space": { "enum": ["normalized_canvas", "world"] }
+          }
+        },
+        "palette_lock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["colors", "delta_e_tolerance"],
+          "properties": {
+            "colors": {
+              "type": "array",
+              "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "delta_e_tolerance": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "style_profile": { "type": "string", "minLength": 1 },
+        "lighting_profile": { "type": "string", "minLength": 1 }
+      }
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "generator", "source_refs"],
+      "properties": {
+        "origin": { "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"] },
+        "generator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model", "task_id", "prompt_hash"],
+          "properties": {
+            "model": { "type": "string", "minLength": 1 },
+            "task_id": { "type": "string", "minLength": 1 },
+            "prompt_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "seed": { "type": ["integer", "string"] },
+            "tool_version": { "type": "string" }
+          }
+        },
+        "source_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "derivation_chain": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["step", "operation", "input_hashes", "output_hash"],
+            "properties": {
+              "step": { "type": "integer", "minimum": 0 },
+              "operation": { "type": "string", "minLength": 1 },
+              "input_hashes": { "type": "array", "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+              "output_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "provenance_ref": { "type": "string", "minLength": 1 },
+    "notes": { "type": "string" }
+  }
+}

@@ -38,6 +38,7 @@ const PYTHON_COMMANDS = {
   "visual-truth": "scripts/visual-truth.py",
   "remediation-learning": "scripts/remediation-learning.py",
   "asset-provenance": "scripts/asset-provenance.py",
+  "asset-consistency": "scripts/asset-consistency.py",
 };
 
 const NODE_COMMANDS = {
@@ -47,7 +48,7 @@ const NODE_COMMANDS = {
 };
 
 function printHelp() {
-  console.log(`MotionLoom 2.2.0 — project-aware animation production and evidence contracts
+  console.log(`MotionLoom 2.3.0 — project-aware animation production and evidence contracts
 
 Usage:
   motionloom <command> [args...]
@@ -73,6 +74,7 @@ Commands:
   visual-truth           Build or validate provenance-bound visual comparisons
   remediation-learning   Record or summarize user-confirmed remediation and benchmark history
   asset-provenance       Validate, classify or report asset origin and production readiness
+  asset-consistency      Validate frame geometry, atlas contamination and layered-map contracts
   setup                  Install and bootstrap MotionLoom in the current project
   status                 Read-only project readiness report
   repair                 Re-apply safe missing setup pieces
@@ -88,6 +90,7 @@ Cross-platform examples:
   motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json
   motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --json
   motionloom asset-provenance check --input <asset-provenance.json> --root <scene-dir> --mode runtime --json
+  motionloom asset-consistency validate --kind frame-geometry --input <frame-geometry.json> --root <scene-dir> --json
 
 The CLI never grants approval or opens a pull request by itself. User review
 and explicit repository side-effect confirmation remain separate gates.

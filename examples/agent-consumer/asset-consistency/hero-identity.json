@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "asset_id": "character/hero-male",
+  "asset_kind": "character",
+  "identity": {
+    "subject_id": "hero-male",
+    "reference_hashes": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "camera": {
+      "projection": "orthographic",
+      "width": 256,
+      "height": 256,
+      "focal_length": 50
+    },
+    "coordinate_system": "screen_y_down",
+    "scale": 1,
+    "pivot": {
+      "x": 0.5,
+      "y": 0.875,
+      "space": "normalized_canvas"
+    },
+    "palette_lock": {
+      "colors": ["#2864D7", "#96B4D2", "#281E50"],
+      "delta_e_tolerance": 4
+    },
+    "style_profile": "clean-orthographic-pilot",
+    "lighting_profile": "flat-key-light"
+  },
+  "derivation": {
+    "origin": "ai_generated",
+    "generator": {
+      "model": "fixture-generator",
+      "task_id": "asset-consistency-fixture",
+      "prompt_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "seed": 20260815,
+      "tool_version": "fixture-1"
+    },
+    "source_refs": ["fixture://motionloom/asset-consistency/hero-male"],
+    "derivation_chain": [
+      {
+        "step": 0,
+        "operation": "deterministic-fixture-generation",
+        "input_hashes": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        "output_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    ]
+  },
+  "provenance_ref": "../ai-generated-pilot-provenance.json",
+  "notes": "Synthetic contract fixture only; runtime-ready examples never imply production art or approval."
+}

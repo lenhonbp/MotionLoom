@@ -30,6 +30,7 @@ For Agent or CI composition, consume JSON and preserve the exit code. If the pro
 2. **Plan** — classify the animation, select a framework, and generate a context-bound `motion-spec.json` with timing, easing, loop, accessibility, performance and source authority.
 3. **Source** — resolve an authoritative asset from the project or `assets/library/`. Record attribution, license and checksum in the scene manifest's required `source_binding`; the binding's SHA-256 must match the bytes referenced by `manifest.file`. Do not promote an unknown or placeholder asset to production.
 3a. **Classify asset provenance** — create or load `asset-provenance.json` with `motionloom asset-provenance`. Treat Agent-created material as ingestible only when its origin, generator task, license, file hash and derivation chain are explicit. `ai_generated` may be runtime-tested but is never production-eligible; `ai_assisted` requires human sign-off; `artist_authored` and `production_approved` cannot be self-asserted by an Agent or quality gate. Use `check --mode runtime` for candidate ingest and `check --mode production` only for a full production gate.
+3b. **Compile asset consistency** — when a task contains multi-frame character actions, sprite sheets/atlases or layered maps, create the matching identity, action-set, frame-geometry, atlas and layered-map contracts from `schemas/`. Run `motionloom asset-consistency validate --kind <identity|action-set|frame-geometry|atlas|layered-map> --input <contract> --root <asset-root> --json`. The compiler measures actual PNG alpha bounds, pivot/footline/bbox drift, frame and atlas contamination, region overlap, parallax/z-order, tile seams and camera-safe bounds. A pass is deterministic contract evidence only; it never upgrades provenance, artist authority, production eligibility or human approval.
 4. **Generate** — use the matching template or rig implementation. For body animation, preserve named anatomy, pivot and parent-first hierarchy.
 5. **Render** — run the platform-neutral Node entrypoint for scene output, or `node scripts/runtime-adapters.mjs` for the verified Rive/GSAP/Framer Motion adapter matrix. Acceptance requires runtime evidence at 0/50/100%, not a static placeholder. Keep the render metadata beside the snapshots.
 6. **Bind Intelligence Core** — build a framework-neutral `motion-ir.json`, `project-graph.json`, `provenance.json`, `replay-bundle.json`, `semantic-lint-report.json` and `semantic-lint-benchmark.json` with `python3 scripts/intelligence.py`. Select only a capability registry entry whose status is `verified`, whose evidence is fresh and whose compatibility matches the target environment. A confidence score or benchmark result can prioritize investigation; neither can replace deterministic or human acceptance.
@@ -84,6 +85,7 @@ Only user-confirmed decisions and outcomes may become durable remediation memory
 - Asset provenance is tiered: `ai_generated` is `runtime_ready` but not `production_eligible`; `ai_assisted` becomes eligible only after human sign-off; `ai_assisted_human_reviewed` remains review-bound; `artist_authored` requires a verified human/artist record and full gate; `unknown` is `blocked`.
 - `production_approved` is a human decision only. An Agent, generator metadata, signed attestation or quality gate may preserve or verify a decision but may never mint it; `approval` remains `false` in machine-generated evidence.
 - Asset provenance binds each declared file to a SHA-256, license/source metadata, generator or derivation chain, runtime evidence and, where applicable, human review. Production checks fail closed on unknown origin, self-asserted artist authority, missing evidence or hash drift.
+- Asset consistency is artifact-first and fail-closed: declared frame geometry, hashes, atlas regions and layered-map bounds must agree with measured runtime/source files. Heuristic warnings remain visible and may become blocking under `--strict`; no consistency result is an approval decision.
 - Browser-review candidates are single-use, time-bounded and bound to the exact task, scene and candidate identity; Dev Lab artifact/task bases must be same-origin and identity-consistent before staging a review decision.
 - Report completeness must select one deterministic passing task bundle per scene and fail on ambiguous ties; a valid artifact is never sufficient to bypass explicit user approval.
 - Runtime telemetry must bind task, scene, source, manifest, Motion IR and deterministic scrub points; tampered, stale, missing or cross-task telemetry is a verification failure.
@@ -101,6 +103,8 @@ Every production `src/output/<scene>/manifest.json` must include a `source_bindi
 
 Every production candidate that includes generated or assisted material must also reference `asset-provenance.json`. Validate it with `motionloom asset-provenance`; use runtime mode to allow safe ingest/testing and production mode to require `production_eligible`. This contract is deliberately separate from step-level `schemas/provenance.schema.json`: the former answers who/what created an asset and whether it may advance, while the latter records the pipeline steps that handled it.
 
+For multi-frame or layered assets, reference a consistency contract from the scene manifest with `consistency_ref` and `consistency_kind` (`identity`, `action-set`, `frame-geometry`, `atlas` or `layered-map`). `quality-gate.py --require-asset-consistency` and `report.py` validate the reference only when declared; missing references remain visible rather than being silently inferred.
+
 The Intelligence Core contracts are defined in `schemas/project-graph.schema.json`, `schemas/provenance.schema.json`, `schemas/capability-registry.schema.json`, `schemas/motion-ir.schema.json`, `schemas/signed-attestation.schema.json` and `schemas/trust-policy.schema.json`. They make project relationships, supply-chain steps, runtime selection, framework-neutral intent and signer trust inspectable without relying on prose.
 
 ```bash
@@ -110,6 +114,14 @@ node scripts/to-dotlottie.mjs --scene-dir src/output/<scene> --output src/output
 # Initialize and recover durable project memory.
 motionloom memory init --project-root <project-path>
 motionloom memory recover --project-root <project-path> --json
+
+# Measure multi-frame, atlas or layered-map consistency from real artifacts.
+motionloom asset-consistency validate --kind frame-geometry \
+  --input src/output/<scene>/hero-walk-frame-geometry.json \
+  --root src/output/<scene> --json
+motionloom asset-consistency validate --kind atlas \
+  --input src/output/<scene>/hero-atlas-contract.json \
+  --root src/output/<scene> --strict --json
 
 # Run the official runtime adapters in a real browser harness.
 node scripts/runtime-adapters.mjs

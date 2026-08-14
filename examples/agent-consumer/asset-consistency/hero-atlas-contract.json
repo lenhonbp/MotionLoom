@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1",
+  "image": "assets/hero-atlas.png",
+  "allow_rotation": false,
+  "padding_px": 1,
+  "extrude_px": 1,
+  "require_transparent_outside_regions": true,
+  "regions": [
+    {
+      "region_id": "hero.walk.00",
+      "frame_id": "walk.00",
+      "rect": {"x": 1, "y": 0, "width": 6, "height": 8},
+      "trim": false,
+      "pivot": {"x": 4, "y": 7}
+    },
+    {
+      "region_id": "hero.walk.01",
+      "frame_id": "walk.01",
+      "rect": {"x": 9, "y": 0, "width": 6, "height": 8},
+      "trim": false,
+      "pivot": {"x": 4, "y": 7}
+    }
+  ]
+}

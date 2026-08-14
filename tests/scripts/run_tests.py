@@ -945,6 +945,16 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
         asset_provenance_tests.returncode == 0 and "asset provenance contract tests: PASS" in asset_provenance_tests.stdout,
         asset_provenance_tests.stdout.strip() or asset_provenance_tests.stderr.strip(),
     )
+    asset_consistency_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_asset_consistency.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Asset consistency preserves deterministic geometry, atlas and layered-map boundaries",
+        asset_consistency_tests.returncode == 0 and "asset consistency contract tests: PASS" in asset_consistency_tests.stdout,
+        asset_consistency_tests.stdout.strip() or asset_consistency_tests.stderr.strip(),
+    )
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ git pull --ff-only origin main
 git log -1 --oneline
 ```
 
-The latest commit must be the npm packaging release announced in the task. Do not publish from an older checkout or from a different fork.
+The latest commit must be the npm packaging release announced in the task. Do not publish from an older checkout or from a different fork. This repository declares `pnpm` as its package manager and intentionally does not ship a `package-lock.json`; do **not** run `npm ci` in the repository. The release verifier and package dry-run do not require a dependency install. If a full workspace install is needed, use the declared package manager with `pnpm install --frozen-lockfile`.
 
 ## 3. Authenticate npm locally
 
@@ -58,6 +58,8 @@ When the dry-run is correct and `npm whoami` shows the intended account, publish
 npm publish --access public
 ```
 
+Do not add `--provenance` unless the local npm client and its CI/provider integration explicitly support automatic npm provenance. Some workstation setups report `Automatic provenance generation not supported for provider: null`; in that case the package itself is still valid, and the supported fallback for this release is the command above without `--provenance`. Never retry by changing the version or by bypassing the package verification steps.
+
 The version `2.3.0` becomes immutable on npm after a successful publish. If npm reports that the version already exists, stop and verify the registry instead of trying to overwrite it.
 
 ## 6. Verify the registry publication
@@ -85,4 +87,13 @@ The CLI should print the MotionLoom command surface. `motionloom doctor` should 
 
 ## Troubleshooting
 
-If `npm whoami` returns `ENEEDAUTH`, repeat `npm login` on the same computer and registry. If publishing returns `E403`, check package ownership, organization publish permission and 2FA policy; do not disable security controls. If the package name is already claimed, stop and choose a scoped name such as `@your-npm-user/motionloom`, then update `name` and `publishConfig` before publishing a new package identity. Never place an npm token in `package.json`, `.npmrc` committed to Git, shell history or chat.
+If `npm whoami` returns `ENEEDAUTH`, repeat `npm login` on the same computer and registry. If `npm ci` reports that no `package-lock.json` exists, skip it and use the release verifier directly; this repository is pnpm-managed. If `npm publish --provenance` reports that the provider is `null` or unsupported, retry `npm publish --access public` without that flag. If publishing returns `E404` on the `PUT` request, do not change the package name or version yet. First run these read-only checks against the public registry:
+
+```bash
+npm config get registry
+npm whoami --registry=https://registry.npmjs.org/
+npm view motionloom name version maintainers --json --registry=https://registry.npmjs.org/
+npm access list collaborators motionloom --json --registry=https://registry.npmjs.org/
+```
+
+The `npm whoami` result must be the intended publisher, and the collaborators result must show that account with publish-capable access. A mismatch usually means the workstation is authenticated as a different npm user, is using a stale token, or the package is owned by another account or team. Re-authenticate only on the workstation with `npm logout` followed by `npm login --registry=https://registry.npmjs.org/`; never paste the token into chat. If the account is correct but publish access is absent, the package owner must grant the account read-write access or publish from the owner account. If publishing returns `E403`, check package ownership, organization publish permission and 2FA policy; do not disable security controls. If the package name is already claimed by an account you do not control, stop and do not rename this release without an explicit release decision. Never place an npm token in `package.json`, `.npmrc` committed to Git, shell history or chat.

@@ -332,6 +332,13 @@
 - [x] Khóa release scope gồm setup/status/repair, Agent discovery recipe, docs và cross-platform regression.
 - [x] Cập nhật package version, changelog, release note và các metadata liên quan lên `2.3.0`.
 - [x] Chạy release verifier, full regression, docs/Skill validation và npm tarball audit.
-- [ ] Push commit onboarding `6568b2d` cùng release commit lên `origin/main` sau xác nhận của user.
-- [ ] Tạo tag và GitHub Release `v2.3.0` với release note đã kiểm chứng.
-- [ ] Publish `motionloom@2.3.0` lên npm và xác minh dist-tag, tarball contents và traceability.
+- [x] Push commit onboarding `6568b2d` cùng release commit lên `origin/main` sau xác nhận của user.
+- [x] Tạo tag và GitHub Release `v2.3.0` với release note đã kiểm chứng.
+- [x] Publish `motionloom@2.3.0` lên npm và xác minh dist-tag, tarball contents và traceability. Workstation initially hit invalid auth (`E401`/masked `E404`), then succeeded after re-login as `lenhonbp` without `--provenance`.
+
+## Release 2.3.0 npm E404 follow-up
+- [x] Xác minh npm identity, registry và package ownership bằng các lệnh read-only trên workstation.
+- [x] Phân biệt lỗi authentication, publish permission, package ownership và registry configuration; không đổi package name hoặc version khi chưa có bằng chứng.
+- [x] Cập nhật publication troubleshooting và release checklist với hướng xử lý E404/E401 đã xác minh.
+- [x] Hướng dẫn user sửa quyền npm trên workstation nếu cần; không lấy hoặc yêu cầu npm token trong chat.
+- [x] Xác minh `motionloom@2.3.0`, `latest`, tarball URL/hash và traceability sau publish thành công.

@@ -985,6 +985,36 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
         rig_compatibility_tests.returncode == 0 and "rig compatibility contract tests: PASS" in rig_compatibility_tests.stdout,
         rig_compatibility_tests.stdout.strip() or rig_compatibility_tests.stderr.strip(),
     )
+    rive_package_gate_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_rive_package_gate.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Rive package gate requires authentic package bytes, runtime proof and human review",
+        rive_package_gate_tests.returncode == 0 and "rive package gate contract tests: PASS" in rive_package_gate_tests.stdout,
+        rive_package_gate_tests.stdout.strip() or rive_package_gate_tests.stderr.strip(),
+    )
+    ai_pilot_builder_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_ai_pilot_builder.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "AI pilot builder requires real alpha, hash-binds artifacts and preserves review-first status",
+        ai_pilot_builder_tests.returncode == 0 and "AI pilot builder tests: PASS" in ai_pilot_builder_tests.stdout,
+        ai_pilot_builder_tests.stdout.strip() or ai_pilot_builder_tests.stderr.strip(),
+    )
+    alpha_isolation_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_alpha_isolation.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Alpha isolation only removes reviewed edge-connected background and rejects residual contamination",
+        alpha_isolation_tests.returncode == 0 and "alpha isolation tests: PASS" in alpha_isolation_tests.stdout,
+        alpha_isolation_tests.stdout.strip() or alpha_isolation_tests.stderr.strip(),
+    )
 
 
 if __name__ == "__main__":

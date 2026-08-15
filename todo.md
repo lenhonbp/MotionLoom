@@ -73,6 +73,14 @@
 - [x] Cấu hình `https://github.com/lenhonbp/MotionLoom.git` làm origin và push branch chính.
 - [x] Xác minh commit, branch, remote URL và repository contents sau khi push.
 
+## AI-generated scout pilot ingest
+
+- [x] Xây builder portable tạo receipt, provenance, controls, measured consistency contracts và runtime candidate **chỉ** từ PNG alpha thực.
+- [x] Thêm alpha-isolator deterministic cho background edge-connected, có hash report, residual-edge fail-closed và regression coverage.
+- [x] Chạy builder trên bốn bytes ImageGen thật; dừng trước `controls.json` vì source RGBA có alpha `255` trên toàn canvas, nên không có candidate hay intake được phát hành.
+- [x] Đưa blocker source/repair boundary vào Dev Lab ở `/lab?pilot=scout-alpha`; review staging bị khóa.
+- [ ] Cung cấp bốn source PNG có alpha/padding thật hoặc có post-process được visually approved; sau đó chạy build → consistency → Artifact Intake → runtime candidate → Dev Lab review end-to-end.
+
 ## Deep audit and development pass
 
 - [ ] Kiểm tra trạng thái GitHub Actions thực tế và khả năng tái lập CI từ clean checkout.
@@ -377,3 +385,10 @@
 - [x] Chạy regression mở rộng cho toàn bộ contracts, CLI cross-platform smoke, quality/report/Dev Lab integration, package tarball và CI workflows.
 - [x] Audit toàn repo về schema drift, unsafe paths, hash/evidence binding, approval bypass, docs/version drift, CLI/package surface, dependency và workflow mistakes; chủ động sửa lỗi an toàn được xác nhận bằng evidence. `pnpm audit --prod` báo 0 advisory; `npm audit` không áp dụng vì repo chỉ có `pnpm-lock.yaml`.
 - [x] Thực hiện full validation sau mỗi đợt sửa, lưu audit report và commit local cuối; không push, open PR hoặc publish nếu không có xác nhận riêng.
+
+## Runtime adapter and AI pilot review follow-up
+- [x] Push commit `0a69192` đã được user duyệt lên `origin/main`; xác nhận remote SHA `0a691923a149084a000635b644b702f54d58d4c7`.
+- [x] Chọn adapter Rive dựa trên support/runtime contract hiện có; thêm package gate chỉ nhận `.riv` thật kèm metadata, provenance, adapter evidence và runtime proof, không tạo placeholder production package.
+- [ ] Tạo AI-generated pilot bằng capability nội bộ, lưu generation receipt, output hash, source/reference/control metadata và provenance `ai_generated`; không tự gán `artist_authored`, `production_eligible` hoặc `production_approved`.
+- [ ] Ingest pilot qua Artifact Intake, asset consistency, runtime candidate và rig compatibility; render runtime evidence và bind Dev Lab handoff trước human review.
+- [ ] Chạy validation, lưu commit local cho adapter/pilot artifacts (nếu có thay đổi), công bố pass/block/review-required và không mở PR khi chưa có user review.

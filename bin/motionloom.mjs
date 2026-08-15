@@ -42,6 +42,9 @@ const PYTHON_COMMANDS = {
   "artifact-intake": "scripts/artifact-intake.py",
   "runtime-candidate": "scripts/runtime-candidate.py",
   "rig-compatibility": "scripts/rig-compatibility.py",
+  "rive-package-gate": "scripts/rive-package-gate.py",
+  "pilot-build": "scripts/build-ai-pilot.py",
+  "alpha-isolate": "scripts/isolate-alpha-background.py",
 };
 
 const NODE_COMMANDS = {
@@ -81,6 +84,9 @@ Commands:
   artifact-intake        Bind generation controls, provenance, adapter metadata and exported bytes
   runtime-candidate      Bind intake exports to consistency contracts before runtime testing
   rig-compatibility      Validate rig bones, sockets, actions, events and runtime adapter evidence
+  rive-package-gate      Verify a real .riv package, runtime proof and provenance before testing
+  pilot-build            Build a review-only hash-bound AI scout pilot from true-alpha PNG sources
+  alpha-isolate          Isolate an edge-connected flat background; block residual edge contamination
   setup                  Install and bootstrap MotionLoom in the current project
   status                 Read-only project readiness report
   repair                 Re-apply safe missing setup pieces
@@ -99,6 +105,9 @@ Cross-platform examples:
   motionloom asset-consistency validate --kind frame-geometry --input <frame-geometry.json> --root <scene-dir> --json
   motionloom artifact-intake intake --root <asset-dir> --registry artifact-adapter-registry.json \\
     --receipt <generation-receipt.json> --controls <control-track.json> --export-manifest <export-manifest.json> --json
+  motionloom alpha-isolate <opaque.png> <isolated.png> --report <alpha-report.json>
+  motionloom rive-package-gate validate --root <package-dir> --registry rig-adapter-registry.json \\
+    --input <rive-package-manifest.json> --strict --json
 
 The CLI never grants approval or opens a pull request by itself. User review
 and explicit repository side-effect confirmation remain separate gates.

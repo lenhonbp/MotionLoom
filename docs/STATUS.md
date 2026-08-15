@@ -4,7 +4,7 @@
 
 ## Current release posture
 
-MotionLoom's repository source and package manifest are prepared for **2.3.0 release metadata**. The publication state of the npm registry and GitHub Release/tag must be verified against the latest release workflow rather than inferred from this document. The repository has a cross-platform CLI, one-command project onboarding, durable Project Memory, Agent interoperability surfaces, artifact-first handoff, runtime evidence, Visual Truth, Remediation Learning, signed attestation, AI-first asset provenance and a browser-based Dev Lab review contract. The protected manual release workflow verifies package/changelog/release-note alignment before publication.
+MotionLoom's repository source and package manifest are prepared for **2.4.0 release metadata**. The publication state of the npm registry and GitHub Release/tag must be verified against the latest release workflow rather than inferred from this document. The repository has a cross-platform CLI, one-command project onboarding, durable Project Memory, Agent interoperability surfaces, artifact-first handoff, runtime evidence, Visual Truth, Remediation Learning, signed attestation, AI-first asset provenance, a truthful code-authored runtime lane and a browser-based Dev Lab review contract. The protected manual release workflow verifies package/changelog/release-note alignment before publication.
 
 The repository is **engineering-ready for continued integration work**, not a universal production certification for every animation framework or every host project. CI status must be read from the latest GitHub Actions run, not inferred from historical audit prose.
 
@@ -30,4 +30,4 @@ Use the following order when sources disagree:
 
 ## Known next work
 
-The bounded analyzer has now been exercised against a labeled external corpus; see the [dated evidence note](audits/external-project-corpus-2026-08-13.md). The highest-value remaining evidence work is paired product evaluation across more real projects and verification of the 2.3.0 version–tag–GitHub Release–npm provenance chain. Missing external projects are reported as `insufficient_evidence`, never as a pass. None of these items should weaken the user-review gate or convert heuristic warnings into approval.
+The bounded analyzer has now been exercised against a labeled external corpus; see the [dated evidence note](audits/external-project-corpus-2026-08-13.md). The highest-value remaining evidence work is paired product evaluation across more real projects and verification of the 2.4.0 version–tag–GitHub Release–npm provenance chain. Missing external projects are reported as `insufficient_evidence`, never as a pass. None of these items should weaken the user-review gate or convert heuristic warnings into approval.

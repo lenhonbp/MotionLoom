@@ -359,6 +359,42 @@ def test_deep_audit_contracts():
         ], capture_output=True, text=True)
         check("review hook rejects expired candidate", expired.returncode != 0 and "expired" in expired.stdout)
 
+
+def test_task_bundle_resolver_contract():
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        opaque_task = root / "artifacts" / "opaque-task-id"
+        shutil.copytree(ROOT / "artifacts/runtime-pilot-001", opaque_task)
+        resolver = ROOT / "scripts/resolve-task-bundle.py"
+        resolved = subprocess.run([
+            sys.executable, str(resolver), "--root", str(root), "--scene", "runtime-pilot-framer",
+        ], capture_output=True, text=True)
+        check(
+            "task bundle resolver binds scene to opaque task directory",
+            resolved.returncode == 0 and resolved.stdout.strip() == "artifacts/opaque-task-id",
+            resolved.stdout.strip() or resolved.stderr.strip(),
+        )
+
+        duplicate = root / "artifacts" / "second-task-id"
+        shutil.copytree(opaque_task, duplicate)
+        ambiguous = subprocess.run([
+            sys.executable, str(resolver), "--root", str(root), "--scene", "runtime-pilot-framer",
+        ], capture_output=True, text=True)
+        check(
+            "task bundle resolver rejects ambiguous scene bindings",
+            ambiguous.returncode != 0 and "ambiguous task bundles" in ambiguous.stderr,
+            ambiguous.stdout.strip() or ambiguous.stderr.strip(),
+        )
+
+        unsafe = subprocess.run([
+            sys.executable, str(resolver), "--root", str(root), "--scene", "../runtime-pilot-framer",
+        ], capture_output=True, text=True)
+        check(
+            "task bundle resolver rejects unsafe scene identifiers",
+            unsafe.returncode != 0 and "unsafe scene" in unsafe.stderr,
+            unsafe.stdout.strip() or unsafe.stderr.strip(),
+        )
+
     unsafe_runtime = subprocess.run(
         ["node", str(ROOT / "scripts/runtime-adapters.mjs")],
         env={**os.environ, "RUNTIME_FRAMEWORKS": "../../escape"},
@@ -1031,6 +1067,7 @@ if __name__ == "__main__":
     test_placeholder_is_not_runtime_evidence()
     test_runtime_evidence_binding()
     test_deep_audit_contracts()
+    test_task_bundle_resolver_contract()
     test_runtime_telemetry_verifier_contract()
     test_approved_browser_review_e2e_contract()
     test_intelligence_core_contracts()

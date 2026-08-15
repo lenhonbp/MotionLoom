@@ -2,9 +2,9 @@
 
 MotionLoom's roadmap is organized around one question: **does this reduce incorrect animation iterations while keeping the user in control of quality and Git side effects?** A roadmap item is not complete because a prompt or template exists; it is complete when the contract, evidence, regression coverage and Agent handoff are inspectable.
 
-## Current baseline: 2.3.0 release target
+## Current baseline: 2.4.0 release target
 
-The current repository baseline includes project-aware analysis, durable Project Memory, context-bound Motion Spec, source binding, real runtime adapters for Lottie/dotLottie/SVG cutout/Rive/GSAP/Framer Motion, Dev Lab browser review, Intelligence Core, semantic and continuity feedback, runtime telemetry, external evidence verification, signed attestation, Agent interoperability surfaces, Visual Truth, Remediation Learning, AI-first asset provenance and cross-platform CLI/CI contracts. The `2.3.0` release target adds one-command project onboarding without weakening review or Git side-effect boundaries.
+The current repository baseline includes project-aware analysis, durable Project Memory, context-bound Motion Spec, source binding, real runtime adapters for Lottie/dotLottie/SVG cutout/Rive/GSAP/Framer Motion, Dev Lab browser review, Intelligence Core, semantic and continuity feedback, runtime telemetry, external evidence verification, signed attestation, Agent interoperability surfaces, Visual Truth, Remediation Learning, AI-first asset provenance and cross-platform CLI/CI contracts. The `2.4.0` release target adds a code-authored runtime-first lane with a review-first Framer Motion pilot and task resolution by declared scene identity, without weakening review or Git side-effect boundaries.
 
 ## Next milestones
 
@@ -14,8 +14,8 @@ The current repository baseline includes project-aware analysis, durable Project
 | **2.3** | Remediation Learning | User-confirmed correction count, first-pass acceptance and rerender-avoidance ledger | Included in 2.2.0 candidate |
 | **2.4** | Runtime Scale | Multi-project, browser and device corpus with capability compatibility explanations | Planned |
 | **2.5** | Agent Interoperability | Versioned schemas, compatibility matrix and replayable task bundles across Agents | Included in 2.2.0 candidate |
-| **2.6** | Agent-created Asset Provenance | Explicit origin/authority/readiness tiers; runtime ingest without automatic production approval; fail-closed production gate | Included in 2.3.0 release target |
-| **2.7** | One-command Onboarding | Project-bound setup/status/repair, Agent router merge, durable memory bootstrap and cross-platform installation recipe | Included in 2.3.0 release target |
+| **2.6** | Agent-created Asset Provenance | Explicit origin/authority/readiness tiers; runtime ingest without automatic production approval; fail-closed production gate | Included in 2.3.0 release |
+| **2.7** | One-command Onboarding | Project-bound setup/status/repair, Agent router merge, durable memory bootstrap and cross-platform installation recipe | Included in 2.3.0 release |
 | **2.8** | Asset Consistency Compiler | Measured frame geometry, atlas contamination and layered-map contracts with fail-closed regression and optional scene quality-gate binding | Implemented in working tree; pending validation/release |
 | **2.9** | Provider-neutral Artifact Intake | Hash-bound generation receipt, control track and export manifest for internal skills/providers, with no embedded credentials or automatic authority | Implemented in working tree; pending validation/release |
 | **3.0** | Control-to-runtime and rig evidence | Runtime candidate bridge plus skeleton/socket/action/event/export compatibility evidence surfaced in Dev Lab before user review | Implemented in working tree; pending validation/release |

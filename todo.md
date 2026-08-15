@@ -137,6 +137,18 @@
 - [ ] Mở candidate runtime-first trong Dev Lab, kiểm tra review-first và giữ `production_approved=false` cho đến human review.
 - [ ] Chạy acceptance, lưu checkpoint Dev Lab, tạo commit cục bộ và báo cáo trước khi xin duyệt push.
 
+## Release-readiness review after runtime-first pilot
+
+- [ ] Đối chiếu version/package hiện tại, npm dist-tag và commit `2da2aeb` để đề xuất version phát hành phù hợp.
+- [ ] Xác nhận release gate: test, doctor, docs audit, npm pack, GitHub Actions và governance review-first trước khi kết luận publish.
+
+## MotionLoom 2.4.0 release preparation
+
+- [x] Sửa Quality workflow để khám phá task bundle theo scene/task binding thay vì suy đoán `artifacts/<scene>-task`.
+- [ ] Thêm regression cho task bundle có ID khác scene slug, rồi chạy lại workflow Quality trên GitHub.
+- [x] Bump metadata sang 2.4.0 và thêm CHANGELOG/release note đúng phạm vi runtime-first pilot.
+- [x] Chạy local release gates, tạo commit cục bộ và chỉ xin duyệt riêng trước push hoặc npm publish.
+
 ## Deep audit and development pass
 
 - [ ] Kiểm tra trạng thái GitHub Actions thực tế và khả năng tái lập CI từ clean checkout.

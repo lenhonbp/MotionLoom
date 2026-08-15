@@ -55,7 +55,7 @@ const NODE_COMMANDS = {
 };
 
 function printHelp() {
-  console.log(`MotionLoom 2.3.0 — project-aware animation production and evidence contracts
+  console.log(`MotionLoom 2.4.0 — project-aware animation production and evidence contracts
 
 Usage:
   motionloom <command> [args...]

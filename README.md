@@ -14,7 +14,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** `motionloom@2.3.0` is the current release target and packages one-command onboarding, project-bound setup/status/repair and the AI-first human-governed asset provenance contract. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
+> **Release posture:** `motionloom@2.4.0` is the next release target. It adds a truthful `code_authored` runtime-first lane, a Framer Motion end-to-end reference candidate, identity-bound Dev Lab review evidence and task-bundle discovery that binds by declared scene identity rather than an inferred directory name. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
 
 ## Why MotionLoom
 
@@ -113,12 +113,12 @@ npx --no-install motionloom devlab loading
 # Validate the exact task bundle before any Git side effect.
 npx --no-install motionloom quality-gate --scene loading \
   --context project-context.json \
-  --task-dir artifacts/loading-task \
+  --task-dir artifacts/<task-id> \
   --require-browser-review --require-intelligence --require-p1 \
   --require-benchmark --require-telemetry --require-attestation --require-asset-provenance
 
 # Local-only by default. A user must review and explicitly authorize side effects.
-npx --no-install motionloom pr loading --task-dir artifacts/loading-task
+npx --no-install motionloom pr loading --task-dir artifacts/<task-id>
 ```
 
 For a source checkout, use `git clone https://github.com/lenhonbp/MotionLoom.git`, run `npm install`, and replace the global command with `node bin/motionloom.mjs` or the corresponding Python/Node script shown in the [development guide](CONTRIBUTING.md).

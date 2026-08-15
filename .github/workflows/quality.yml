@@ -153,44 +153,57 @@ jobs:
           fi
           cat /tmp/changed-scenes
 
+      - name: Resolve task bundles bound to changed scenes
+        run: |
+          : > /tmp/changed-scene-tasks
+          if [ ! -s /tmp/changed-scenes ]; then
+            echo "No changed scenes; task bundle resolution is skipped."
+            exit 0
+          fi
+          while read -r scene; do
+            [ -z "$scene" ] && continue
+            task_dir=$(python3 scripts/resolve-task-bundle.py --root . --scene "$scene")
+            printf '%s\t%s\n' "$scene" "$task_dir" >> /tmp/changed-scene-tasks
+          done < /tmp/changed-scenes
+          cat /tmp/changed-scene-tasks
+
       - name: Capture and verify runtime telemetry for changed scenes
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No changed scenes; runtime telemetry capture is skipped."
             exit 0
           fi
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            bash scripts/capture-runtime-telemetry.sh "$scene" "artifacts/${scene}-task"
-          done < /tmp/changed-scenes
+            bash scripts/capture-runtime-telemetry.sh "$scene" "$task_dir"
+          done < /tmp/changed-scene-tasks
 
       - name: Generate semantic lint benchmarks for changed scenes
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No changed scenes; semantic lint benchmark generation is skipped."
             exit 0
           fi
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            task_dir="artifacts/${scene}-task"
             if [ ! -f "$task_dir/task.json" ]; then
               echo "FAIL: no task bundle found for changed scene: $scene"
               exit 1
             fi
             python3 scripts/intelligence.py semantic-lint benchmark --task-dir "$task_dir" \
               --iterations 25 --threshold-ms 500 --output "$task_dir/semantic-lint-benchmark.json"
-          done < /tmp/changed-scenes
+          done < /tmp/changed-scene-tasks
 
       - name: Refresh task artifact manifest and handoff
         run: |
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            python3 scripts/report.py collect --task-dir "artifacts/${scene}-task"
-          done < /tmp/changed-scenes
+            python3 scripts/report.py collect --task-dir "$task_dir"
+          done < /tmp/changed-scene-tasks
 
       - name: Build and verify signed attestations for changed scenes
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No changed scenes; signed attestation generation is skipped."
             exit 0
           fi
@@ -198,9 +211,8 @@ jobs:
             --private-key /tmp/motionloom-ci-attestation.key \
             --policy /tmp/motionloom-ci-policy.json \
             --key-id "ci-ephemeral-${GITHUB_RUN_ID}"
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            task_dir="artifacts/${scene}-task"
             if [ -f project-context.json ]; then
               context="project-context.json"
             else
@@ -224,11 +236,11 @@ jobs:
               --expected-task-id "$task_id" \
               --expected-scene "$scene" \
               --output "$task_dir/attestation-verifier-report.json"
-          done < /tmp/changed-scenes
+          done < /tmp/changed-scene-tasks
 
       - name: Require task report and handoff for changed scenes
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No changed scenes; report contract is skipped."
             exit 0
           fi
@@ -236,10 +248,10 @@ jobs:
 
       - name: Prepare Dev Lab scene artifacts
         run: |
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            bash scripts/devlab.sh "$scene" --prepare-only
-          done < /tmp/changed-scenes
+            bash scripts/devlab.sh "$scene" --prepare-only "$task_dir"
+          done < /tmp/changed-scene-tasks
 
       - name: Boot Dev Lab HTTP server
         run: |
@@ -257,42 +269,40 @@ jobs:
 
       - name: Rebuild replay bundle after generated evidence
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No changed scenes; replay rebuild is skipped."
             exit 0
           fi
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
-            task_dir="artifacts/${scene}-task"
             python3 scripts/intelligence.py replay capture \
               --task-dir "$task_dir" --root . \
               --output "$task_dir/replay-bundle.json"
-          done < /tmp/changed-scenes
+          done < /tmp/changed-scene-tasks
 
       - name: Enforce context-bound quality gate
         run: |
-          if [ ! -s /tmp/changed-scenes ]; then
+          if [ ! -s /tmp/changed-scene-tasks ]; then
             echo "No scene outputs changed; context-bound scene gate is skipped."
             exit 0
           fi
-          while read -r scene; do
+          while IFS=$'\t' read -r scene task_dir; do
             [ -z "$scene" ] && continue
             if [ -f project-context.json ]; then
               context="project-context.json"
-            elif [ -f "artifacts/${scene}-task/project-context.json" ]; then
-              context="artifacts/${scene}-task/project-context.json"
+            elif [ -f "$task_dir/project-context.json" ]; then
+              context="$task_dir/project-context.json"
             else
               echo "FAIL: no project context found for changed scene: $scene"
               exit 1
             fi
-            task_dir="artifacts/${scene}-task"
             if [ ! -f "$task_dir/task.json" ]; then
               echo "FAIL: no task bundle found for changed scene: $scene"
               exit 1
             fi
             python3 scripts/quality-gate.py --scene "$scene" --context "$context" \
               --task-dir "$task_dir" --require-browser-review --require-intelligence --require-p1 --require-benchmark --require-telemetry --require-attestation --require-visual-truth --require-asset-provenance
-          done < /tmp/changed-scenes
+          done < /tmp/changed-scene-tasks
 
   project-corpus:
     name: Project corpus evidence posture

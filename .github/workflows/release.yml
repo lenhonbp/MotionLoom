@@ -14,7 +14,7 @@ on:
       release_version:
         description: package version to verify and publish
         required: true
-        default: 2.3.0
+        default: 2.4.0
         type: string
       create_github_release:
         description: Create a GitHub release after npm publication

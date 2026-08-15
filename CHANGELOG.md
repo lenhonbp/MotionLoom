@@ -4,6 +4,8 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-08-15
+
 ### Added
 
 - Deterministic Asset Consistency Compiler with identity, action-set, frame-geometry, atlas and layered-map schemas.
@@ -12,11 +14,14 @@ All notable MotionLoom changes are documented here. The project follows semantic
 - Provider-neutral Artifact Intake contracts for generation receipts, control tracks, export manifests and hash-bound adapter registry evidence, including an internal-ImageGen-shaped scaffold that makes no provider API call.
 - Control-to-runtime `runtime-candidate` bridge, rig compatibility contracts/registry, public fixtures and cross-platform CLI smoke scripts for skeleton/socket/action/event/export bindings.
 - Dev Lab evidence rail and Pipeline handoff support for Artifact Intake, runtime candidate and rig compatibility findings before a user review decision.
+- Truthful `code_authored` provenance lane for runtime scenes, with a hash-bound Framer Motion pilot rendered by Playwright at 0/50/100%, integrity verification, local-only attestation and a pending human Dev Lab review.
+- Fail-closed task-bundle resolver for Quality CI that binds `task.json.scene` to the changed scene rather than inferring a directory name from the scene slug.
 
 ### Fixed
 
 - Quality Gate and task reports can validate an explicitly declared `consistency_ref` without forcing legacy scenes to invent a contract; strict production runs fail closed on a non-ready contract.
 - Quality Gate and reports accept explicitly declared Artifact Intake evidence without breaking legacy scenes, and preserve `review_required` rather than flattening adapter/candidate/rig findings to a pass.
+- Quality CI correctly discovers valid task bundles whose task ID differs from the scene slug, including the runtime-first pilot shape.
 
 ### Boundary
 
@@ -104,6 +109,7 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
 [2.2.0]: docs/releases/2.2.0.md
+[2.4.0]: docs/releases/2.4.0.md
 [2.3.0]: docs/releases/2.3.0.md
 [2.1.0]: docs/releases/2.1.0.md
 [2.0.0]: docs/releases/2.0.0.md

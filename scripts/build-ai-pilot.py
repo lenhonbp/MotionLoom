@@ -92,6 +92,36 @@ def measured_frame(PNGImage: Any, path: Path) -> dict[str, Any]:
     }
 
 
+def require_clean_pilot_geometry(frame_id: str, data: dict[str, Any]) -> None:
+    """Reject canvas-spanning residue for this isolated, single-character pilot.
+
+    Alpha isolation can deliberately remove only edge-connected background. A
+    detached band may therefore remain alpha-opaque without touching an edge.
+    The pilot has a narrow, centred single-character contract, so its measured
+    alpha bounds must retain padding on every side and cannot occupy most of a
+    canvas width. This is a geometry guard, not a human-quality approval.
+    """
+    bbox = data["alpha_bbox"]
+    width, height = int(data["width"]), int(data["height"])
+    minimum_padding = max(1, round(min(width, height) * 0.05))
+    paddings = {
+        "left": int(bbox["x"]),
+        "top": int(bbox["y"]),
+        "right": width - (int(bbox["x"]) + int(bbox["width"])),
+        "bottom": height - (int(bbox["y"]) + int(bbox["height"])),
+    }
+    if min(paddings.values()) < minimum_padding:
+        raise ValueError(
+            f"{frame_id} does not retain {minimum_padding}px clean padding on every edge; "
+            f"measured {paddings}. Reject possible canvas-spanning contamination."
+        )
+    if int(bbox["width"]) / width > 0.6:
+        raise ValueError(
+            f"{frame_id} alpha subject spans {int(bbox['width'])}/{width}px of the canvas width; "
+            "reject possible detached horizontal contamination."
+        )
+
+
 def frame_entry(frame_id: str, role: str, target: str, file_name: str, data: dict[str, Any], root_relative_output: str) -> dict[str, Any]:
     return {
         "path": f"{root_relative_output}/frames/{file_name}",
@@ -151,6 +181,7 @@ def main(argv: list[str] | None = None) -> int:
         destination = frames_dir / f"scout-{frame_id}.png"
         shutil.copy2(sources[frame_id], destination)
         frames[frame_id] = measured_frame(PNGImage, destination)
+        require_clean_pilot_geometry(frame_id, frames[frame_id])
 
     canvas_sizes = {(item["width"], item["height"]) for item in frames.values()}
     if len(canvas_sizes) != 1:

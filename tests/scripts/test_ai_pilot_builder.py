@@ -19,7 +19,7 @@ def check(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
-def write_png(path: Path, alpha: bool, offset: int = 0) -> None:
+def write_png(path: Path, alpha: bool, offset: int = 0, contamination: bool = False) -> None:
     """Write one compact, non-interlaced 4x4 PNG without third-party libraries."""
     width = height = 4
     channels = 4 if alpha else 3
@@ -27,7 +27,7 @@ def write_png(path: Path, alpha: bool, offset: int = 0) -> None:
     for y in range(height):
         rows.append(0)
         for x in range(width):
-            visible = x == 1 + offset and y in {1, 2}
+            visible = (x == 1 + offset and y in {1, 2}) or (contamination and x == 3 and y == 1)
             rows.extend((244, 124, 21))
             if alpha:
                 rows.append(255 if visible else 0)
@@ -93,8 +93,14 @@ def main() -> int:
         write_png(opaque, alpha=False)
         rejected = build(ROOT, {key: opaque for key in sources}, ".motionloom/pilots/test-ai-pilot-opaque")
         check(rejected.returncode != 0 and "has no alpha channel" in (rejected.stderr + rejected.stdout), "RGB checkered source must be rejected as non-alpha")
+
+        contaminated = source_dir / "contaminated.png"
+        write_png(contaminated, alpha=True, contamination=True)
+        rejected = build(ROOT, {key: contaminated for key in sources}, ".motionloom/pilots/test-ai-pilot-contaminated")
+        check(rejected.returncode != 0 and "clean padding" in (rejected.stderr + rejected.stdout), "detached canvas-edge contamination must be rejected")
     shutil.rmtree(workspace, ignore_errors=True)
     shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-opaque", ignore_errors=True)
+    shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-contaminated", ignore_errors=True)
     print("AI pilot builder tests: PASS")
     return 0
 

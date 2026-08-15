@@ -1,0 +1,42 @@
+{
+  "contract": "motionloom-ai-pilot-partial-handoff",
+  "version": 1,
+  "asset_id": "character.scout-robot.ai-pilot",
+  "state": "partial",
+  "authority": "ai_generated",
+  "production_approved": false,
+  "completed": {
+    "master_frame": "v3 idle source alpha-isolated and visually checked",
+    "source_quality": "clean padding confirmed; minor pixel-edge irregularities remain review-visible",
+    "guard_coverage": [
+      "RGB/opaque source rejection",
+      "edge-connected alpha isolation report",
+      "residual-edge rejection",
+      "clean-padding geometry rejection"
+    ]
+  },
+  "blocked": {
+    "reason": "image generation quota exhausted before independent contact-right, passing, and contact-left frames could be created",
+    "missing_frames": [
+      "contact-right",
+      "passing",
+      "contact-left"
+    ],
+    "not_emitted": [
+      "controls.json",
+      "generation receipt",
+      "export manifest",
+      "asset consistency contract",
+      "Artifact Intake report",
+      "runtime candidate",
+      "runtime render evidence",
+      "Dev Lab review candidate"
+    ]
+  },
+  "resume_requirements": [
+    "Create three independent action frames from the reviewed master; do not repeat idle as action frames.",
+    "Run alpha isolation with hash reports and visual checks for all four frames.",
+    "Run build-ai-pilot, Artifact Intake, asset-consistency and runtime-candidate without bypassing a failed gate.",
+    "Render the candidate and hand it to Dev Lab with review_required still true."
+  ]
+}

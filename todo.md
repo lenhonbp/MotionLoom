@@ -80,6 +80,13 @@
 - [x] Chạy builder trên bốn bytes ImageGen thật; dừng trước `controls.json` vì source RGBA có alpha `255` trên toàn canvas, nên không có candidate hay intake được phát hành.
 - [x] Đưa blocker source/repair boundary vào Dev Lab ở `/lab?pilot=scout-alpha`; review staging bị khóa.
 - [ ] Cung cấp bốn source PNG có alpha/padding thật hoặc có post-process được visually approved; sau đó chạy build → consistency → Artifact Intake → runtime candidate → Dev Lab review end-to-end.
+- [ ] Chủ động tạo lại bốn source scout pixel-art có transparency/padding thật và clean edge; xác minh bytes trước khi đưa vào builder.
+- [ ] Chạy ingest hash-bound, frame-geometry consistency và runtime candidate trên source đạt preflight; không bypass bất kỳ validator nào.
+- [ ] Render candidate frame sequence, bind evidence vào Dev Lab và mở review-first handoff khi candidate ở trạng thái review_required.
+- [ ] Tạo master scout từ nguồn mới có nền charcoal phẳng, không line/shadow/texture; visual-review và alpha-isolate thành RGBA source sạch trước khi sinh pose.
+- [ ] Tạo riêng contact-right, passing và contact-left từ master mới; mỗi frame phải qua alpha-isolation report, clean-edge review và geometry measurement.
+- [ ] Khi quota tạo ảnh khả dụng, tạo ba pose walk `contact-right`, `passing` và `contact-left` từ master v3 alpha; không dùng idle lặp làm frame action.
+- [ ] Chỉ sau khi đủ bốn frame sạch mới tạo bundle Artifact Intake, consistency contract, runtime candidate, render evidence và Dev Lab handoff.
 
 ## Deep audit and development pass
 

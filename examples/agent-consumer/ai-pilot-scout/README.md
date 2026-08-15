@@ -31,3 +31,7 @@ python3 scripts/runtime-candidate.py report \
 Use `--frame-url ID=URL` when the four frames are hosted for Dev Lab. The builder carries those URLs only in `devlab-pilot-evidence.json`; it does not treat URL reachability as evidence of quality, runtime behavior, review, or approval.
 
 > The builder rejects ordinary RGB files and a fully opaque image. A visible checkerboard painted into an RGB PNG is **not** transparency. This restriction makes frame geometry and contamination checks meaningful.
+
+## Current pilot handoff
+
+The checked-in [`partial-handoff.json`](partial-handoff.json) records the current real-byte pilot boundary: one v3 master was alpha-isolated, visually checked and retained outside this repository; the independent walk phases could not be generated before the image quota was exhausted. No intake bundle, runtime candidate, render evidence or Dev Lab candidate has been emitted from a repeated idle image. Resume only with three independently generated and reviewed action frames, then run the exact commands above.

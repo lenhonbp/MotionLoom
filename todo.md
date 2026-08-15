@@ -87,6 +87,15 @@
 - [ ] Tạo riêng contact-right, passing và contact-left từ master mới; mỗi frame phải qua alpha-isolation report, clean-edge review và geometry measurement.
 - [ ] Khi quota tạo ảnh khả dụng, tạo ba pose walk `contact-right`, `passing` và `contact-left` từ master v3 alpha; không dùng idle lặp làm frame action.
 - [ ] Chỉ sau khi đủ bốn frame sạch mới tạo bundle Artifact Intake, consistency contract, runtime candidate, render evidence và Dev Lab handoff.
+- [ ] Kiểm tra connector hoặc phiên browser Gemini mà người dùng đang dùng; không suy đoán quyền truy cập và không lưu hay yêu cầu lộ credential.
+- [ ] Tạo `contact-right`, `passing` và `contact-left` bằng Gemini từ master scout v3; ghi nhận provider/model/task metadata là `ai_generated`.
+- [ ] Chạy alpha/padding/contamination preflight từng pose trước khi cho phép Artifact Intake hoặc runtime candidate.
+- [ ] Nếu browser Gemini không mở file input tự động, dùng đường Gemini có thể audit với master v3 làm reference; lưu request/output identifiers vào provenance thay vì suy diễn từ preview UI.
+- [ ] Tạo ba pose độc lập bằng ChatGPT từ master Scout v3 và giữ lại metadata phiên/tên tệp để ghi provenance `ai_generated` trước khi ingest.
+- [ ] Chuẩn hóa ba PNG ChatGPT đã nhận theo thứ tự contact-right, passing, contact-left; kiểm tra loại màu/alpha, padding, contamination và identity drift trước Artifact Intake.
+- [ ] Tạo lại ba pose ChatGPT theo corrective prompt: xuất canvas 1920×1920, lock silhouette/scale master v3, không crop, duy trì padding và chỉ thay đổi chi/tư thế walk.
+- [ ] Thêm provider contract ChatGPT vào builder/adapter registry để receipt và provenance không thể ghi sai nguồn là `internal-imagegen` khi bytes đến từ ChatGPT.
+- [ ] Giữ ba pose ChatGPT v2 ở trạng thái `rejected_pre_ingest`: contact-right thiếu padding cạnh phải/đáy; không pad hoặc resize source để vượt geometry gate.
 
 ## Deep audit and development pass
 

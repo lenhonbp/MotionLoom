@@ -16,7 +16,7 @@
     ]
   },
   "blocked": {
-    "reason": "image generation quota exhausted before independent contact-right, passing, and contact-left frames could be created",
+    "reason": "Independent ChatGPT action frames were received but rejected pre-ingest because their 1254x1254 source canvas, tight padding, and subject proportions do not satisfy the reviewed 1920x1920 master geometry contract.",
     "missing_frames": [
       "contact-right",
       "passing",
@@ -33,6 +33,37 @@
       "Dev Lab review candidate"
     ]
   },
+  "rejected_source_attempts": [
+    {
+      "provider": "openai-chatgpt",
+      "authority": "ai_generated",
+      "state": "rejected_pre_ingest",
+      "reason": "No resampling, transparent padding, or metadata edit may be used to bypass the measured source-geometry gate.",
+      "frames": [
+        {
+          "role": "contact-right",
+          "sha256": "d26deada40d35349411f08890ff0dfe6610997170b9fd100ea3bd65536f6623c",
+          "canvas": [1254, 1254],
+          "alpha_bbox": [97, 71, 1113, 1141],
+          "padding": {"left": 97, "top": 71, "right": 44, "bottom": 42}
+        },
+        {
+          "role": "passing",
+          "sha256": "164f6dad075babe30595e9f4e617940b35450f68cc709a0f4cf648d79756edb7",
+          "canvas": [1254, 1254],
+          "alpha_bbox": [41, 39, 1177, 1191],
+          "padding": {"left": 41, "top": 39, "right": 36, "bottom": 24}
+        },
+        {
+          "role": "contact-left",
+          "sha256": "b278e2e4a8e0cdb2ac82b0650b0ca70d1284729937d4a7c0a545a180c1331b0a",
+          "canvas": [1254, 1254],
+          "alpha_bbox": [31, 61, 1179, 1153],
+          "padding": {"left": 31, "top": 61, "right": 44, "bottom": 40}
+        }
+      ]
+    }
+  ],
   "resume_requirements": [
     "Create three independent action frames from the reviewed master; do not repeat idle as action frames.",
     "Run alpha isolation with hash reports and visual checks for all four frames.",

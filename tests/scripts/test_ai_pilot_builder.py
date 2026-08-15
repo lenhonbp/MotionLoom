@@ -37,7 +37,7 @@ def write_png(path: Path, alpha: bool, offset: int = 0, contamination: bool = Fa
     path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, color_type, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(bytes(rows))) + chunk(b"IEND", b""))
 
 
-def build(root: Path, sources: dict[str, Path], output: str) -> subprocess.CompletedProcess[str]:
+def build(root: Path, sources: dict[str, Path], output: str, provider: str = "internal-imagegen") -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
             sys.executable, str(BUILDER),
@@ -48,6 +48,7 @@ def build(root: Path, sources: dict[str, Path], output: str) -> subprocess.Compl
             "--root", str(root),
             "--output", output,
             "--generated-at", "2026-08-15T00:00:00Z",
+            "--provider", provider,
             "--overwrite",
         ],
         capture_output=True,
@@ -89,6 +90,15 @@ def main() -> int:
         runtime_data = json.loads(runtime.stdout)
         check(runtime.returncode == 0 and runtime_data["status"] == "review_required" and runtime_data["runtime_verified"] is False, runtime.stderr or runtime.stdout)
 
+        chatgpt_output = ".motionloom/pilots/test-ai-pilot-chatgpt"
+        chatgpt = build(ROOT, sources, chatgpt_output, provider="chatgpt")
+        check(chatgpt.returncode == 0, chatgpt.stderr or chatgpt.stdout)
+        chatgpt_workspace = ROOT / chatgpt_output
+        chatgpt_provenance = json.loads((chatgpt_workspace / "provenance.json").read_text())
+        chatgpt_receipt = json.loads((chatgpt_workspace / "receipt.json").read_text())
+        check(chatgpt_provenance["generator"]["source"] == "openai-chatgpt", "ChatGPT import must not be relabelled internal-imagegen")
+        check(chatgpt_receipt["provider"]["adapter_id"] == "openai.chatgpt" and chatgpt_receipt["provider"]["invocation_mode"] == "manual", "ChatGPT receipt must preserve user-mediated adapter truth")
+
         opaque = source_dir / "opaque.png"
         write_png(opaque, alpha=False)
         rejected = build(ROOT, {key: opaque for key in sources}, ".motionloom/pilots/test-ai-pilot-opaque")
@@ -99,6 +109,7 @@ def main() -> int:
         rejected = build(ROOT, {key: contaminated for key in sources}, ".motionloom/pilots/test-ai-pilot-contaminated")
         check(rejected.returncode != 0 and "clean padding" in (rejected.stderr + rejected.stdout), "detached canvas-edge contamination must be rejected")
     shutil.rmtree(workspace, ignore_errors=True)
+    shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-chatgpt", ignore_errors=True)
     shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-opaque", ignore_errors=True)
     shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-contaminated", ignore_errors=True)
     print("AI pilot builder tests: PASS")

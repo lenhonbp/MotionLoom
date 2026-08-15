@@ -32,6 +32,32 @@ FRAME_ORDER = (
     ("passing", "passing", "runtime_candidate"),
     ("contact-left", "contact_left", "runtime_candidate"),
 )
+PROVIDER_PROFILES = {
+    "internal-imagegen": {
+        "adapter_id": "internal.imagegen",
+        "kind": "internal_skill",
+        "invocation_mode": "agent-mediated",
+        "cost_class": "included",
+        "generator_source": "internal-imagegen",
+        "default_model": "default",
+        "default_task_id": "motionloom-scout-ai-pilot-ingest-2026",
+        "license_source": "Internal ImageGen generation; provider-native receipt was not exported",
+        "reconstruction_source": "agent-mediated ImageGen source",
+        "lab_limit": "Internal ImageGen adapter is scaffold-only",
+    },
+    "chatgpt": {
+        "adapter_id": "openai.chatgpt",
+        "kind": "external_provider",
+        "invocation_mode": "manual",
+        "cost_class": "external",
+        "generator_source": "openai-chatgpt",
+        "default_model": "chatgpt-image-generation",
+        "default_task_id": "motionloom-scout-chatgpt-pilot-2026",
+        "license_source": "User-provided ChatGPT generation; provider-native receipt was not exported",
+        "reconstruction_source": "user-mediated ChatGPT source",
+        "lab_limit": "ChatGPT import adapter is scaffold-only",
+    },
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -146,6 +172,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--frame-url", action="append", default=[], help="Optional frame URL: idle=/manus-storage/frame.png")
     parser.add_argument("--generated-at", default=None, help="ISO-8601 evidence timestamp; defaults to build time")
+    parser.add_argument("--provider", choices=sorted(PROVIDER_PROFILES), default="internal-imagegen", help="Truthful source provider profile")
+    parser.add_argument("--provider-model", default=None, help="Provider/model label for provenance; defaults to profile value")
+    parser.add_argument("--provider-task-id", default=None, help="Provider or user-mediated task identifier for provenance")
     parser.add_argument("--overwrite", action="store_true", help="Replace an existing pilot workspace")
     args = parser.parse_args(argv)
 
@@ -161,6 +190,9 @@ def main(argv: list[str] | None = None) -> int:
         shutil.rmtree(output)
     urls = parse_urls(args.frame_url)
     timestamp = args.generated_at or datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    provider = PROVIDER_PROFILES[args.provider]
+    provider_model = args.provider_model or provider["default_model"]
+    provider_task_id = args.provider_task_id or provider["default_task_id"]
 
     sources = {
         "idle": args.idle,
@@ -200,7 +232,8 @@ def main(argv: list[str] | None = None) -> int:
     min_alpha = min(int(item["alpha_pixels"]) for item in frames.values())
     idle_hash = frames["idle"]["sha256"]
     prompt_capsule = (
-        "MotionLoom scout robot AI pilot. Post-hoc ingest capsule only; provider-native prompt and task receipt were not exported. "
+        f"MotionLoom scout robot AI pilot imported from {provider['generator_source']}. "
+        "Post-hoc ingest capsule only; provider-native prompt and task receipt were not exported. "
         "The capsule binds reviewed output bytes without asserting a human approval or artist authorship."
     )
     prompt_hash = sha256_text(prompt_capsule)
@@ -258,16 +291,16 @@ def main(argv: list[str] | None = None) -> int:
     provenance = {
         "schema_version": "1.0",
         "provenance_id": "scout-ai-pilot-provenance-v1",
-        "task_id": "motionloom-scout-ai-pilot-ingest-2026",
+        "task_id": provider_task_id,
         "scene": "scout-walk",
         "created_at": timestamp,
         "asset": {"id": ASSET_ID, "path": f"{relative_output}/frames/scout-idle.png", "type": "frame_sequence", "framework": "canvas", "version": "pilot-v1"},
         "authority": "ai_generated",
         "readiness": "runtime_ready",
-        "generator": {"model": "default", "task_id": "motionloom-scout-ai-pilot-ingest-2026", "source": "internal-imagegen", "generated_at": timestamp, "prompt_hash": prompt_hash, "agent": "MotionLoom"},
-        "license": {"spdx": "LicenseRef-Generated-Pilot", "source": "Internal ImageGen generation; provider-native receipt was not exported", "attribution": "AI-generated scout pilot; human review remains required"},
+        "generator": {"model": provider_model, "task_id": provider_task_id, "source": provider["generator_source"], "generated_at": timestamp, "prompt_hash": prompt_hash, "agent": "MotionLoom"},
+        "license": {"spdx": "LicenseRef-Generated-Pilot", "source": provider["license_source"], "attribution": "AI-generated scout pilot; human review remains required"},
         "files": provenance_files,
-        "provenance_chain": [{"step": "ingest", "actor": "MotionLoom", "source": "post-hoc hash-bound local ingest; not a provider-native receipt", "timestamp": timestamp}],
+        "provenance_chain": [{"step": "ingest", "actor": "MotionLoom", "source": f"post-hoc hash-bound local ingest from {provider['reconstruction_source']}; not a provider-native receipt", "timestamp": timestamp}],
         "runtime_evidence": {"status": "not_run", "runtime": "canvas", "tested_at": timestamp},
     }
     receipt = {
@@ -276,7 +309,7 @@ def main(argv: list[str] | None = None) -> int:
         "created_at": timestamp,
         "asset": {"id": ASSET_ID, "kind": "frame_sequence", "intended_use": "runtime_candidate"},
         "authority": "ai_generated",
-        "provider": {"adapter_id": "internal.imagegen", "kind": "internal_skill", "invocation_mode": "agent-mediated", "task_id": "motionloom-scout-ai-pilot-ingest-2026", "model": "default", "generated_at": timestamp, "cost_class": "included", "prompt_hash": prompt_hash},
+        "provider": {"adapter_id": provider["adapter_id"], "kind": provider["kind"], "invocation_mode": provider["invocation_mode"], "task_id": provider_task_id, "model": provider_model, "generated_at": timestamp, "cost_class": provider["cost_class"], "prompt_hash": prompt_hash},
         "control_track_ref": f"{relative_output}/controls.json",
         "provenance_ref": f"{relative_output}/provenance.json",
         "outputs": receipt_outputs,
@@ -305,7 +338,7 @@ def main(argv: list[str] | None = None) -> int:
             "style_profile": "pixel-art scout robot pilot",
             "lighting_profile": "flat game sprite lighting",
         },
-        "derivation": {"origin": "ai_generated", "generator": {"model": "default", "task_id": "motionloom-scout-ai-pilot-ingest-2026", "prompt_hash": prompt_hash}, "source_refs": ["provenance.json", "receipt-reconstruction.json"]},
+        "derivation": {"origin": "ai_generated", "generator": {"model": provider_model, "task_id": provider_task_id, "prompt_hash": prompt_hash}, "source_refs": ["provenance.json", "receipt-reconstruction.json"]},
         "provenance_ref": "provenance.json",
         "notes": "Identity controls are a post-hoc ingest representation. They bind output hashes but do not prove provider-native generation controls.",
     }
@@ -335,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
         "artifact": ASSET_ID,
         "status": "incomplete_provider_receipt",
         "created_at": timestamp,
-        "known": ["output bytes", "output SHA-256", "agent-mediated ImageGen source", "post-hoc control capsule hash"],
+        "known": ["output bytes", "output SHA-256", provider["reconstruction_source"], "post-hoc control capsule hash"],
         "unknown": ["provider-native request ID", "provider-native prompt record", "provider-native seed", "provider-native output receipt"],
         "governance": {"authority": "ai_generated", "human_review": "required", "production_approved": False, "attestation_approval": False},
     }
@@ -347,7 +380,7 @@ def main(argv: list[str] | None = None) -> int:
         "authority": "ai_generated",
         "production_approved": False,
         "runtime_verified": False,
-        "limits": ["Internal ImageGen adapter is scaffold-only", "Provider-native generation receipt was unavailable", "Runtime proof is not yet present", "No human approval exists"],
+        "limits": [provider["lab_limit"], "Provider-native generation receipt was unavailable", "Runtime proof is not yet present", "No human approval exists"],
         "frames": [
             {"id": frame_id, "label": role.replace("_", " "), "path": f"frames/scout-{frame_id}.png", "url": urls.get(frame_id), "sha256": frames[frame_id]["sha256"], "alpha_bbox": frames[frame_id]["alpha_bbox"]}
             for frame_id, role, _ in FRAME_ORDER

@@ -33,6 +33,21 @@
       "limitations": ["Adapter imports Agent-mediated ImageGen output only; it does not invoke ImageGen or prove a model, seed, license, rig compatibility, runtime quality or human approval."],
       "risk_level": "medium",
       "side_effect_level": "user_review_required"
+    },
+    {
+      "adapter_id": "openai.chatgpt",
+      "kind": "external_provider",
+      "status": "scaffold_only",
+      "adapter_version": "0.1",
+      "invocation_mode": "manual",
+      "cost_class": "external",
+      "inputs": ["user-provided-images", "reference-images", "control-track", "prompt-hash"],
+      "outputs": ["image", "frame-sequence", "generation-receipt"],
+      "compatibility": {"os": ["linux", "macos", "windows"]},
+      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
+      "limitations": ["Adapter imports user-provided ChatGPT output only; it does not invoke ChatGPT, verify a provider-native task ID, prove a model, seed, license, rig compatibility, runtime quality or human approval."],
+      "risk_level": "medium",
+      "side_effect_level": "user_review_required"
     }
   ]
 }

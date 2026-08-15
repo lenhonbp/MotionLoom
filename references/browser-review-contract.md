@@ -13,8 +13,14 @@ Prepare a candidate with:
 ```bash
 python3 scripts/review-hook.py prepare \
   --task-dir artifacts/<task-id> \
-  --lab-url http://127.0.0.1:3300
+  --lab-url https://animdevlab-hcxnxr9c.manus.space/lab
 ```
+
+`--lab-url` là **browser review route thực tế**. Dev Lab React dùng
+`https://…/lab`; Dev Lab static cục bộ dùng `http://127.0.0.1:3300/`. Command
+tự gắn `scene`, `task_id`, `candidate_id`, `artifact_base` và `task_base` vào
+URL cùng origin; Dev Lab từ chối URL thiếu field, foreign origin hoặc path sai
+trước khi tải artifact.
 
 The command writes `browser-review.json` into the task bundle and scene output, records a deterministic `candidate_id`, binds the candidate to the context and animation source SHA-256, and emits JSON containing the exact URL and the next browser Agent action.
 

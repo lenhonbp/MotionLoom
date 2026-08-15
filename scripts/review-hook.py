@@ -12,7 +12,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
@@ -40,6 +40,29 @@ def parse_time(value: str) -> datetime:
 def candidate_id(task_id: str, scene: str, context_hash: str, source_hash: str, render_hash: str) -> str:
     raw = f"{task_id}:{scene}:{context_hash}:{source_hash}:{render_hash}".encode()
     return hashlib.sha256(raw).hexdigest()[:20]
+
+
+def review_urls(lab_url: str, scene: str, task_id: str, candidate: str) -> tuple[str, str, str]:
+    """Build an exact review route while anchoring artifact paths at its origin.
+
+    `--lab-url` is the actual browser route, e.g. `https://host/lab` for the
+    React Dev Lab or `http://127.0.0.1:3300/` for the bundled static lab.
+    Artifact and task paths intentionally remain same-origin root paths.
+    """
+    parsed = urlsplit(lab_url.strip())
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.query or parsed.fragment:
+        raise ValueError("lab-url must be an absolute http(s) Dev Lab route without query or fragment")
+    origin = urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+    review_path = parsed.path.rstrip("/") or "/"
+    review_base = f"{origin}{review_path}" if review_path != "/" else origin
+    query = urlencode({
+        "scene": scene,
+        "task_id": task_id,
+        "candidate_id": candidate,
+        "artifact_base": f"{origin}/scenes/{scene}",
+        "task_base": f"{origin}/tasks/{task_id}",
+    })
+    return f"{review_base}/?{query}" if review_path != "/" else f"{origin}/?{query}", f"{origin}/scenes/{scene}", f"{origin}/tasks/{task_id}"
 
 
 def paths(task_dir: Path, task: dict) -> tuple[Path, Path, Path, Path]:
@@ -79,9 +102,8 @@ def prepare(args: argparse.Namespace) -> int:
     source_hash = sha256(source_path)
     render_hash = sha256(render_meta)
     cid = candidate_id(task["task_id"], scene, context_hash, source_hash, render_hash)
-    base = args.lab_url.rstrip("/")
     task_id = task["task_id"]
-    url = f"{base}/?{urlencode({'scene': scene, 'task_id': task_id, 'candidate_id': cid, 'artifact_base': f'{base}/scenes/{scene}', 'task_base': f'{base}/tasks/{task_id}'})}"
+    url, artifact_base, task_base = review_urls(args.lab_url, scene, task_id, cid)
     candidate = {
         "schema_version": "1.0",
         "candidate_id": cid,
@@ -120,7 +142,7 @@ def prepare(args: argparse.Namespace) -> int:
     handoff = read_json(handoff_path)
     if memory_path.is_file():
         shutil.copy2(memory_path, task_dir / "project-memory.json")
-    handoff.update({"state": "review_required", "to_agent": "browser-review-agent", "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.", "next_actions": [{"action": "Open internal Dev Lab candidate", "kind": "browser_review", "agent": "browser-review-agent", "skill": "browser-review", "url": url, "candidate_id": cid, "requires_user_approval": True, "evidence_needed": ["review.json"], "output_artifacts": ["review.json"]}], "required_artifacts": sorted(set(handoff.get("required_artifacts", []) + ["browser-review.json", "review.json", "semantic-lint-benchmark.json", "evidence-verifier-report.json", "runtime-adapters/runtime-evidence.json"] + (["project-memory.json"] if memory_path.is_file() else [])))})
+    handoff.update({"state": "review_required", "to_agent": "browser-review-agent", "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.", "next_actions": [{"action": "Open internal Dev Lab candidate", "kind": "browser_review", "agent": "browser-review-agent", "skill": "browser-review", "url": url, "artifact_base": artifact_base, "task_base": task_base, "candidate_id": cid, "requires_user_approval": True, "evidence_needed": ["review.json"], "output_artifacts": ["review.json"]}], "required_artifacts": sorted(set(handoff.get("required_artifacts", []) + ["browser-review.json", "review.json", "semantic-lint-benchmark.json", "evidence-verifier-report.json", "runtime-adapters/runtime-evidence.json"] + (["project-memory.json"] if memory_path.is_file() else [])))})
     handoff_path.write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     subprocess.run([sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
     subprocess.run([sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)

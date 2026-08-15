@@ -107,6 +107,12 @@
 - [x] Nâng AI Scout preflight card với master-frame preview, geometry blocker rõ ràng và liên kết corrective prompt.
 - [x] Chạy acceptance cho repo và Dev Lab, rồi lưu checkpoint Dev Lab `9ad54c8c`.
 - [x] Tạo commit cục bộ cho repo MotionLoom và báo cáo phạm vi trước khi xin duyệt push.
+- [x] Push hai commit onboarding đã được duyệt (`7876031`, `9794ce5`) lên `origin/main` và xác minh SHA remote.
+- [x] Thiết kế deep link review mang candidate/task/artifact base từ Agent handoff sang Dev Lab mà không tin URL chưa được validate.
+- [x] Triển khai parser, validation và fallback UI cho review URL để Dev Lab tự mở đúng candidate thật khi evidence hợp lệ.
+- [x] Kiểm thử deep link với candidate hợp lệ, thiếu, foreign hoặc malformed; lưu checkpoint Dev Lab sau khi xác minh.
+- [x] Chạy AI Scout preflight với ba pose hiện có; builder chặn contact-right ở 44px padding cạnh phải nên trạng thái vẫn `partial`, không ingest/candidate/runtime/Dev Lab review.
+- [ ] Tạo commit cục bộ cho review deep link và báo cáo phạm vi trước khi xin duyệt push.
 
 ## Deep audit and development pass
 

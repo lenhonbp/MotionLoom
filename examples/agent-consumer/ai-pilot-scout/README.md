@@ -32,6 +32,8 @@ Use `--frame-url ID=URL` when the four frames are hosted for Dev Lab. The builde
 
 > The builder rejects ordinary RGB files and a fully opaque image. A visible checkerboard painted into an RGB PNG is **not** transparency. This restriction makes frame geometry and contamination checks meaningful.
 
+When any source fails preflight, the builder exits non-zero and writes only `partial-handoff.json` beside the copied source bytes. That handoff binds the original SHA-256, any measurable alpha/canvas/padding metrics, provider identity and exact refusal reasons. It deliberately does **not** emit `controls.json`, a receipt, candidate, runtime render or Dev Lab review link. Replace the source independently; do not resample, add transparent margins or edit metadata to make rejected bytes pass.
+
 ## Current pilot handoff
 
 The checked-in [`partial-handoff.json`](partial-handoff.json) records the current real-byte pilot boundary: one v3 master was alpha-isolated, visually checked and retained outside this repository; the independent walk phases could not be generated before the image quota was exhausted. No intake bundle, runtime candidate, render evidence or Dev Lab candidate has been emitted from a repeated idle image. Resume only with three independently generated and reviewed action frames, then run the exact commands above.

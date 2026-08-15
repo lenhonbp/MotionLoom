@@ -148,6 +148,83 @@ def require_clean_pilot_geometry(frame_id: str, data: dict[str, Any]) -> None:
         )
 
 
+def partial_frame_record(frame_id: str, source: Path, data: dict[str, Any] | None, error: str | None) -> dict[str, Any]:
+    """Describe a rejected source without emitting an ingestable candidate."""
+    record: dict[str, Any] = {
+        "role": frame_id,
+        "source": str(source),
+        "sha256": sha256_file(source),
+        "bytes": source.stat().st_size,
+    }
+    if data is not None:
+        bbox = data["alpha_bbox"]
+        record["canvas"] = [data["width"], data["height"]]
+        record["alpha_bbox"] = [bbox["x"], bbox["y"], bbox["width"], bbox["height"]]
+        record["padding"] = {
+            "left": bbox["x"],
+            "top": bbox["y"],
+            "right": data["width"] - (bbox["x"] + bbox["width"]),
+            "bottom": data["height"] - (bbox["y"] + bbox["height"]),
+        }
+    if error is not None:
+        record["error"] = error
+    return record
+
+
+def write_partial_handoff(
+    output: Path,
+    provider: dict[str, str],
+    provider_model: str,
+    provider_task_id: str,
+    timestamp: str,
+    rejected_frames: list[dict[str, Any]],
+    errors: list[str],
+) -> None:
+    """Write source-bound refusal evidence; never create controls or a candidate."""
+    handoff = {
+        "contract": "motionloom-ai-pilot-partial-handoff",
+        "version": 1,
+        "asset_id": ASSET_ID,
+        "state": "partial",
+        "authority": "ai_generated",
+        "production_approved": False,
+        "created_at": timestamp,
+        "blocked": {
+            "reason": "Source preflight failed. No canvas resampling, transparent padding, metadata edit, intake, candidate, render, or approval was emitted.",
+            "errors": errors,
+            "missing_frames": [entry["role"] for entry in rejected_frames if entry.get("error")],
+            "not_emitted": [
+                "controls.json",
+                "generation receipt",
+                "export manifest",
+                "asset consistency contract",
+                "Artifact Intake report",
+                "runtime candidate",
+                "runtime render evidence",
+                "Dev Lab review candidate",
+            ],
+        },
+        "rejected_source_attempts": [
+            {
+                "provider": provider["generator_source"],
+                "adapter_id": provider["adapter_id"],
+                "model": provider_model,
+                "task_id": provider_task_id,
+                "authority": "ai_generated",
+                "state": "rejected_pre_ingest",
+                "reason": "Measured source bytes failed the pilot preflight; no transform may bypass the gate.",
+                "frames": rejected_frames,
+            }
+        ],
+        "resume_requirements": [
+            "Provide independent source frames that satisfy the measured canvas and clean-padding requirements.",
+            "Do not resize, pad, crop, isolate, or relabel rejected bytes to bypass the source gate.",
+            "Re-run build-ai-pilot and downstream pipeline stages only after preflight succeeds.",
+        ],
+    }
+    write_json(output / "partial-handoff.json", handoff)
+
+
 def frame_entry(frame_id: str, role: str, target: str, file_name: str, data: dict[str, Any], root_relative_output: str) -> dict[str, Any]:
     return {
         "path": f"{root_relative_output}/frames/{file_name}",
@@ -209,15 +286,35 @@ def main(argv: list[str] | None = None) -> int:
     frames_dir.mkdir()
     PNGImage = load_png_reader()
     frames: dict[str, dict[str, Any]] = {}
+    rejected_frames: list[dict[str, Any]] = []
+    preflight_errors: list[str] = []
     for frame_id, role, _ in FRAME_ORDER:
         destination = frames_dir / f"scout-{frame_id}.png"
         shutil.copy2(sources[frame_id], destination)
-        frames[frame_id] = measured_frame(PNGImage, destination)
-        require_clean_pilot_geometry(frame_id, frames[frame_id])
+        data: dict[str, Any] | None = None
+        try:
+            data = measured_frame(PNGImage, destination)
+            require_clean_pilot_geometry(frame_id, data)
+        except ValueError as exc:
+            error = str(exc)
+            preflight_errors.append(error)
+            rejected_frames.append(partial_frame_record(frame_id, destination, data, error))
+            continue
+        assert data is not None
+        frames[frame_id] = data
+        rejected_frames.append(partial_frame_record(frame_id, destination, data, None))
+
+    if not preflight_errors:
+        canvas_sizes = {(item["width"], item["height"]) for item in frames.values()}
+        if len(canvas_sizes) != 1:
+            preflight_errors.append(f"all frames must use one canvas; measured {sorted(canvas_sizes)}")
+
+    if preflight_errors:
+        write_partial_handoff(output, provider, provider_model, provider_task_id, timestamp, rejected_frames, preflight_errors)
+        print(json.dumps({"status": "partial", "root": str(root), "output": output.relative_to(root).as_posix(), "asset_id": ASSET_ID, "errors": preflight_errors}, indent=2))
+        return 2
 
     canvas_sizes = {(item["width"], item["height"]) for item in frames.values()}
-    if len(canvas_sizes) != 1:
-        raise SystemExit(f"all frames must use one canvas; measured {sorted(canvas_sizes)}")
     width, height = next(iter(canvas_sizes))
     alpha_bboxes = [item["alpha_bbox"] for item in frames.values()]
     footlines = [bbox["y"] + bbox["height"] - 1 for bbox in alpha_bboxes]

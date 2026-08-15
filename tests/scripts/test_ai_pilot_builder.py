@@ -101,13 +101,21 @@ def main() -> int:
 
         opaque = source_dir / "opaque.png"
         write_png(opaque, alpha=False)
-        rejected = build(ROOT, {key: opaque for key in sources}, ".motionloom/pilots/test-ai-pilot-opaque")
+        opaque_output = ".motionloom/pilots/test-ai-pilot-opaque"
+        rejected = build(ROOT, {key: opaque for key in sources}, opaque_output)
         check(rejected.returncode != 0 and "has no alpha channel" in (rejected.stderr + rejected.stdout), "RGB checkered source must be rejected as non-alpha")
+        opaque_handoff = json.loads((ROOT / opaque_output / "partial-handoff.json").read_text())
+        check(opaque_handoff["state"] == "partial" and opaque_handoff["production_approved"] is False, "early RGB rejection must emit a non-approving partial handoff")
+        check(len(opaque_handoff["rejected_source_attempts"][0]["frames"]) == 4, "partial handoff must bind every supplied source hash")
 
         contaminated = source_dir / "contaminated.png"
         write_png(contaminated, alpha=True, contamination=True)
-        rejected = build(ROOT, {key: contaminated for key in sources}, ".motionloom/pilots/test-ai-pilot-contaminated")
+        contaminated_output = ".motionloom/pilots/test-ai-pilot-contaminated"
+        rejected = build(ROOT, {key: contaminated for key in sources}, contaminated_output, provider="chatgpt")
         check(rejected.returncode != 0 and "clean padding" in (rejected.stderr + rejected.stdout), "detached canvas-edge contamination must be rejected")
+        contaminated_handoff = json.loads((ROOT / contaminated_output / "partial-handoff.json").read_text())
+        attempt = contaminated_handoff["rejected_source_attempts"][0]
+        check(attempt["provider"] == "openai-chatgpt" and attempt["state"] == "rejected_pre_ingest", "partial handoff must preserve ChatGPT provenance")
     shutil.rmtree(workspace, ignore_errors=True)
     shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-chatgpt", ignore_errors=True)
     shutil.rmtree(ROOT / ".motionloom/pilots/test-ai-pilot-opaque", ignore_errors=True)

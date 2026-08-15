@@ -145,7 +145,7 @@
 ## MotionLoom 2.4.0 release preparation
 
 - [x] Sửa Quality workflow để khám phá task bundle theo scene/task binding thay vì suy đoán `artifacts/<scene>-task`.
-- [ ] Thêm regression cho task bundle có ID khác scene slug, rồi chạy lại workflow Quality trên GitHub.
+- [x] Thêm regression cho task bundle có ID khác scene slug, rồi chạy lại workflow Quality trên GitHub.
 - [x] Bump metadata sang 2.4.0 và thêm CHANGELOG/release note đúng phạm vi runtime-first pilot.
 - [x] Chạy local release gates, tạo commit cục bộ và chỉ xin duyệt riêng trước push hoặc npm publish.
 

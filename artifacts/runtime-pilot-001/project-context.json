@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.1",
+  "generated_at": "2026-08-15T00:00:00Z",
+  "project_root": "/home/ubuntu/animation-skill",
+  "name": "MotionLoom runtime pilot",
+  "description": "Code-authored Framer Motion runtime scene used to prove the review-first artifact pipeline without an AI sprite dependency.",
+  "stack": {
+    "framework": "framer-motion",
+    "react": true,
+    "vue": false,
+    "react_native": false,
+    "native_web": false
+  },
+  "brand": {
+    "primary": "#2563EB",
+    "accent": "#F59E0B",
+    "palette": ["#2563EB", "#F59E0B", "#0F172A"],
+    "fonts": []
+  },
+  "motion_language": {
+    "easings_used": ["piecewise scrubbed transform"],
+    "duration_patterns": ["1.2s runtime scene"],
+    "recommendation": "manual checkpoint scrub"
+  },
+  "existing_animations": ["runtime-pilot-framer"],
+  "source_authority": "hash-bound code-authored Framer Motion source; runtime evidence requires human review"
+}

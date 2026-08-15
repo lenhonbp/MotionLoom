@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "run_id": "1786808553918-145614",
+  "generated_at": "2026-08-15T15:42:35.907Z",
+  "mode": "runtime-telemetry",
+  "task_id": "runtime-pilot-001",
+  "scene": "runtime-pilot-framer",
+  "framework": "framer-motion",
+  "runtime": "framer-motion@13.1.0",
+  "samples": [
+    {
+      "sequence": 0,
+      "percent": 0,
+      "captured_at_ms": 760.7000000476837,
+      "raf_intervals_ms": [
+        16.700000000000045,
+        16.600000000000023,
+        16.699999999999932
+      ],
+      "state_sha256": "0769bb6867251ff8d951b01e7d817ab4644d1f7d4a38b0e91ad54ec5b0f81f6b",
+      "state": {
+        "progress": 0,
+        "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+        "opacity": "0.28",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    },
+    {
+      "sequence": 1,
+      "percent": 50,
+      "captured_at_ms": 844.1000000238419,
+      "raf_intervals_ms": [
+        16.600000000000023,
+        16.799999999999955,
+        16.600000000000023
+      ],
+      "state_sha256": "015ad2af517be79a3cf102b48b5f61282acd1843c7b5efe20472c2752d79c890",
+      "state": {
+        "progress": 0.5,
+        "transform": "matrix(1.02851, -0.256437, 0.256437, 1.02851, 176, -48)",
+        "opacity": "1",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "percent": 100,
+      "captured_at_ms": 927.7000000476837,
+      "raf_intervals_ms": [
+        16.700000000000045,
+        16.699999999999932,
+        16.700000000000045
+      ],
+      "state_sha256": "275a832573d3c660f6d820256f95412e253f0a29c02e8f535dfdec2c47e56de2",
+      "state": {
+        "progress": 1,
+        "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+        "opacity": "1",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "sample_count": 3,
+    "raf_interval_count": 9,
+    "max_raf_interval_ms": 16.799999999999955,
+    "p95_raf_interval_ms": 16.799999999999955
+  },
+  "status": "pass"
+}

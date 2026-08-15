@@ -1,0 +1,84 @@
+{
+  "report_version": "1.0",
+  "task_id": "runtime-pilot-001",
+  "status": "review_required",
+  "confidence": "high",
+  "completed": [
+    {
+      "id": "artifact-intake",
+      "summary": "Code-authored source, controls, receipt and export all validate hash-bound.",
+      "status": "pass",
+      "evidence": [
+        "../examples/agent-consumer/runtime-pilot/receipt.json",
+        "../examples/agent-consumer/runtime-pilot/controls.json",
+        "../examples/agent-consumer/runtime-pilot/export.json"
+      ]
+    },
+    {
+      "id": "runtime-adapter",
+      "summary": "Playwright rendered Framer Motion at 0%, 50% and 100% with no console errors.",
+      "status": "pass",
+      "evidence": [
+        "runtime-evidence.json"
+      ]
+    }
+  ],
+  "verified": [
+    {
+      "id": "runtime-candidate",
+      "summary": "Strict candidate validation passed; production eligibility remains false.",
+      "status": "pass",
+      "evidence": [
+        "runtime-candidate-report.json"
+      ]
+    }
+  ],
+  "not_completed": [
+    {
+      "id": "browser-review",
+      "summary": "User must inspect the exact three runtime checkpoints in Dev Lab before any PR action.",
+      "status": "pending"
+    }
+  ],
+  "problems": [],
+  "structure_review": {
+    "missing_files": [],
+    "broken_references": [],
+    "untracked_artifacts": []
+  },
+  "browser_review": [
+    {
+      "candidate_id": "8cccc4ac5a7e493ffe40",
+      "decision": "pending",
+      "evidence": [
+        "browser-review.json"
+      ],
+      "next_action": "Open the internal Dev Lab URL and ask the user to review."
+    }
+  ],
+  "next_agent": [
+    {
+      "id": "confirm-pr",
+      "summary": "A pull request remains prohibited until an explicit user confirmation follows browser review.",
+      "status": "pending",
+      "agent": "motionloom",
+      "skill": "motionloom",
+      "evidence_needed": [
+        "review.json"
+      ],
+      "next_action": "Keep OPEN_PR=0 unless the user separately instructs otherwise."
+    },
+    {
+      "id": "browser-review",
+      "summary": "Open the exact candidate in the internal Dev Lab browser.",
+      "status": "pending",
+      "agent": "browser-review-agent",
+      "skill": "browser-review",
+      "evidence_needed": [
+        "review.json"
+      ],
+      "next_action": "Ask user to approve or request changes."
+    }
+  ],
+  "generated_at": "2026-08-15T15:44:47Z"
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1",
+  "asset_id": "runtime/framer-motion-pilot",
+  "asset_kind": "ui",
+  "identity": {
+    "subject_id": "framer-motion-runtime-pilot",
+    "reference_hashes": [
+      "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b"
+    ],
+    "camera": {
+      "projection": "orthographic",
+      "width": 512,
+      "height": 512,
+      "focal_length": 50
+    },
+    "coordinate_system": "screen_y_down",
+    "scale": 1,
+    "pivot": {
+      "x": 0.5,
+      "y": 0.5,
+      "space": "normalized_canvas"
+    },
+    "palette_lock": {
+      "colors": ["#2563eb", "#f59e0b", "#0f172a"],
+      "delta_e_tolerance": 0
+    },
+    "style_profile": "code-authored-runtime-pilot",
+    "lighting_profile": "not-applicable"
+  },
+  "derivation": {
+    "origin": "code_authored",
+    "source_refs": ["src/output/runtime-pilot-framer/scene.jsx"],
+    "derivation_chain": [
+      {
+        "step": 0,
+        "operation": "repository-code-authoring",
+        "input_hashes": [],
+        "output_hash": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b"
+      }
+    ]
+  },
+  "provenance_ref": "provenance.json",
+  "notes": "Code-authored Framer Motion pilot. Runtime evidence can establish runtime verification only; human review remains required."
+}

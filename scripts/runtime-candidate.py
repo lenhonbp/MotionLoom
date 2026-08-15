@@ -33,6 +33,7 @@ PROFILE_REQUIREMENTS = {
     "video": {"asset_identity", "action_set"},
     "rigged_2d": {"asset_identity", "action_set"},
     "rigged_3d": {"asset_identity", "action_set"},
+    "runtime_scene": {"asset_identity", "action_set"},
 }
 
 

@@ -26,7 +26,7 @@
     },
     "authority": {
       "type": "string",
-      "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"]
+      "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "code_authored", "unknown"]
     },
     "readiness": {
       "type": "string",

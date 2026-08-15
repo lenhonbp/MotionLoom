@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
-import { motion, motionValue, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import { Rive } from "@rive-app/canvas";
+import { FramerRuntimePilot } from "../../src/output/runtime-pilot-framer/scene.jsx";
 
 const params = new URLSearchParams(window.location.search);
 const framework = params.get("framework") || "gsap";
@@ -16,10 +16,6 @@ function status(text) {
 function expose(adapter) {
   window.__animationAdapter = adapter;
   status(`${adapter.framework}: ${adapter.status}`);
-}
-
-function Stage({ children }) {
-  return <div className="stage">{children}</div>;
 }
 
 function mountGsap() {
@@ -45,35 +41,6 @@ function mountGsap() {
   };
   expose(adapter);
   adapter.setProgress(0);
-}
-
-function FramerScene() {
-  const progress = useRef(motionValue(0)).current;
-  const x = useTransform(progress, [0, 1], [0, 240]);
-  const y = useTransform(progress, [0, 1], [0, -36]);
-  const rotate = useTransform(progress, [0, 1], [0, 28]);
-  const opacity = useTransform(progress, [0, 1], [0.25, 1]);
-  const scale = useTransform(progress, [0, 1], [0.82, 1]);
-
-  useEffect(() => {
-    const box = document.querySelector(".motion-box");
-    const adapter = {
-      framework: "framer-motion",
-      runtime: "framer-motion@13.1.0",
-      status: "ready",
-      ready: true,
-      setProgress(value) { progress.set(Math.max(0, Math.min(1, Number(value)))); },
-      getState() { return { progress: progress.get(), transform: box ? getComputedStyle(box).transform : "", opacity: box ? getComputedStyle(box).opacity : "" }; },
-    };
-    expose(adapter);
-    adapter.setProgress(0);
-  }, [progress]);
-
-  return (
-    <Stage>
-      <motion.div className="motion-box" style={{ x, y, rotate, opacity, scale }} />
-    </Stage>
-  );
 }
 
 async function mountRive() {
@@ -132,7 +99,7 @@ async function mountRive() {
 async function main() {
   try {
     if (framework === "gsap") mountGsap();
-    else if (framework === "framer-motion") createRoot(rootNode).render(<FramerScene />);
+    else if (framework === "framer-motion") createRoot(rootNode).render(<FramerRuntimePilot expose={expose} />);
     else if (framework === "rive") await mountRive();
     else throw new Error(`Unknown framework: ${framework}`);
   } catch (error) {

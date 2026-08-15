@@ -127,6 +127,15 @@
 - [x] Stage receipt Codex `exec-6c962cac-7e7f-491b-b0a8-e7c4ee7d2412` cùng SHA-256, source mode và blocker geometry/background vào partial handoff mà không ingest bytes.
 - [x] Cập nhật handoff Codex với capability preflight: dừng ngay nếu tool chỉ trả 1254×1254, RGB hoặc checkerboard rasterized; không cần tạo các pose còn lại.
 - [x] Chạy regression evidence và tạo commit cục bộ `17dc3f4` cho tài liệu/partial handoff Codex bị reject; không push nếu chưa có duyệt riêng.
+- [x] Push hai commit Codex đã được duyệt (`17dc3f4`, `fbd4aa1`) lên `origin/main`; SHA remote `fbd4aa1afa413b849d7ef9030aa2be4681f608c5`, chỉ gồm handoff Codex và ledger, không có user-upload hoặc partial evidence cục bộ.
+
+## Runtime-first end-to-end pilot
+
+- [ ] Rà soát fixture GSAP/Framer Motion hiện có và chọn một source code-authored tối thiểu, có provenance/replay metadata rõ ràng.
+- [ ] Tạo task bundle runtime-first với scene, source binding, runtime adapter evidence và candidate identity-bound; không dùng AI Scout source bị reject.
+- [ ] Render candidate qua runtime thật, ghi snapshots/quality/execution evidence và tạo review URL Dev Lab.
+- [ ] Mở candidate runtime-first trong Dev Lab, kiểm tra review-first và giữ `production_approved=false` cho đến human review.
+- [ ] Chạy acceptance, lưu checkpoint Dev Lab, tạo commit cục bộ và báo cáo trước khi xin duyệt push.
 
 ## Deep audit and development pass
 

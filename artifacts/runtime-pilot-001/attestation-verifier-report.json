@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "verifier": "motionloom-attestation-verifier/1.0",
+  "verified": true,
+  "approval": false,
+  "issues": [],
+  "signers": [
+    {
+      "key_id": "runtime-pilot-local-2026",
+      "status": "verified",
+      "algorithm": "ed25519"
+    }
+  ],
+  "bindings": {
+    "task_id": "runtime-pilot-001",
+    "scene": "runtime-pilot-framer",
+    "context_hash": "9e9bb3bf2e490d23e9f5d52dfc4779b69adf0cc63b32df66adfde7050845fc74",
+    "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+    "manifest_sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d",
+    "motion_ir_sha256": "1d339ca2ec9c510e54e53c37ef32c2ddf1485dbaec97c5e9aa178a8f6c9c3287"
+  }
+}

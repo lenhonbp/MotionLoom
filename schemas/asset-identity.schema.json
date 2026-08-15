@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://motionloom.dev/schemas/asset-identity.schema.json",
   "title": "MotionLoom Asset Identity Contract",
-  "description": "Stable identity and derivation locks shared by AI-generated asset variants.",
+  "description": "Stable identity and derivation locks shared by generated or code-authored runtime variants.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "asset_id", "asset_kind", "identity", "derivation"],
@@ -69,9 +69,9 @@
     "derivation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["origin", "generator", "source_refs"],
+      "required": ["origin", "source_refs"],
       "properties": {
-        "origin": { "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"] },
+        "origin": { "enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "code_authored", "unknown"] },
         "generator": {
           "type": "object",
           "additionalProperties": false,
@@ -107,5 +107,11 @@
     },
     "provenance_ref": { "type": "string", "minLength": 1 },
     "notes": { "type": "string" }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"derivation": {"properties": {"origin": {"enum": ["ai_generated", "ai_assisted", "ai_assisted_human_reviewed"]}}, "required": ["origin"]}}, "required": ["derivation"]},
+      "then": {"properties": {"derivation": {"required": ["generator"]}}}
+    }
+  ]
 }

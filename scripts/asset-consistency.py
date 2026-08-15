@@ -253,12 +253,13 @@ def validate_identity(document: dict[str, Any]) -> dict[str, Any]:
     identity = document.get("identity") if isinstance(document.get("identity"), dict) else {}
     derivation = document.get("derivation") if isinstance(document.get("derivation"), dict) else {}
     issues.extend(_required(identity, ("subject_id", "reference_hashes", "camera", "coordinate_system", "scale", "pivot", "palette_lock")))
-    issues.extend(_required(derivation, ("origin", "generator", "source_refs")))
+    issues.extend(_required(derivation, ("origin", "source_refs")))
     generator = derivation.get("generator") if isinstance(derivation.get("generator"), dict) else {}
-    issues.extend(_required(generator, ("model", "task_id", "prompt_hash")))
     origin = derivation.get("origin")
-    if origin not in {"ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"}:
+    if origin not in {"ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "code_authored", "unknown"}:
         issues.append(Issue("error", "invalid_origin", "asset origin is not a supported provenance tier", "derivation.origin"))
+    if origin in {"ai_generated", "ai_assisted", "ai_assisted_human_reviewed"}:
+        issues.extend(_required(generator, ("model", "task_id", "prompt_hash")))
     if origin == "unknown":
         issues.append(Issue("error", "unknown_origin", "unknown asset origin is blocked", "derivation.origin"))
     return _result("asset_identity", issues, {"asset_id": document.get("asset_id"), "origin": derivation.get("origin")})

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "runtime-pilot-001",
+  "state": "review_required",
+  "from_agent": "motionloom",
+  "to_agent": "browser-review-agent",
+  "summary": "Open the exact rendered candidate in the internal Dev Lab and obtain user approval before PR.",
+  "required_artifacts": [
+    "browser-review.json",
+    "evidence-verifier-report.json",
+    "execution-report.json",
+    "review.json",
+    "runtime-adapters/runtime-evidence.json",
+    "runtime-candidate-report.json",
+    "runtime-evidence.json",
+    "semantic-lint-benchmark.json",
+    "task.json"
+  ],
+  "next_actions": [
+    {
+      "action": "Open internal Dev Lab candidate",
+      "kind": "browser_review",
+      "agent": "browser-review-agent",
+      "skill": "browser-review",
+      "url": "https://animdevlab-hcxnxr9c.manus.space/lab/?scene=runtime-pilot-framer&task_id=runtime-pilot-001&candidate_id=8cccc4ac5a7e493ffe40&artifact_base=https%3A%2F%2Fanimdevlab-hcxnxr9c.manus.space%2Fscenes%2Fruntime-pilot-framer&task_base=https%3A%2F%2Fanimdevlab-hcxnxr9c.manus.space%2Ftasks%2Fruntime-pilot-001",
+      "artifact_base": "https://animdevlab-hcxnxr9c.manus.space/scenes/runtime-pilot-framer",
+      "task_base": "https://animdevlab-hcxnxr9c.manus.space/tasks/runtime-pilot-001",
+      "candidate_id": "8cccc4ac5a7e493ffe40",
+      "requires_user_approval": true,
+      "evidence_needed": [
+        "review.json"
+      ],
+      "output_artifacts": [
+        "review.json"
+      ]
+    }
+  ]
+}

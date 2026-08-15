@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1",
+  "candidate_id": "runtime-pilot-framer-001",
+  "asset_id": "runtime/framer-motion-pilot",
+  "created_at": "2026-08-15T00:00:00Z",
+  "artifact_intake": {
+    "registry": "artifact-adapter-registry.json",
+    "receipt": "examples/agent-consumer/runtime-pilot/receipt.json",
+    "controls": "examples/agent-consumer/runtime-pilot/controls.json",
+    "export_manifest": "examples/agent-consumer/runtime-pilot/export.json"
+  },
+  "consistency": {
+    "asset_identity": "examples/agent-consumer/runtime-pilot/asset-identity.json",
+    "action_set": "examples/agent-consumer/runtime-pilot/action-set.json"
+  },
+  "runtime": {
+    "target": "framer-motion",
+    "runtime_evidence_ref": "src/output/runtime-pilot-framer/runtime-evidence.json",
+    "review_required": true
+  }
+}

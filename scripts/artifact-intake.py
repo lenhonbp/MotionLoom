@@ -23,7 +23,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = re.compile(r"^[a-f0-9]{64}$")
 SAFE = re.compile(r"^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+")
-AUTHORITY = {"ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "unknown"}
+AUTHORITY = {"ai_generated", "ai_assisted", "ai_assisted_human_reviewed", "artist_authored", "code_authored", "unknown"}
 ADAPTER_STATUS = {"verified", "scaffold_only", "static_validated", "project_integrated", "disabled"}
 SENSITIVE_KEYS = {"api_key", "apikey", "token", "secret", "password", "authorization", "credential"}
 
@@ -222,16 +222,16 @@ def validate_controls(controls: dict[str, Any], root: Path) -> list[Issue]:
             ids.add(str(track.get("id")))
             kind = track.get("kind")
             kinds.add(str(kind))
-            if kind not in {"identity", "style", "camera", "motion", "pose", "seed", "negative_prompt", "lighting"}:
+            if kind not in {"identity", "style", "camera", "motion", "pose", "seed", "negative_prompt", "lighting", "source"}:
                 _issue(issues, "invalid_track_kind", "track kind is unsupported", f"{prefix}.kind")
             if track.get("binding") not in {"required", "advisory", "not_applicable"}:
                 _issue(issues, "invalid_track_binding", "track binding is unsupported", f"{prefix}.binding")
             if not _hash(track.get("value_hash")):
                 _issue(issues, "invalid_sha256", "track value_hash must be lowercase SHA-256", f"{prefix}.value_hash")
     profile = controls.get("output_profile") if isinstance(controls.get("output_profile"), dict) else {}
-    if profile.get("kind") not in {"image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d"}:
+    if profile.get("kind") not in {"image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d", "runtime_scene"}:
         _issue(issues, "invalid_output_kind", "controls.output_profile.kind is unsupported", "controls.output_profile.kind")
-    animated = profile.get("kind") in {"frame_sequence", "sprite_atlas", "video", "rigged_2d", "rigged_3d"}
+    animated = profile.get("kind") in {"frame_sequence", "sprite_atlas", "video", "rigged_2d", "rigged_3d", "runtime_scene"}
     if animated and "motion" not in kinds and "pose" not in kinds:
         _issue(issues, "missing_motion_control", "animated output requires a motion or pose control track", "controls.tracks")
     if animated and (not isinstance(profile.get("fps"), (int, float)) or profile.get("fps", 0) <= 0 or not isinstance(profile.get("expected_frame_count"), int) or profile.get("expected_frame_count", 0) < 1):
@@ -249,7 +249,7 @@ def validate_receipt(receipt: dict[str, Any], controls: dict[str, Any] | None, p
         _issue(issues, "invalid_datetime", "receipt.created_at must be ISO-8601", "receipt.created_at")
     asset = receipt.get("asset") if isinstance(receipt.get("asset"), dict) else {}
     _required(asset, ("id", "kind", "intended_use"), "receipt.asset", issues)
-    if asset.get("kind") not in {"image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d"}:
+    if asset.get("kind") not in {"image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d", "runtime_scene"}:
         _issue(issues, "invalid_asset_kind", "receipt.asset.kind is unsupported", "receipt.asset.kind")
     if asset.get("intended_use") not in {"pilot", "runtime_candidate", "reference_only"}:
         _issue(issues, "invalid_intended_use", "receipt.asset.intended_use is unsupported", "receipt.asset.intended_use")

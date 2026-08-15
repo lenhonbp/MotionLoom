@@ -1,0 +1,9 @@
+{
+  "mode": "runtime",
+  "scene": "runtime-pilot-framer",
+  "framework": "framer-motion",
+  "run_id": "1786808553918-145614",
+  "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+  "runtime_evidence": "../runtime-evidence.json",
+  "checkpoints": [0, 50, 100]
+}

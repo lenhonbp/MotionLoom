@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "runtime-pilot-framer-receipt",
+  "created_at": "2026-08-15T00:00:00Z",
+  "asset": {
+    "id": "runtime/framer-motion-pilot",
+    "kind": "runtime_scene",
+    "intended_use": "runtime_candidate"
+  },
+  "authority": "code_authored",
+  "provider": {
+    "adapter_id": "fixture.local-artifact-intake",
+    "kind": "fixture",
+    "invocation_mode": "none",
+    "task_id": "runtime-pilot-001",
+    "model": "code-authored-repository-source",
+    "generated_at": "2026-08-15T00:00:00Z",
+    "cost_class": "included"
+  },
+  "control_track_ref": "examples/agent-consumer/runtime-pilot/controls.json",
+  "provenance_ref": "examples/agent-consumer/runtime-pilot/provenance.json",
+  "outputs": [
+    {
+      "path": "src/output/runtime-pilot-framer/scene.jsx",
+      "role": "runtime-source",
+      "sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+      "bytes": 1769
+    }
+  ]
+}

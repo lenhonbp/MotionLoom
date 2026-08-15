@@ -1,0 +1,31 @@
+{
+  "scene": "runtime-pilot-framer",
+  "task_id": "runtime-pilot-001",
+  "name": "Framer Motion Runtime Pilot",
+  "description": "Code-authored Framer Motion scene rendered at deterministic 0/50/100 checkpoints before human review.",
+  "framework": "framer-motion",
+  "category": "runtime-pilot",
+  "file": "scene.jsx",
+  "runtime_evidence": "runtime-evidence.json",
+  "asset_provenance": "asset-provenance.json",
+  "source_binding": {
+    "kind": "project",
+    "source_path": "scene.jsx",
+    "authority": "code_authored",
+    "license": "MIT",
+    "attribution": "MotionLoom contributors",
+    "sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b"
+  },
+  "checks": [
+    {
+      "id": "source-bound",
+      "label": "Runtime source is hash-bound before adapter execution",
+      "pass": true
+    },
+    {
+      "id": "review-first",
+      "label": "Runtime evidence does not approve a production release or pull request",
+      "pass": true
+    }
+  ]
+}

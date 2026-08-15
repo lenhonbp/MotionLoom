@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "scene": "runtime-pilot-framer",
+  "task_id": "runtime-pilot-001",
+  "category": "runtime-pilot",
+  "framework": "framer-motion",
+  "duration_s": 1.2,
+  "fps": 60,
+  "total_frames": 72,
+  "loop": true,
+  "easing": "piecewise scrubbed transform",
+  "camera": null,
+  "theme": {
+    "primary": "#2563EB",
+    "accent": "#F59E0B"
+  },
+  "performance": {
+    "max_file_kb": 300,
+    "max_layers": 8
+  },
+  "source_binding": "hash-bound code-authored scene.jsx; no generated visual asset is asserted",
+  "accessibility": {
+    "reduced_motion": "manual review uses discrete checkpoints"
+  }
+}

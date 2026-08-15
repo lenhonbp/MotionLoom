@@ -8,7 +8,7 @@
       "target": "sprite",
       "framework": "sprite",
       "status": "static_validated",
-      "evidence": [{"path": "scripts/runtime-candidate.py", "sha256": "a4f608358801156e882a8f90bcd448ce925dcf0b389b774713ee959d75b176a0"}],
+      "evidence": [{"path": "scripts/runtime-candidate.py", "sha256": "ec292a902de12c14dcc53442e15f6d7b8a8f8d22fd2bcdd7e522c15ca9d20af1"}],
       "limitations": ["Contract-only adapter; requires runtime evidence before runtime verification."]
     },
     {

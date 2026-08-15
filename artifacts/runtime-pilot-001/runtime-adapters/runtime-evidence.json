@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.1",
+  "run_id": "1786808870894-145958",
+  "generated_at": "2026-08-15T15:47:52.510Z",
+  "mode": "runtime",
+  "harness": "tests/runtime-harness",
+  "status": "pass",
+  "frameworks": [
+    {
+      "run_id": "1786808870894-145958",
+      "framework": "framer-motion",
+      "url": "http://127.0.0.1:4179/tests/runtime-harness/index.html?framework=framer-motion",
+      "status": "pass",
+      "ready": true,
+      "runtime": "framer-motion@13.1.0",
+      "frames": [
+        {
+          "percent": 0,
+          "file": "artifacts/runtime-adapters/framer-motion/frame-00.png",
+          "state": {
+            "progress": 0,
+            "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+            "opacity": "0.28",
+            "contract": {
+              "framework": "framer-motion",
+              "checkpoints": [
+                0,
+                50,
+                100
+              ],
+              "durationSeconds": 1.2,
+              "loop": true,
+              "sourceAuthority": "code_authored"
+            }
+          }
+        },
+        {
+          "percent": 50,
+          "file": "artifacts/runtime-adapters/framer-motion/frame-50.png",
+          "state": {
+            "progress": 0.5,
+            "transform": "matrix(1.02851, -0.256437, 0.256437, 1.02851, 176, -48)",
+            "opacity": "1",
+            "contract": {
+              "framework": "framer-motion",
+              "checkpoints": [
+                0,
+                50,
+                100
+              ],
+              "durationSeconds": 1.2,
+              "loop": true,
+              "sourceAuthority": "code_authored"
+            }
+          }
+        },
+        {
+          "percent": 100,
+          "file": "artifacts/runtime-adapters/framer-motion/frame-100.png",
+          "state": {
+            "progress": 1,
+            "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+            "opacity": "1",
+            "contract": {
+              "framework": "framer-motion",
+              "checkpoints": [
+                0,
+                50,
+                100
+              ],
+              "durationSeconds": 1.2,
+              "loop": true,
+              "sourceAuthority": "code_authored"
+            }
+          }
+        }
+      ],
+      "console_errors": [],
+      "telemetry": {
+        "file": "framer-motion/runtime-telemetry.json",
+        "sha256": "1c11a49eac8fb6c87977ccb84cccc59162fa015c73424a07690785bac094e773",
+        "metrics": {
+          "sample_count": 3,
+          "raf_interval_count": 9,
+          "max_raf_interval_ms": 16.799999999999955,
+          "p95_raf_interval_ms": 16.799999999999955
+        }
+      }
+    }
+  ],
+  "scene": "runtime-pilot-framer",
+  "task_id": "runtime-pilot-001",
+  "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+  "manifest_sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d",
+  "motion_ir_sha256": "1d339ca2ec9c510e54e53c37ef32c2ddf1485dbaec97c5e9aa178a8f6c9c3287"
+}

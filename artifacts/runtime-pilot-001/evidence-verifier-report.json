@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "verifier": "motionloom-evidence-verifier/1.0",
+  "verified": true,
+  "approval": false,
+  "issues": [],
+  "bindings": {
+    "scene": "runtime-pilot-framer",
+    "task_id": "runtime-pilot-001",
+    "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+    "manifest_sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d",
+    "motion_ir_sha256": "1d339ca2ec9c510e54e53c37ef32c2ddf1485dbaec97c5e9aa178a8f6c9c3287",
+    "telemetry_files": [
+      "framer-motion/runtime-telemetry.json"
+    ]
+  },
+  "policy": {
+    "max_age_days": 1.0
+  }
+}

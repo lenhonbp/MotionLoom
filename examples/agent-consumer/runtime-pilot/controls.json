@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1",
+  "control_id": "runtime-pilot-framer-controls",
+  "asset_id": "runtime/framer-motion-pilot",
+  "created_at": "2026-08-15T00:00:00Z",
+  "references": [
+    {
+      "id": "framer-runtime-source",
+      "path": "src/output/runtime-pilot-framer/scene.jsx",
+      "sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+      "role": "motion"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "source-binding",
+      "kind": "source",
+      "binding": "required",
+      "value_hash": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b"
+    },
+    {
+      "id": "scrub-progress",
+      "kind": "motion",
+      "binding": "required",
+      "value_hash": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+      "samples": 3
+    }
+  ],
+  "output_profile": {
+    "kind": "runtime_scene",
+    "fps": 60,
+    "expected_frame_count": 3,
+    "loop": true
+  }
+}

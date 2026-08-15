@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "task_id": "runtime-pilot-001",
+  "scene": "runtime-pilot-framer",
+  "framework": "framer-motion",
+  "authority": "code_authored",
+  "source": {
+    "path": "src/output/runtime-pilot-framer/scene.jsx",
+    "sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b"
+  },
+  "timeline": {
+    "duration_seconds": 1.2,
+    "fps": 60,
+    "loop": true,
+    "checkpoints": [0, 50, 100]
+  },
+  "tracks": [
+    {
+      "id": "pilot-trajectory",
+      "properties": ["x", "y", "rotate", "scale", "opacity"],
+      "scrubbable": true
+    }
+  ],
+  "review_contract": {
+    "production_eligible": false,
+    "production_approved": false,
+    "requires_human_review": true
+  }
+}

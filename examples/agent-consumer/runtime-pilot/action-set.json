@@ -1,0 +1,19 @@
+{
+  "schema_version": "0.1",
+  "asset_identity": "runtime/framer-motion-pilot",
+  "actions": [
+    {
+      "action_id": "scrubbable-trajectory",
+      "frames": ["src/output/runtime-pilot-framer/scene.jsx"],
+      "fps": 60,
+      "loop": true,
+      "events": ["checkpoint-00", "checkpoint-50", "checkpoint-100"],
+      "required_sockets": []
+    }
+  ],
+  "invariants": {
+    "checkpoint_percentages": [0, 50, 100],
+    "progress_domain": [0, 1],
+    "runtime_target": "framer-motion"
+  }
+}

@@ -25,6 +25,7 @@ AUTHORITIES = {
     "ai_assisted",
     "ai_assisted_human_reviewed",
     "artist_authored",
+    "code_authored",
     "unknown",
 }
 READINESS = {
@@ -208,6 +209,8 @@ def validate_document(data: dict[str, Any]) -> list[str]:
         errors.append("unknown authority is always blocked")
     if authority == "ai_generated" and readiness != "runtime_ready":
         errors.append("ai_generated assets may be runtime_ready only; they are never production eligible")
+    if authority == "code_authored" and readiness not in {"runtime_ready", "review_required"}:
+        errors.append("code_authored runtime scenes may be runtime_ready or review_required only; production eligibility remains a separate human-governed release lane")
     if authority == "ai_assisted_human_reviewed" and readiness not in {"review_required", "production_eligible"}:
         errors.append("ai_assisted_human_reviewed assets must remain review_required or pass a later production gate")
     if authority == "ai_assisted_human_reviewed":
@@ -231,7 +234,7 @@ def validate_document(data: dict[str, Any]) -> list[str]:
                 errors.append("full_gate.checked_at must be an ISO-8601 timestamp")
         if authority in {"ai_assisted", "ai_assisted_human_reviewed"}:
             _check_human_review(data, errors)
-        if authority in {"unknown", "ai_generated"}:
+        if authority in {"unknown", "ai_generated", "code_authored"}:
             errors.append(f"{authority} cannot be production eligible")
     if readiness == "production_approved":
         approval = data.get("human_approval")
@@ -248,8 +251,8 @@ def validate_document(data: dict[str, Any]) -> list[str]:
                 errors.append("human_approval.approved_at must be an ISO-8601 timestamp")
             if approval.get("user_confirmed") is not True:
                 errors.append("human_approval.user_confirmed must be true")
-        if authority in {"unknown", "ai_generated"}:
-            errors.append("unknown and ai_generated assets can never be production_approved")
+        if authority in {"unknown", "ai_generated", "code_authored"}:
+            errors.append("unknown, ai_generated and code_authored assets can never be production_approved")
     if "human_approval" in data and readiness != "production_approved":
         errors.append("human_approval is only valid when readiness is production_approved")
     return errors
@@ -292,6 +295,8 @@ def classify(data: dict[str, Any], errors: list[str] | None = None) -> dict[str,
     if not errors:
         if authority == "ai_generated":
             effective = "runtime_ready"
+        elif authority == "code_authored":
+            effective = "review_required" if readiness == "review_required" else "runtime_ready"
         elif authority in {"ai_assisted", "ai_assisted_human_reviewed"}:
             review = data.get("human_review") or {}
             if data.get("full_gate", {}).get("status") == "pass" and review.get("decision") == "approved" and review.get("user_confirmed") is True:

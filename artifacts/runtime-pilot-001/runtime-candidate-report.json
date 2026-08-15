@@ -1,0 +1,32 @@
+{
+  "contract": "runtime-candidate",
+  "status": "review_required",
+  "runtime_test_ready": true,
+  "runtime_verified": true,
+  "review_required": true,
+  "production_eligible": false,
+  "production_approved": false,
+  "candidate_id": "runtime-pilot-framer-001",
+  "asset_id": "runtime/framer-motion-pilot",
+  "intake": {
+    "status": "review_required",
+    "adapter": {
+      "adapter_id": "fixture.local-artifact-intake",
+      "status": "static_validated",
+      "invocation_mode": "none",
+      "cost_class": "included"
+    }
+  },
+  "consistency": {
+    "asset_identity": {
+      "status": "pass",
+      "ready": true
+    },
+    "action_set": {
+      "status": "pass",
+      "ready": true
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

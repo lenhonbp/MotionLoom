@@ -1,0 +1,32 @@
+{
+  "type": "https://motionloom.dev/attestation/v1",
+  "predicate_type": "https://motionloom.dev/predicate/animation-evidence/v1",
+  "subject": [
+    {
+      "name": "runtime-pilot-framer",
+      "digest": {
+        "sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d"
+      }
+    }
+  ],
+  "predicate": {
+    "task_id": "runtime-pilot-001",
+    "scene": "runtime-pilot-framer",
+    "context_hash": "9e9bb3bf2e490d23e9f5d52dfc4779b69adf0cc63b32df66adfde7050845fc74",
+    "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+    "manifest_sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d",
+    "motion_ir_sha256": "1d339ca2ec9c510e54e53c37ef32c2ddf1485dbaec97c5e9aa178a8f6c9c3287",
+    "evidence": {
+      "runtime_evidence_sha256": "2fe4258081208faec1471294c460e7fe06e98b8bb9f793d5d43582a7deb88b52",
+      "runtime_telemetry_sha256": "6d0b6f76d4ec2f6175362341043dbd37fe23287994a81fcae2f3f50ff3a71ea9",
+      "verifier_report_sha256": "494fdf1ef0d38bd35dd95af45f319ac93e7f0e675d99fc97ed9d4fef018dd87a"
+    },
+    "provenance_chain_hash": "02beba194b154fee1c0f70b798e151938a0761f42d5af4d9081369015a43c169",
+    "policy_version": "1.0",
+    "generated_at": "2026-08-15T15:48:48.381321Z",
+    "builder": {
+      "name": "motionloom-attestation-builder",
+      "version": "1.0.0"
+    }
+  }
+}

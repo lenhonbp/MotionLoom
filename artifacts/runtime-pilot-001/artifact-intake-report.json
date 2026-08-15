@@ -1,0 +1,42 @@
+{
+  "contract": "artifact-intake",
+  "status": "review_required",
+  "ready": true,
+  "runtime_candidate": true,
+  "production_eligible": false,
+  "production_approved": false,
+  "adapter": {
+    "adapter_id": "fixture.local-artifact-intake",
+    "status": "static_validated",
+    "invocation_mode": "none",
+    "cost_class": "included"
+  },
+  "errors": [],
+  "warnings": [
+    {
+      "severity": "warning",
+      "code": "adapter_side_effect",
+      "message": "adapter registry cannot be used as authority to run a side-effecting provider",
+      "path": "registry.adapters[1].side_effect_level"
+    },
+    {
+      "severity": "warning",
+      "code": "adapter_side_effect",
+      "message": "adapter registry cannot be used as authority to run a side-effecting provider",
+      "path": "registry.adapters[2].side_effect_level"
+    },
+    {
+      "severity": "warning",
+      "code": "adapter_not_runtime_verified",
+      "message": "adapter status is static_validated; retain human review and runtime evidence",
+      "path": "receipt.provider.adapter_id"
+    }
+  ],
+  "evidence": {
+    "receipt": "/home/ubuntu/animation-skill/examples/agent-consumer/runtime-pilot/receipt.json",
+    "controls": "/home/ubuntu/animation-skill/examples/agent-consumer/runtime-pilot/controls.json",
+    "export_manifest": "/home/ubuntu/animation-skill/examples/agent-consumer/runtime-pilot/export.json",
+    "registry": "/home/ubuntu/animation-skill/artifact-adapter-registry.json",
+    "provenance": "/home/ubuntu/animation-skill/examples/agent-consumer/runtime-pilot/provenance.json"
+  }
+}

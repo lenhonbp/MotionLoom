@@ -72,6 +72,17 @@ def main() -> int:
         production = MODULE.evaluate(pilot_path, base=root, mode="production")
         check(production["status"] == "fail" and not production["summary"]["production_eligible"], "AI-generated pilot must fail production gate")
 
+        code_scene = make_document("pilot.json", digest, authority="code_authored", readiness="review_required")
+        code_scene_path = root / "code-authored-scene.json"
+        code_scene_path.write_text(json.dumps(code_scene), encoding="utf-8")
+        code_scene_runtime = MODULE.evaluate(code_scene_path, base=root, mode="runtime")
+        check(code_scene_runtime["status"] == "pass" and code_scene_runtime["summary"]["effective_readiness"] == "review_required", "Code-authored scene must validate for review without production authority")
+        code_scene["readiness"] = "production_eligible"
+        code_scene_production_path = root / "code-authored-production-claim.json"
+        code_scene_production_path.write_text(json.dumps(code_scene), encoding="utf-8")
+        code_scene_production = MODULE.evaluate(code_scene_production_path, base=root, mode="production")
+        check(code_scene_production["status"] == "fail" and not code_scene_production["summary"]["production_eligible"], "Code-authored scene must not self-promote to production eligibility")
+
         pilot["files"][0]["sha256"] = "0" * 64
         tampered_path = root / "tampered.json"
         tampered_path.write_text(json.dumps(pilot), encoding="utf-8")

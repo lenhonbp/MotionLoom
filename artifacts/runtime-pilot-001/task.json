@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "task_id": "runtime-pilot-001",
+  "scene": "runtime-pilot-framer",
+  "intent": "Prove code-authored Framer Motion runtime evidence from Intake through mandatory Dev Lab review.",
+  "project_name": "MotionLoom",
+  "context_path": "artifacts/runtime-pilot-001/project-context.json",
+  "context_hash": "9e9bb3bf2e490d23e9f5d52dfc4779b69adf0cc63b32df66adfde7050845fc74",
+  "state": "review_required",
+  "browser_review": {
+    "required": true,
+    "status": "prepared",
+    "candidate_id": "8cccc4ac5a7e493ffe40",
+    "candidate_path": "browser-review.json",
+    "review_artifact": "review.json"
+  },
+  "owner_agent": "motionloom",
+  "created_at": "2026-08-15T00:00:00Z",
+  "updated_at": "2026-08-15T15:44:47Z"
+}

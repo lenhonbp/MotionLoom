@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "run_id": "1786808870894-145958",
+  "generated_at": "2026-08-15T15:47:52.478Z",
+  "mode": "runtime-telemetry",
+  "task_id": "runtime-pilot-001",
+  "scene": "runtime-pilot-framer",
+  "framework": "framer-motion",
+  "runtime": "framer-motion@13.1.0",
+  "source_sha256": "f4c0e56de842cae6b234566b556e4f07154f8109dde382a474218a9de8b45a8b",
+  "manifest_sha256": "2b53bf3b6fc8dfe16a271ecd52ec51c2acb5b612c0b77d9fd4e485696989011d",
+  "motion_ir_sha256": "1d339ca2ec9c510e54e53c37ef32c2ddf1485dbaec97c5e9aa178a8f6c9c3287",
+  "samples": [
+    {
+      "sequence": 0,
+      "percent": 0,
+      "captured_at_ms": 767.8999999761581,
+      "raf_intervals_ms": [
+        16.699999999999932,
+        16.600000000000023,
+        16.799999999999955
+      ],
+      "state_sha256": "0769bb6867251ff8d951b01e7d817ab4644d1f7d4a38b0e91ad54ec5b0f81f6b",
+      "state": {
+        "progress": 0,
+        "transform": "matrix(0.82, 0, 0, 0.82, 0, 0)",
+        "opacity": "0.28",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    },
+    {
+      "sequence": 1,
+      "percent": 50,
+      "captured_at_ms": 851.1000000238419,
+      "raf_intervals_ms": [
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023
+      ],
+      "state_sha256": "015ad2af517be79a3cf102b48b5f61282acd1843c7b5efe20472c2752d79c890",
+      "state": {
+        "progress": 0.5,
+        "transform": "matrix(1.02851, -0.256437, 0.256437, 1.02851, 176, -48)",
+        "opacity": "1",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    },
+    {
+      "sequence": 2,
+      "percent": 100,
+      "captured_at_ms": 934.6000000238419,
+      "raf_intervals_ms": [
+        16.700000000000045,
+        16.600000000000023,
+        16.699999999999932
+      ],
+      "state_sha256": "275a832573d3c660f6d820256f95412e253f0a29c02e8f535dfdec2c47e56de2",
+      "state": {
+        "progress": 1,
+        "transform": "matrix(0.882948, 0.469472, -0.469472, 0.882948, 240, -36)",
+        "opacity": "1",
+        "contract": {
+          "framework": "framer-motion",
+          "checkpoints": [
+            0,
+            50,
+            100
+          ],
+          "durationSeconds": 1.2,
+          "loop": true,
+          "sourceAuthority": "code_authored"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "sample_count": 3,
+    "raf_interval_count": 9,
+    "max_raf_interval_ms": 16.799999999999955,
+    "p95_raf_interval_ms": 16.799999999999955
+  },
+  "status": "pass"
+}

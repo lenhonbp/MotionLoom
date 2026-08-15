@@ -42,6 +42,15 @@ def main() -> int:
         if any((project / path).exists() for path in ("AGENTS.md", "project-context.json", ".motionloom")):
             errors.append("setup dry-run changed the project")
 
+        init_dry = run_cli(project, "init", "--dry-run")
+        try:
+            init_payload = json.loads(init_dry.stdout)
+        except json.JSONDecodeError as exc:
+            errors.append(f"init dry-run did not emit JSON: {exc}")
+            init_payload = {}
+        if init_dry.returncode != 0 or init_payload.get("status") != "planned" or init_payload.get("onboarding") != "quick_start":
+            errors.append(f"init should expose the quick-start contract: {init_payload}")
+
         package = json.loads((project / "package.json").read_text(encoding="utf-8"))
         package["devDependencies"] = {"motionloom": "2.2.0"}
         (project / "package.json").write_text(json.dumps(package), encoding="utf-8")
@@ -71,6 +80,8 @@ def main() -> int:
         status_payload = json.loads(status.stdout)
         if status.returncode != 0 or status_payload.get("status") != "ready":
             errors.append(f"status should report ready: {status_payload}")
+        if status_payload.get("quick_start", {}).get("gates_active") is not False:
+            errors.append("status should confirm that setup does not activate animation gates")
 
         (project / "AGENTS.md").unlink()
         repair = run_cli(project, "repair", "--skip-install", "--skip-memory", "--yes")

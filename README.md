@@ -56,34 +56,39 @@ Every handoff is machine-readable. The typical bundle under `artifacts/<task-id>
 
 ## Quick start
 
-### Recommended: one command from the project
+### Start once. Continue your normal work.
 
 ```bash
 cd /path/to/your/project
 npx --yes motionloom setup
 npx --no-install motionloom status
-
-# For AI-generated multi-frame assets, compile measured contracts before runtime review.
-npx --no-install motionloom asset-consistency validate \
-  --kind frame-geometry \
-  --input src/output/<scene>/hero-walk-frame-geometry.json \
-  --root src/output/<scene> --json
 ```
 
-This is the easiest path for a project owner. The wizard detects the host project, installs MotionLoom locally as a development dependency, merges an idempotent `AGENTS.md` router, runs discovery and creates fresh project context plus durable `.motionloom/project-memory.json`. It never commits, pushes, opens a PR or grants asset approval.
+This is the entire first-run path. MotionLoom detects the host project and package manager, installs a local development dependency, creates project-bound memory, and adds a small Agent router without overwriting existing guidance. `motionloom init` is an equivalent alias when an Agent or user prefers that wording. It never creates a scene, calls a generator, runs an asset gate, opens Dev Lab, commits, pushes, opens a PR, or grants approval.
 
-Preview or repair the same flow without memorizing low-level commands:
+After this, keep building your application normally. When you actually begin an animation task, tell your Agent to use MotionLoom. The Agent then reads the relevant workflow rather than showing every schema, contract, or production rule up front.
+
+Use these only if you need them:
 
 ```bash
-npx --yes motionloom setup --dry-run --json   # preview; no install or file changes
-npx --yes motionloom setup --yes              # accept safe defaults
-npx --no-install motionloom status --json     # read-only readiness report
-npx --no-install motionloom repair --yes      # restore only missing managed pieces
+npx --yes motionloom init --dry-run --json     # preview; no install or file changes
+npx --no-install motionloom doctor             # check the installed package
+npx --no-install motionloom repair --yes       # restore only missing managed pieces
 ```
 
 MotionLoom supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
 
-### Start from a real project
+### When you begin animation work
+
+The detail level follows the job rather than the installation. A simple interface motion task starts with a scene plan and runtime render. Importing a third-party or AI-generated visual asset adds the intake path. A production runtime package adds rig, provenance and runtime-specific checks. These are safeguards for the affected artifact, not rules imposed on unrelated product work.
+
+| Your task | Start with | MotionLoom reveals next |
+|---|---|---|
+| UI motion, loading state, page transition | `motionloom analyze . --init-memory` | Scene plan, runtime render and Dev Lab review |
+| Imported or AI-generated frames, sprite atlas, layered map | The same project analysis | Provenance and measured asset-consistency/intake steps |
+| Rive, Spine or other packaged runtime asset | The same project analysis | Package, rig and runtime evidence steps |
+
+### Advanced: start from a real project
 
 Run the first commands from the project that owns the animation. Do not copy the example context into production; generate a fresh context from the host project.
 

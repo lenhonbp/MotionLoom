@@ -97,6 +97,17 @@
 - [ ] Thêm provider contract ChatGPT vào builder/adapter registry để receipt và provenance không thể ghi sai nguồn là `internal-imagegen` khi bytes đến từ ChatGPT.
 - [ ] Giữ ba pose ChatGPT v2 ở trạng thái `rejected_pre_ingest`: contact-right thiếu padding cạnh phải/đáy; không pad hoặc resize source để vượt geometry gate.
 
+## Progressive onboarding and internal Dev Lab experience
+
+- [x] Thiết kế quick-start mặc định cho `motionloom setup`/`init`: chỉ tạo project memory, phát hiện framework và hỏi tối đa ba câu cơ bản.
+- [x] Bảo đảm các contract/gate sâu không xuất hiện ở luồng cơ bản; chỉ được giải thích/kích hoạt khi người dùng chọn `ingest` hoặc `runtime`.
+- [x] Cập nhật `motionloom doctor`, `status`, CLI help và README theo progressive disclosure cho người không rành code.
+- [x] Nâng landing/workbench Dev Lab với trạng thái pipeline, quick actions và luồng review-first dễ hiểu khi Agent mở qua browser nội bộ.
+- [x] Làm evidence rail trực quan: preview frame, badge trạng thái, hướng dẫn khắc phục inline và không thay thế artifact evidence bằng demo.
+- [x] Nâng AI Scout preflight card với master-frame preview, geometry blocker rõ ràng và liên kết corrective prompt.
+- [x] Chạy acceptance cho repo và Dev Lab, rồi lưu checkpoint Dev Lab `9ad54c8c`.
+- [ ] Tạo commit cục bộ cho repo MotionLoom và báo cáo phạm vi trước khi xin duyệt push.
+
 ## Deep audit and development pass
 
 - [ ] Kiểm tra trạng thái GitHub Actions thực tế và khả năng tái lập CI từ clean checkout.

@@ -19,12 +19,16 @@ const MARKER_START = "<!-- MOTIONLOOM:START -->";
 const MARKER_END = "<!-- MOTIONLOOM:END -->";
 
 function usage() {
-  console.log(`MotionLoom ${VERSION} — onboarding and project readiness
+  console.log(`MotionLoom ${VERSION} — quick start for project-aware animation
 
-Usage:
-  motionloom setup [options]       Install and bootstrap the current project
-  motionloom status [options]      Read-only readiness report
-  motionloom repair [options]      Re-apply safe missing setup pieces
+Start here:
+  motionloom init [options]        One safe setup for the current project
+  motionloom status [options]      Short, read-only project readiness check
+  motionloom doctor                Validate the installed package
+
+Maintenance:
+  motionloom setup [options]       Alias for init (kept for compatibility)
+  motionloom repair [options]      Re-apply only missing managed pieces
 
 Options:
   --project-root <path>            Host project (default: current directory)
@@ -43,13 +47,16 @@ Safe defaults:
   - idempotent AGENTS.md merge, never overwrite existing project guidance
   - Project Memory stays bound to the current project root
   - no commit, push, PR, approval or production promotion
+
+No asset or runtime gate runs during init. Choose an animation task first;
+the installed Agent router will load the relevant MotionLoom workflow then.
 `);
 }
 
 function parseArgs(argv) {
   const args = [...argv];
   let action = "setup";
-  if (["setup", "status", "repair"].includes(args[0])) action = args.shift();
+  if (["setup", "init", "status", "repair"].includes(args[0])) action = args.shift();
   const options = {
     action,
     projectRoot: process.cwd(),
@@ -117,6 +124,23 @@ function readJson(path) {
 
 function projectPackage(root) {
   return readJson(join(root, "package.json"));
+}
+
+function detectProjectKind(packageJson) {
+  const dependencies = {
+    ...(packageJson?.dependencies || {}),
+    ...(packageJson?.devDependencies || {}),
+  };
+  if (dependencies.next) return "Next.js";
+  if (dependencies["@angular/core"]) return "Angular";
+  if (dependencies.vue || dependencies.nuxt) return "Vue";
+  if (dependencies.svelte || dependencies["@sveltejs/kit"]) return "Svelte";
+  if (dependencies.phaser) return "Phaser";
+  if (dependencies["pixi.js"] || dependencies["@pixi/react"]) return "PixiJS";
+  if (dependencies["@babylonjs/core"]) return "Babylon.js";
+  if (dependencies.three || dependencies["@react-three/fiber"]) return "Three.js";
+  if (dependencies.react || dependencies["react-dom"]) return "React";
+  return "Node / unclassified";
 }
 
 function hasDependency(packageJson) {
@@ -219,8 +243,9 @@ When a task involves animation, motion, assets, runtime rendering or Dev Lab rev
 - Read the installed MotionLoom package's canonical \`SKILL.md\` and \`agent-card.json\` first; do not copy them into the host project.
 - Run \`npx --no-install motionloom status --json\` before planning animation work.
 - Keep project context and \`.motionloom/project-memory.json\` bound to this project; never copy them from another project.
-- After rendering, open the MotionLoom Dev Lab candidate for user review before any PR handoff.
-- Treat runtime evidence, quality gates, attestation and heuristics as evidence only; they never imply user approval.
+- Continue normal product work without running MotionLoom gates until the task actually includes animation or an animation asset.
+- For an animation task, follow the applicable canonical workflow; use ingest/runtime checks only when importing assets or testing a target runtime.
+- After rendering, open the MotionLoom Dev Lab candidate for user review before any PR handoff. Evidence never implies user approval.
 - Keep Git side effects local-only until the user explicitly confirms commit, push or PR.
 
 ${MARKER_END}`;
@@ -310,6 +335,11 @@ function statusReport(options) {
     context: { path: join(projectRoot, "project-context.json"), exists: context },
     memory: { path: join(projectRoot, ".motionloom", "project-memory.json"), exists: memory, validation: memoryCheck },
     discovery,
+    quick_start: {
+      project_kind: detectProjectKind(packageJson),
+      gates_active: false,
+      next_action: "Continue normal work. Start an animation task when you are ready; MotionLoom will then load only the relevant workflow.",
+    },
   };
 }
 
@@ -319,15 +349,14 @@ function printStatus(report, json) {
     return;
   }
   const label = report.status === "ready" ? "READY" : report.status === "needs_review" ? "NEEDS REVIEW" : "NEEDS SETUP";
-  console.log(`MotionLoom status: ${label}`);
-  console.log(`Project: ${report.project_root}`);
-  console.log(`Package: ${report.package.installed ? `installed ${report.package.version || "unknown"}` : "not installed locally"}`);
-  console.log(`Runtime: Node ${report.runtime.node.version} ${report.runtime.node.supported ? "PASS" : "BLOCKED"}; Python ${report.runtime.python.version || "missing"} ${report.runtime.python.supported ? "PASS" : "BLOCKED"}`);
-  console.log(`Agent router: ${report.router.status}`);
-  console.log(`Project context: ${report.context.exists ? "present" : "missing"}`);
-  console.log(`Project Memory: ${report.memory.exists ? (report.memory.validation.ok ? "valid" : "needs review") : "missing"}`);
-  console.log(`Discovery: ${report.discovery.ok ? "PASS" : "BLOCKED"}`);
-  if (report.status !== "ready") console.log("Next step: npx --yes motionloom setup");
+  console.log(`MotionLoom: ${label} · ${report.quick_start.project_kind}`);
+  if (report.status === "ready") {
+    console.log("Project memory and Agent routing are ready. No animation gate is active.");
+    console.log("Next: continue normal work. When you start animation, ask the Agent to use MotionLoom.");
+    return;
+  }
+  console.log(`Missing setup pieces: package ${report.package.installed ? "ready" : "missing"}, memory ${report.memory.exists ? "present" : "missing"}, router ${report.router.status}.`);
+  console.log("Next: npx --yes motionloom init");
 }
 
 function setup(options) {
@@ -335,8 +364,10 @@ function setup(options) {
   const packageJson = projectPackage(projectRoot);
   const result = {
     command: options.action,
+    onboarding: "quick_start",
     status: "blocked",
     project_root: projectRoot,
+    project_kind: detectProjectKind(packageJson),
     dry_run: options.dryRun,
     changed: [],
     planned: [],
@@ -432,19 +463,16 @@ function printSetup(result, json) {
     return;
   }
   const label = result.status === "ready" ? "READY" : result.status === "planned" ? "DRY RUN" : result.status === "needs_review" ? "NEEDS REVIEW" : "BLOCKED";
-  console.log(`MotionLoom setup: ${label}`);
-  console.log(`Project: ${result.project_root}`);
-  for (const item of result.changed) console.log(`  PASS  ${typeof item === "string" ? item : `${item.step}: ${item.action}`}`);
-  for (const item of result.planned) console.log(`  PLAN  ${typeof item === "string" ? item : item.command ? item.command.join(" ") : `${item.step}: ${item.action || "planned"}`}`);
-  for (const warning of result.warnings) console.log(`  WARN  ${warning}`);
+  console.log(`MotionLoom quick start: ${label} · ${result.project_kind || "project"}`);
   for (const error of result.errors) console.log(`  BLOCK ${error}`);
+  for (const warning of result.warnings) console.log(`  NOTE  ${warning}`);
   if (result.status === "ready") {
-    console.log("Next: ask your Agent to read the MotionLoom router, inspect project memory, then create a small animation candidate.");
-    console.log("Review: open the Dev Lab candidate before any PR or Git side effect.");
+    console.log("Ready. Project memory is set up and your normal work stays uninterrupted.");
+    console.log("When an animation task begins, ask your Agent to use MotionLoom. Asset and runtime checks appear only when relevant.");
   } else if (result.status === "planned") {
-    console.log("Dry run only: rerun without --dry-run to apply the safe local setup.");
+    console.log("Dry run only: rerun without --dry-run to apply the same safe quick start.");
   } else {
-    console.log("Next: run `npx --no-install motionloom status --json` and follow the reported missing or review-required item.");
+    console.log("Next: run `npx --no-install motionloom status --json` for details, then resolve the reported setup item.");
   }
 }
 

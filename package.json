@@ -126,6 +126,7 @@
     "test": "node bin/motionloom.mjs test",
     "validate": "npm run quality:attestation",
     "doctor": "node bin/motionloom.mjs doctor --json",
+    "init": "node bin/motionloom.mjs init",
     "setup": "node bin/motionloom.mjs setup",
     "setup:dry": "node bin/motionloom.mjs setup --dry-run",
     "status": "node bin/motionloom.mjs status",

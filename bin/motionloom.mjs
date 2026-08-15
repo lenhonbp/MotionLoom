@@ -48,6 +48,7 @@ const PYTHON_COMMANDS = {
 };
 
 const NODE_COMMANDS = {
+  init: "scripts/setup.mjs",
   setup: "scripts/setup.mjs",
   status: "scripts/setup.mjs",
   repair: "scripts/setup.mjs",
@@ -59,8 +60,12 @@ function printHelp() {
 Usage:
   motionloom <command> [args...]
 
-Commands:
+Start here:
+  init                   One safe project setup; no animation gate runs
+  status                 Short read-only readiness report
   doctor                 Validate the installed Skill package
+
+Use when an animation task needs it:
   analyze                Run project analysis and refresh Project Memory
   memory                 Initialize, inspect, refresh, recover or validate memory
   intelligence           Build or validate Intelligence Core artifacts
@@ -87,8 +92,7 @@ Commands:
   rive-package-gate      Verify a real .riv package, runtime proof and provenance before testing
   pilot-build            Build a review-only hash-bound AI scout pilot from true-alpha PNG sources
   alpha-isolate          Isolate an edge-connected flat background; block residual edge contamination
-  setup                  Install and bootstrap MotionLoom in the current project
-  status                 Read-only project readiness report
+  setup                  Alias for init (kept for compatibility)
   repair                 Re-apply safe missing setup pieces
 
 Cross-platform examples:
@@ -128,7 +132,7 @@ if (!script) {
 }
 
 const executable = script.endsWith(".mjs") ? process.execPath : PYTHON;
-const delegatedArgs = NODE_COMMANDS[command] && command !== "setup" ? [command, ...args] : args;
+  const delegatedArgs = NODE_COMMANDS[command] && !["setup", "init"].includes(command) ? [command, ...args] : command === "init" ? ["init", ...args] : args;
 const result = spawnSync(executable, [resolve(ROOT, script), ...delegatedArgs], {
   cwd: ROOT,
   stdio: "inherit",

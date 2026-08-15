@@ -112,7 +112,7 @@
 - [x] Triển khai parser, validation và fallback UI cho review URL để Dev Lab tự mở đúng candidate thật khi evidence hợp lệ.
 - [x] Kiểm thử deep link với candidate hợp lệ, thiếu, foreign hoặc malformed; lưu checkpoint Dev Lab sau khi xác minh.
 - [x] Chạy AI Scout preflight với ba pose hiện có; builder chặn contact-right ở 44px padding cạnh phải nên trạng thái vẫn `partial`, không ingest/candidate/runtime/Dev Lab review.
-- [ ] Tạo commit cục bộ cho review deep link và báo cáo phạm vi trước khi xin duyệt push.
+- [x] Tạo commit cục bộ cho review deep link và báo cáo phạm vi trước khi xin duyệt push.
 
 ## Deep audit and development pass
 

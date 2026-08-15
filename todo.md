@@ -106,7 +106,7 @@
 - [x] Làm evidence rail trực quan: preview frame, badge trạng thái, hướng dẫn khắc phục inline và không thay thế artifact evidence bằng demo.
 - [x] Nâng AI Scout preflight card với master-frame preview, geometry blocker rõ ràng và liên kết corrective prompt.
 - [x] Chạy acceptance cho repo và Dev Lab, rồi lưu checkpoint Dev Lab `9ad54c8c`.
-- [ ] Tạo commit cục bộ cho repo MotionLoom và báo cáo phạm vi trước khi xin duyệt push.
+- [x] Tạo commit cục bộ cho repo MotionLoom và báo cáo phạm vi trước khi xin duyệt push.
 
 ## Deep audit and development pass
 

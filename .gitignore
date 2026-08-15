@@ -9,3 +9,4 @@ dev-lab/public/scenes/
 /artifacts/runtime-adapters/
 /.motionloom/pilots/
 /.motionloom/incoming/
+/.motionloom/runs/

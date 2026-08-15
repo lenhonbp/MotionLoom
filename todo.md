@@ -118,7 +118,7 @@
 - [x] Stage ba PNG ChatGPT user-upload nguyên gốc cùng SHA-256 và provenance `chatgpt-user-import` trước khi chạy bất kỳ validator hoặc builder nào.
 - [x] Bổ sung regression để `build-ai-pilot` phát hành `partial-handoff.json` hash-bound khi reject ở frame đầu tiên, không chỉ trả traceback.
 - [x] Chạy preflight có evidence cho canvas, alpha, contamination và padding trên cả ba pose. Kết quả reject hash-bound: canvas 1254×1254, padding phải/đáy thấp hơn 63px; không resize/pad để bypass.
-- [x] Ignore `/.motionloom/incoming/` để ba bytes user-upload chỉ phục vụ validation cục bộ, không thể bị commit hoặc đóng gói npm nhầm.
+- [x] Ignore `/.motionloom/incoming/` và `/.motionloom/runs/` để ba bytes user-upload cùng copies validation cục bộ không thể bị commit hoặc đóng gói npm nhầm.
 - [x] Tạo commit cục bộ cho partial handoff fail-closed, regression và bảo vệ user-upload bytes; báo cáo trước khi xin duyệt push.
 - [ ] Khi cả bốn frame pass, chạy build-ai-pilot → Artifact Intake → consistency → runtime candidate → runtime render → review handoff Dev Lab; nếu bất kỳ gate fail, kết thúc `partial`.
 - [x] Cung cấp prompt ChatGPT copy-paste, yêu cầu upload master v3, tạo ba pose độc lập và trả lại PNG gốc cùng metadata phiên để provenance `ai_generated` được ghi trung thực.

@@ -122,6 +122,11 @@
 - [x] Tạo commit cục bộ cho partial handoff fail-closed, regression và bảo vệ user-upload bytes; báo cáo trước khi xin duyệt push.
 - [ ] Khi cả bốn frame pass, chạy build-ai-pilot → Artifact Intake → consistency → runtime candidate → runtime render → review handoff Dev Lab; nếu bất kỳ gate fail, kết thúc `partial`.
 - [x] Cung cấp prompt ChatGPT copy-paste, yêu cầu upload master v3, tạo ba pose độc lập và trả lại PNG gốc cùng metadata phiên để provenance `ai_generated` được ghi trung thực.
+- [x] Push ba commit hardening đã được duyệt (`ad3bbb8`, `6620dde`, `a154d91`) lên `origin/main` và xác minh SHA remote `a154d9177ac1fc5276e2538b0ca72484bbf08ed9`.
+- [x] Soạn handoff Codex dùng master v3, contract canvas/padding/footline, pose definitions và provenance `ai_generated`; yêu cầu trả ba PNG gốc độc lập, không post-process để bypass.
+- [x] Stage receipt Codex `exec-6c962cac-7e7f-491b-b0a8-e7c4ee7d2412` cùng SHA-256, source mode và blocker geometry/background vào partial handoff mà không ingest bytes.
+- [x] Cập nhật handoff Codex với capability preflight: dừng ngay nếu tool chỉ trả 1254×1254, RGB hoặc checkerboard rasterized; không cần tạo các pose còn lại.
+- [ ] Chạy regression evidence và tạo commit cục bộ cho tài liệu/partial handoff Codex bị reject; không push nếu chưa có duyệt riêng.
 
 ## Deep audit and development pass
 

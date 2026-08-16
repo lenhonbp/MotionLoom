@@ -193,6 +193,7 @@
 - [x] Tạo adapter CloudKit local-first chỉ sync review metadata/annotation; không sync repository, secrets, source asset hoặc bypass identity checks.
 - [x] Thêm Swift unit tests, fixture conformance tests, build smoke macOS/iOS, CI macOS và tài liệu Xcode/TestFlight; không tự sign, push hay submit build.
 - [x] Chạy acceptance trên macOS/Xcode thực; macOS app đã build/launch unsigned và iOS target đã build unsigned. Blocker còn lại: chưa có iOS Simulator runtime và Apple Developer signing/CloudKit container để chạy device UI smoke, sync live hoặc TestFlight.
+- [x] Đã commit local (chưa push): `1c992fd0` fix macOS /var path-safety (4 files, suite PASS) và `08c4706d` feat(apple) native macOS + iOS review alpha (38 files); working tree clean. Chờ xác nhận riêng của chủ sở hữu trước khi push lên origin/main.
 - [ ] Cài một iOS Simulator runtime rồi chạy UI smoke của Review companion trên Simulator.
 - [ ] Khi chủ sở hữu sẵn sàng, cấu hình Apple Developer Team, bundle identifiers, CloudKit container/entitlements và TestFlight signing; không tự submit build.
 

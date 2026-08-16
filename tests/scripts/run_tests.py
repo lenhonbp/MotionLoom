@@ -952,6 +952,16 @@ def test_quality_workflow_rebuilds_replay_after_generated_artifacts():
         setup_tests.returncode == 0 and "setup onboarding tests: PASS" in setup_tests.stdout,
         setup_tests.stdout.strip() or setup_tests.stderr.strip(),
     )
+    apple_contract_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_apple_contracts.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "Apple review contracts preserve hash binding and human-governed boundaries",
+        apple_contract_tests.returncode == 0 and "apple contract tests: PASS" in apple_contract_tests.stdout,
+        apple_contract_tests.stdout.strip() or apple_contract_tests.stderr.strip(),
+    )
     visual_tests = subprocess.run(
         [sys.executable, str(ROOT / "tests/scripts/test_visual_truth.py")],
         capture_output=True,

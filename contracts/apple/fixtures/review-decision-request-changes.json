@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "decision_id": "review-runtime-pilot-001-001",
+  "task_id": "runtime-pilot-001",
+  "candidate_id": "8cccc4ac5a7e493ffe40",
+  "evidence": {
+    "runtime_evidence_sha256": "2fe4258081208faec1471294c460e7fe06e98b8bb9f793d5d43582a7deb88b52",
+    "candidate_report_sha256": "a85156020ff421e94d344af0ab70e6506ccb3ba49ff376c7c1d9155c7672beb3"
+  },
+  "decision": "request_changes",
+  "annotations": [{"id": "note-runtime-pilot-001-001", "timecode_ms": 600, "body": "Review fixture: inspect midpoint easing before any human production approval."}],
+  "created_at": "2026-08-16T00:00:00Z",
+  "reviewer": {"kind": "human", "display_name": "Fixture Reviewer", "device_id": "fixture-device"}
+}

@@ -182,6 +182,20 @@
 - [ ] Định nghĩa benchmark suite và metrics: acceptance precision, false approval rate, provenance completeness, replay success và time-to-fix.
 - [ ] Tách release channels/compatibility policy cho core contracts, runtime adapters, Dev Lab protocol và Agent-facing SKILL.md.
 
+## MotionLoom Apple apps: approved implementation program
+
+- [x] Khóa versioned JSON contracts và fixtures cho task, candidate, evidence frame, review launch descriptor và review decision; không duplicate validator policy sang Swift.
+- [x] Tạo Swift Package `MotionLoomContracts` có decoding, schema version migration, identity binding và regression fixtures fail-closed.
+- [x] Tạo Swift Package `MotionLoomReview` với timeline state, annotation, review decision và export handoff; không tự cấp `production_approved`.
+- [x] Tạo macOS-only `MotionLoomMacBridge` với sandbox bookmark, allow-list command, scoped artifact access và reject path/URL untrusted.
+- [x] Tạo MotionLoom Studio alpha cho macOS: Project Inspector, status surface, safe task launch và Web Review Surface cho Dev Lab.
+- [x] Tạo iOS/iPadOS Review companion chỉ đọc candidate/evidence, scrub timeline, annotate và tạo human review decision.
+- [x] Tạo adapter CloudKit local-first chỉ sync review metadata/annotation; không sync repository, secrets, source asset hoặc bypass identity checks.
+- [x] Thêm Swift unit tests, fixture conformance tests, build smoke macOS/iOS, CI macOS và tài liệu Xcode/TestFlight; không tự sign, push hay submit build.
+- [x] Chạy acceptance trên macOS/Xcode thực; macOS app đã build/launch unsigned và iOS target đã build unsigned. Blocker còn lại: chưa có iOS Simulator runtime và Apple Developer signing/CloudKit container để chạy device UI smoke, sync live hoặc TestFlight.
+- [ ] Cài một iOS Simulator runtime rồi chạy UI smoke của Review companion trên Simulator.
+- [ ] Khi chủ sở hữu sẵn sàng, cấu hình Apple Developer Team, bundle identifiers, CloudKit container/entitlements và TestFlight signing; không tự submit build.
+
 ## Intelligence Core v0.1 implementation
 
 - [x] Thêm schema `project-graph`, `provenance`, `capability-registry` và `motion-ir` với version/policy rõ ràng.

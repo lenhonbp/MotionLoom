@@ -1,0 +1,93 @@
+name: MotionLoom Apple
+
+on:
+  pull_request:
+    paths:
+      - "apps/apple/**"
+      - "contracts/apple/**"
+      - "tests/scripts/test_apple_contracts.py"
+      - "tests/scripts/run_tests.py"
+      - ".github/workflows/apple.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/apple/**"
+      - "contracts/apple/**"
+      - "tests/scripts/test_apple_contracts.py"
+      - "tests/scripts/run_tests.py"
+      - ".github/workflows/apple.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apple-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-native-review-surface:
+    name: Swift packages and iOS Simulator compatibility
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show selected Xcode and SDKs
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          xcrun --show-sdk-path --sdk macosx
+          xcrun --show-sdk-path --sdk iphonesimulator
+
+      - name: Run canonical contract regression
+        run: python3 tests/scripts/test_apple_contracts.py
+
+      - name: Run MotionLoomContracts unit tests
+        working-directory: apps/apple/Packages/MotionLoomContracts
+        run: swift test
+
+      - name: Run MotionLoomReview unit tests
+        working-directory: apps/apple/Packages/MotionLoomReview
+        run: swift test
+
+      - name: Run MotionLoomMacBridge unit tests
+        working-directory: apps/apple/Packages/MotionLoomMacBridge
+        run: swift test
+
+      - name: Run MotionLoomReviewUI unit tests
+        working-directory: apps/apple/Packages/MotionLoomReviewUI
+        run: swift test
+
+      - name: Compile Review UI against iOS Simulator SDK
+        run: |
+          destination="$(mktemp)"
+          apps/apple/scripts/emit-ios-simulator-destination.sh "$destination"
+          cd apps/apple/Packages/MotionLoomReviewUI
+          swift build --destination "$destination"
+          rm -f "$destination"
+
+      - name: Run MotionLoomReviewSync local-first tests
+        working-directory: apps/apple/Packages/MotionLoomReviewSync
+        run: swift test
+
+      - name: Build unsigned MotionLoom Studio macOS app
+        working-directory: apps/apple/MotionLoomApple
+        run: |
+          xcodebuild \
+            -project MotionLoomApple.xcodeproj \
+            -target MotionLoomStudio \
+            -sdk macosx \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Build unsigned MotionLoom Review iOS app
+        working-directory: apps/apple/MotionLoomApple
+        run: |
+          xcodebuild \
+            -project MotionLoomApple.xcodeproj \
+            -target MotionLoomReview \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build

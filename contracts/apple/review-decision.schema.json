@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/contracts/apple/review-decision.schema.json",
+  "title": "MotionLoom human review decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "decision_id", "task_id", "candidate_id", "evidence", "decision", "created_at", "reviewer"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "decision_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_evidence_sha256", "candidate_report_sha256"],
+      "properties": {
+        "runtime_evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "candidate_report_sha256": {"$ref": "#/$defs/sha256"},
+        "attestation_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "decision": {"type": "string", "enum": ["request_changes", "reviewed_no_decision", "approve_for_next_human_step"]},
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "timecode_ms", "body"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "timecode_ms": {"type": "integer", "minimum": 0},
+          "body": {"type": "string", "minLength": 1, "maxLength": 4000}
+        }
+      }
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "display_name"],
+      "properties": {
+        "kind": {"const": "human"},
+        "display_name": {"type": "string", "minLength": 1},
+        "device_id": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

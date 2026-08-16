@@ -257,6 +257,14 @@ The public integration surfaces are intentionally small and inspectable:
 
 The Skill can trigger or suggest an internal browser-capable Agent to open the Dev Lab after rendering. Dev Lab is post-render review infrastructure, not a competing Skill. The user can request changes, receive a structured fix plan and rerender selectively, or explicitly confirm the PR path.
 
+## Native companion apps (alpha)
+
+`apps/apple/` contains the native-first Apple companion surface. **MotionLoom Studio for macOS** opens a scoped project, exposes the evidence and timeline inspection surface, and can request only allow-listed local checks. **MotionLoom Review for iPhone and iPad** reads a hash-bound review launch descriptor, scrubs evidence, records annotations, and exports a human review decision.
+
+These apps do not replace the Agent, the npm CLI or Dev Lab. They make a project’s artifact state and human review decision visible between Agent sessions. They cannot grant `production_approved`, set `OPEN_PR=1`, push Git changes, publish npm packages, or turn an AI-generated asset into artist-authored material.
+
+Read [the Apple workspace guide](apps/apple/README.md), [the contract boundary](docs/architecture/apple/contracts.md), and [the TestFlight preparation guide](docs/apple-distribution.md) before building locally.
+
 ## Repository map
 
 | Path | Purpose |
@@ -273,6 +281,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | `references/` | Progressive-disclosure implementation references |
 | `docs/` | Framework selection, checklists, audits and release notes |
 | `dev-lab/` | Self-contained browser review workbench and harness |
+| `apps/apple/` | macOS Studio and iOS/iPadOS Review companion sources, Swift packages, Xcode project and local build guide |
 | `artifacts/<task-id>/` | Per-task evidence, report and handoff bundle |
 | `schemas/visual-truth.schema.json`, `scripts/visual-truth.py` | Provenance-bound visual comparison and review explanation contract |
 | `schemas/remediation-history.schema.json`, `scripts/remediation-learning.py` | Append-only remediation/benchmark ledger and aggregate learning metrics |
@@ -297,6 +306,7 @@ The Skill can trigger or suggest an internal browser-capable Agent to open the D
 | Check control-to-runtime and rig compatibility | `motionloom runtime-candidate`, `motionloom rig-compatibility`, and [production checklist](docs/CHECKLIST.md) |
 | Validate visual truth before review/PR | `motionloom visual-truth build|validate` and [production checklist](docs/CHECKLIST.md) |
 | Check current evidence posture | [Current status](docs/STATUS.md), [external corpus evidence](docs/audits/external-project-corpus-2026-08-13.md) and [historical audit snapshot](AUDIT-REPORT.md) |
+| Build the native review companions | [Apple workspace guide](apps/apple/README.md), [Studio architecture](docs/architecture/apple/studio.md), and [distribution preparation](docs/apple-distribution.md) |
 | Contribute code or docs | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Report a vulnerability or request help | [SECURITY.md](SECURITY.md) and [SUPPORT.md](SUPPORT.md) |
 | See version history | [CHANGELOG.md](CHANGELOG.md) and [release notes](docs/releases/) |

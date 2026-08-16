@@ -1,0 +1,74 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000021 /* MotionLoomStudioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000006 /* MotionLoomStudioApp.swift */; };
+		A00000000000000000000022 /* MotionLoomReviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000007 /* MotionLoomReviewApp.swift */; };
+		A00000000000000000000023 /* MotionLoomContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000061 /* MotionLoomContracts.swift */; };
+		A00000000000000000000024 /* MotionLoomReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000062 /* MotionLoomReview.swift */; };
+		A00000000000000000000025 /* MotionLoomMacBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000063 /* MotionLoomMacBridge.swift */; };
+		A00000000000000000000026 /* MotionLoomContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000065 /* MotionLoomContracts.swift */; };
+		A00000000000000000000027 /* MotionLoomReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000066 /* MotionLoomReview.swift */; };
+		A00000000000000000000028 /* MotionLoomReviewUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000064 /* MotionLoomReviewUI.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000006 /* MotionLoomStudioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomStudioApp.swift; path = ../MotionLoomStudio/Sources/MotionLoomStudio/MotionLoomStudioApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000007 /* MotionLoomReviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomReviewApp.swift; path = ../MotionLoomReviewApp/MotionLoomReviewApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000008 /* MotionLoomStudio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MotionLoomStudio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000009 /* MotionLoomReview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MotionLoomReview.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000061 /* MotionLoomContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomContracts.swift; path = ../Packages/MotionLoomContracts/Sources/MotionLoomContracts/MotionLoomContracts.swift; sourceTree = "<group>"; };
+		A00000000000000000000062 /* MotionLoomReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomReview.swift; path = ../Packages/MotionLoomReview/Sources/MotionLoomReview/MotionLoomReview.swift; sourceTree = "<group>"; };
+		A00000000000000000000063 /* MotionLoomMacBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomMacBridge.swift; path = ../Packages/MotionLoomMacBridge/Sources/MotionLoomMacBridge/MotionLoomMacBridge.swift; sourceTree = "<group>"; };
+		A00000000000000000000064 /* MotionLoomReviewUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomReviewUI.swift; path = ../Packages/MotionLoomReviewUI/Sources/MotionLoomReviewUI/MotionLoomReviewUI.swift; sourceTree = "<group>"; };
+		A00000000000000000000065 /* MotionLoomContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomContracts.swift; path = ../Packages/MotionLoomContracts/Sources/MotionLoomContracts/MotionLoomContracts.swift; sourceTree = "<group>"; };
+		A00000000000000000000066 /* MotionLoomReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MotionLoomReview.swift; path = ../Packages/MotionLoomReview/Sources/MotionLoomReview/MotionLoomReview.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A0000000000000000000000C /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A0000000000000000000000D /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000002 = {isa = PBXGroup; children = (A00000000000000000000004 /* MotionLoomStudio */, A00000000000000000000005 /* MotionLoomReview */, A00000000000000000000003 /* Products */); sourceTree = "<group>"; };
+		A00000000000000000000003 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000008 /* MotionLoomStudio.app */, A00000000000000000000009 /* MotionLoomReview.app */); name = Products; sourceTree = "<group>"; };
+		A00000000000000000000004 /* MotionLoomStudio */ = {isa = PBXGroup; children = (A00000000000000000000006 /* MotionLoomStudioApp.swift */, A00000000000000000000061 /* MotionLoomContracts.swift */, A00000000000000000000062 /* MotionLoomReview.swift */, A00000000000000000000063 /* MotionLoomMacBridge.swift */); name = MotionLoomStudio; sourceTree = "<group>"; };
+		A00000000000000000000005 /* MotionLoomReview */ = {isa = PBXGroup; children = (A00000000000000000000007 /* MotionLoomReviewApp.swift */, A00000000000000000000065 /* MotionLoomContracts.swift */, A00000000000000000000066 /* MotionLoomReview.swift */, A00000000000000000000064 /* MotionLoomReviewUI.swift */); name = MotionLoomReview; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A0000000000000000000000E /* MotionLoomStudio */ = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000011 /* Build configuration list for PBXNativeTarget "MotionLoomStudio" */; buildPhases = (A0000000000000000000000A /* Sources */, A0000000000000000000000C /* Frameworks */); buildRules = (); dependencies = (); name = MotionLoomStudio; productName = MotionLoomStudio; productReference = A00000000000000000000008 /* MotionLoomStudio.app */; productType = "com.apple.product-type.application"; };
+		A0000000000000000000000F /* MotionLoomReview */ = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000012 /* Build configuration list for PBXNativeTarget "MotionLoomReview" */; buildPhases = (A0000000000000000000000B /* Sources */, A0000000000000000000000D /* Frameworks */); buildRules = (); dependencies = (); name = MotionLoomReview; productName = MotionLoomReview; productReference = A00000000000000000000009 /* MotionLoomReview.app */; productType = "com.apple.product-type.application"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 2660; LastUpgradeCheck = 2660; TargetAttributes = {A0000000000000000000000E = {CreatedOnToolsVersion = 26.0;}; A0000000000000000000000F = {CreatedOnToolsVersion = 26.0;};};}; buildConfigurationList = A00000000000000000000010 /* Build configuration list for PBXProject "MotionLoomApple" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = A00000000000000000000002; productRefGroup = A00000000000000000000003 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (A0000000000000000000000E /* MotionLoomStudio */, A0000000000000000000000F /* MotionLoomReview */); };
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A0000000000000000000000A /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000021 /* MotionLoomStudioApp.swift in Sources */, A00000000000000000000023 /* MotionLoomContracts.swift in Sources */, A00000000000000000000024 /* MotionLoomReview.swift in Sources */, A00000000000000000000025 /* MotionLoomMacBridge.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+		A0000000000000000000000B /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000022 /* MotionLoomReviewApp.swift in Sources */, A00000000000000000000026 /* MotionLoomContracts.swift in Sources */, A00000000000000000000027 /* MotionLoomReview.swift in Sources */, A00000000000000000000028 /* MotionLoomReviewUI.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000031 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {SWIFT_VERSION = 6.0; }; name = Debug; };
+		A00000000000000000000032 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {SWIFT_VERSION = 6.0; }; name = Release; };
+		A00000000000000000000041 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "MotionLoom Studio"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.motionloom.studio.alpha; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = macosx; SWIFT_VERSION = 6.0; }; name = Debug; };
+		A00000000000000000000042 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "MotionLoom Studio"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.motionloom.studio.alpha; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = macosx; SWIFT_VERSION = 6.0; }; name = Release; };
+		A00000000000000000000051 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "MotionLoom Review"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.motionloom.review.alpha; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SWIFT_VERSION = 6.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Debug; };
+		A00000000000000000000052 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "MotionLoom Review"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.motionloom.review.alpha; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SWIFT_VERSION = 6.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000010 /* Build configuration list for PBXProject "MotionLoomApple" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000031 /* Debug */, A00000000000000000000032 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A00000000000000000000011 /* Build configuration list for PBXNativeTarget "MotionLoomStudio" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000041 /* Debug */, A00000000000000000000042 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A00000000000000000000012 /* Build configuration list for PBXNativeTarget "MotionLoomReview" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000051 /* Debug */, A00000000000000000000052 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}

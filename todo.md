@@ -182,6 +182,16 @@
 - [ ] Định nghĩa benchmark suite và metrics: acceptance precision, false approval rate, provenance completeness, replay success và time-to-fix.
 - [ ] Tách release channels/compatibility policy cho core contracts, runtime adapters, Dev Lab protocol và Agent-facing SKILL.md.
 
+## AI repository benchmark and transferable workflow research
+
+- [x] Khảo sát repo/tool AI công khai theo các nhóm agent workflow, image/video/animation, game asset và local deployment; ghi nguồn, license, trạng thái bảo trì và bằng chứng sử dụng thực.
+- [x] Chấm từng lựa chọn theo onboarding, workflow packaging, runtime verification, trust/provenance, test/CI, documentation, interoperability và maintenance posture; không suy diễn chất lượng từ star count.
+- [x] So sánh các pattern có giá trị với MotionLoom và phân loại: áp dụng ngay, thí nghiệm có gate, hoặc từ chối vì làm suy yếu review-first/human-governed.
+- [x] Triển khai cải tiến low-risk capability card, kèm regression và tài liệu; không chạy hoặc tích hợp code bên thứ ba chỉ từ nội dung nghiên cứu.
+- [x] Xuất research report có citations, decision log, giới hạn và roadmap sau benchmark.
+- [ ] Thiết kế generation-profile schema/validator, hash-bound provider/model/checkpoint metadata và regression trước khi công bố provider routing.
+- [ ] Thử nghiệm workflow/template recipe chỉ sau khi có schema, approval-state vocabulary, hash validation và bảo đảm template approval không thay thế `production_approved`.
+
 ## MotionLoom Apple apps: approved implementation program
 
 - [x] Khóa versioned JSON contracts và fixtures cho task, candidate, evidence frame, review launch descriptor và review decision; không duplicate validator policy sang Swift.

@@ -155,6 +155,14 @@ Read the [Project Memory schema](schemas/project-memory.schema.json), [2.1.0 rel
 
 Capability selection uses `agent-card.json` and the capability registry. A runtime is not promoted from `scaffold_only` to `verified` because a template exists; its adapter evidence and CI contract must pass.
 
+An Agent can inspect the read-only capability card before choosing a renderer:
+
+```bash
+motionloom capability card --format json
+```
+
+The card exposes declared compatibility, evidence references, limitations and fallback paths. It does **not** select a runtime, refresh evidence, infer production approval or replace the verification step; use `motionloom intelligence capabilities select --registry capability-registry.json --capability runtime.<id>` immediately before execution.
+
 ## Evidence, trust and review
 
 MotionLoom keeps distinct layers distinct:

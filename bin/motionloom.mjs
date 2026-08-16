@@ -54,6 +54,10 @@ const NODE_COMMANDS = {
   repair: "scripts/setup.mjs",
 };
 
+const COMMAND_ALIASES = {
+  capability: { script: "scripts/intelligence.py", args: ["capabilities"] },
+};
+
 function printHelp() {
   console.log(`MotionLoom 2.4.0 — project-aware animation production and evidence contracts
 
@@ -69,6 +73,7 @@ Use when an animation task needs it:
   analyze                Run project analysis and refresh Project Memory
   memory                 Initialize, inspect, refresh, recover or validate memory
   intelligence           Build or validate Intelligence Core artifacts
+  capability             Export or select evidence-bound runtime capabilities
   attestation            Build/validate canonical signed-attestation artifacts
   verify-attestation     Verify an attestation against a trust policy
   evidence-verify        Verify runtime evidence externally
@@ -103,6 +108,7 @@ Cross-platform examples:
     --status accepted --summary "Use ease-out for UI entry" --user-confirmed
   motionloom discovery check --root . --json
   motionloom discovery install-matrix --root . --json
+  motionloom capability card --format json
   motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json
   motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --json
   motionloom asset-provenance check --input <asset-provenance.json> --root <scene-dir> --mode runtime --json
@@ -124,7 +130,8 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
   process.exit(0);
 }
 
-const script = NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
+const alias = COMMAND_ALIASES[command];
+const script = alias?.script || NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
 if (!script) {
   console.error(`Unknown MotionLoom command: ${command}`);
   printHelp();
@@ -132,7 +139,13 @@ if (!script) {
 }
 
 const executable = script.endsWith(".mjs") ? process.execPath : PYTHON;
-  const delegatedArgs = NODE_COMMANDS[command] && !["setup", "init"].includes(command) ? [command, ...args] : command === "init" ? ["init", ...args] : args;
+const delegatedArgs = alias
+  ? [...alias.args, ...args]
+  : NODE_COMMANDS[command] && !["setup", "init"].includes(command)
+    ? [command, ...args]
+    : command === "init"
+      ? ["init", ...args]
+      : args;
 const result = spawnSync(executable, [resolve(ROOT, script), ...delegatedArgs], {
   cwd: ROOT,
   stdio: "inherit",

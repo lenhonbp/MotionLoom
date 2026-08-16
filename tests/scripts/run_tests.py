@@ -554,6 +554,35 @@ def test_intelligence_core_contracts():
             "--registry", str(registry), "--capability", "runtime.rive",
         ], capture_output=True, text=True)
         check("intelligence selects verified runtime", selected.returncode == 0 and '"status": "verified"' in selected.stdout)
+
+        capability_card = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "card",
+            "--registry", str(registry), "--format", "json",
+        ], capture_output=True, text=True)
+        capability_card_data = json.loads(capability_card.stdout) if capability_card.returncode == 0 else {}
+        rive_card = next((entry for entry in capability_card_data.get("capabilities", []) if entry.get("id") == "runtime.rive"), {})
+        check(
+            "intelligence exports read-only capability card",
+            capability_card.returncode == 0
+            and capability_card_data.get("kind") == "motionloom-capability-card"
+            and capability_card_data.get("selection", {}).get("required") is True
+            and capability_card_data.get("review", {}).get("production_approval") == "not_derived"
+            and rive_card.get("declared_status") == "verified"
+            and rive_card.get("last_verified_at"),
+            capability_card.stderr.strip(),
+        )
+
+        capability_alias = subprocess.run([
+            "node", str(ROOT / "bin/motionloom.mjs"), "capability", "card",
+            "--registry", str(registry), "--format", "json",
+        ], capture_output=True, text=True)
+        capability_alias_data = json.loads(capability_alias.stdout) if capability_alias.returncode == 0 else {}
+        check(
+            "motionloom capability alias exports card",
+            capability_alias.returncode == 0 and capability_alias_data.get("kind") == "motionloom-capability-card",
+            capability_alias.stderr.strip(),
+        )
+
         scaffold = subprocess.run([
             sys.executable, str(intelligence), "capabilities", "select",
             "--registry", str(registry), "--capability", "runtime.spine",
@@ -582,6 +611,11 @@ def test_intelligence_core_contracts():
             "--registry", str(tampered_path), "--capability", "runtime.rive",
         ], capture_output=True, text=True)
         check("intelligence blocks tampered capability evidence", tampered_select.returncode != 0)
+        tampered_card = subprocess.run([
+            sys.executable, str(intelligence), "capabilities", "card",
+            "--registry", str(tampered_path), "--format", "json",
+        ], capture_output=True, text=True)
+        check("intelligence blocks capability card with tampered evidence", tampered_card.returncode != 0)
 
         replay = subprocess.run([
             sys.executable, str(intelligence), "replay", "capture",

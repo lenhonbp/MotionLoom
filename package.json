@@ -142,6 +142,7 @@
     "intelligence": "node bin/motionloom.mjs intelligence",
     "intelligence:registry": "node bin/motionloom.mjs intelligence capabilities build --output capability-registry.json",
     "intelligence:registry:check": "node bin/motionloom.mjs intelligence capabilities validate --path capability-registry.json",
+    "intelligence:card": "node bin/motionloom.mjs capability card --format json",
     "intelligence:p1": "node bin/motionloom.mjs intelligence",
     "quality:p1": "node bin/motionloom.mjs quality-gate --require-intelligence --require-p1 --require-benchmark",
     "eval:intelligence": "node bin/motionloom.mjs eval-intelligence",

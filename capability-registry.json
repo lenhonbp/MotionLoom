@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1",
-  "registry_id": "registry-motionloom-1.5.0",
-  "generated_at": "2026-08-12T18:18:03Z",
+  "registry_id": "registry-motionloom-2.4.0",
+  "generated_at": "2026-08-16T12:51:00Z",
   "selection_policy": {
     "require_verified": true,
     "allow_scaffold_only": false,
@@ -12,7 +12,7 @@
       "id": "runtime.lottie-json",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -30,11 +30,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -49,7 +49,7 @@
       "id": "runtime.dotlottie-package",
       "kind": "packager",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -67,11 +67,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -86,7 +86,7 @@
       "id": "runtime.svg-cutout-rig",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -104,11 +104,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -123,7 +123,7 @@
       "id": "runtime.rive",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -141,11 +141,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -160,7 +160,7 @@
       "id": "runtime.gsap",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -178,11 +178,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -197,7 +197,7 @@
       "id": "runtime.framer-motion",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -215,11 +215,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -234,7 +234,7 @@
       "id": "runtime.spine",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -252,11 +252,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],
@@ -271,7 +271,7 @@
       "id": "runtime.threejs",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "1.5.0",
+      "adapter_version": "2.4.0",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -289,11 +289,11 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-12T18:18:03Z",
+      "last_verified_at": "2026-08-16T12:51:00Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
-          "sha256": "7cc8dd2dcf1745815fdc60c4a5a716efe8f854157e20f618f1e9e18ad6c9fdf2",
+          "sha256": "711a64c07b4d82f646d066c7b0d91deaefc5c9c0fb701358706bf31d558b4d89",
           "kind": "ci"
         }
       ],

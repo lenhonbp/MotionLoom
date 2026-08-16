@@ -453,6 +453,13 @@ def capability_build(args: argparse.Namespace) -> int:
 def capability_validate(args: argparse.Namespace) -> int:
     registry_path = Path(args.path).expanduser().resolve()
     registry = read_json(registry_path)
+    capability_registry_validate(registry)
+    ids = [entry.get("id") for entry in registry["capabilities"]]
+    print(json.dumps({"status": "valid", "kind": "capability-registry", "capability_count": len(ids)}, ensure_ascii=False))
+    return 0
+
+
+def capability_registry_validate(registry: Any) -> None:
     if not isinstance(registry, dict) or not isinstance(registry.get("capabilities"), list):
         raise ValueError("capability registry must contain capabilities")
     ids = [entry.get("id") for entry in registry["capabilities"]]
@@ -467,7 +474,55 @@ def capability_validate(args: argparse.Namespace) -> int:
                 raise ValueError(f"capability evidence missing: {evidence.get('path')}")
             if digest_file(evidence_path) != evidence.get("sha256"):
                 raise ValueError(f"capability evidence hash mismatch: {evidence.get('path')}")
-    print(json.dumps({"status": "valid", "kind": "capability-registry", "capability_count": len(ids)}, ensure_ascii=False))
+
+
+def capability_card(args: argparse.Namespace) -> int:
+    """Export a read-only, evidence-bound capability projection for Agents.
+
+    The card deliberately exposes declared registry state only. It does not
+    select a runtime, refresh evidence, grant approval, or change policy.
+    Callers must run ``capabilities select`` before execution.
+    """
+    registry = read_json(Path(args.registry).expanduser().resolve())
+    capability_registry_validate(registry)
+    capabilities = []
+    for entry in registry["capabilities"]:
+        capabilities.append({
+            "id": entry.get("id"),
+            "kind": entry.get("kind"),
+            "declared_status": entry.get("status"),
+            "adapter_version": entry.get("adapter_version"),
+            "last_verified_at": entry.get("last_verified_at"),
+            "inputs": entry.get("inputs", []),
+            "outputs": entry.get("outputs", []),
+            "compatibility": entry.get("compatibility", {}),
+            "evidence": entry.get("evidence", []),
+            "limitations": entry.get("limitations", []),
+            "fallback": entry.get("fallback", ""),
+            "risk_level": entry.get("risk_level"),
+            "side_effect_level": entry.get("side_effect_level"),
+        })
+    card = {
+        "schema_version": "0.1",
+        "kind": "motionloom-capability-card",
+        "registry": {
+            "registry_id": registry.get("registry_id"),
+            "schema_version": registry.get("schema_version"),
+            "generated_at": registry.get("generated_at"),
+            "selection_policy": registry.get("selection_policy", {}),
+        },
+        "capabilities": capabilities,
+        "selection": {
+            "required": True,
+            "command": "motionloom capability select --registry <capability-registry.json> --capability <runtime.id>",
+            "note": "This card is discovery metadata. Select validates evidence freshness and integrity before a runtime may be used.",
+        },
+        "review": {
+            "production_approval": "not_derived",
+            "attestation_approval": "not_derived",
+        },
+    }
+    print(json.dumps(card, ensure_ascii=False))
     return 0
 
 
@@ -1571,6 +1626,10 @@ def add_subcommands(parser: argparse.ArgumentParser) -> None:
     capabilities_select_parser.add_argument("--status", default="verified")
     capabilities_select_parser.add_argument("--allow-scaffold-only", action="store_true")
     capabilities_select_parser.set_defaults(func=capability_select)
+    capabilities_card_parser = capabilities_sub.add_parser("card", help="export a read-only capability card for Agent discovery")
+    capabilities_card_parser.add_argument("--registry", default=str(ROOT / "capability-registry.json"))
+    capabilities_card_parser.add_argument("--format", choices=["json"], default="json")
+    capabilities_card_parser.set_defaults(func=capability_card)
 
     replay = sub.add_parser("replay", help="capture or verify clean-root integrity replay bundle")
     replay_sub = replay.add_subparsers(dest="action", required=True)

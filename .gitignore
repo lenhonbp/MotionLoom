@@ -11,3 +11,10 @@ dev-lab/public/scenes/
 /.motionloom/incoming/
 /.motionloom/keys/
 /.motionloom/runs/
+apps/apple/.swiftpm/
+apps/apple/Products/
+.build/
+DerivedData/
+apps/apple/MotionLoomApple/build/
+apps/apple/**/.build/
+apps/**/build/

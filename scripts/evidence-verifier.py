@@ -34,14 +34,21 @@ def parse_json(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def reject_symlink_components(path: Path) -> None:
-    current = Path(path.anchor) if path.anchor else Path(".")
-    for part in path.parts:
-        if part in (path.anchor, ""):
-            continue
+def reject_symlink_within_root(root: Path, relative: Path, label: str) -> None:
+    """Reject links inside an untrusted root, not symlinked system parents.
+
+    macOS exposes /var as a symlink to /private/var. A fixture rooted in mktemp
+    must be valid when the root itself is a real directory, while an evidence
+    path must never traverse a symlink at or below that root.
+    """
+    root = root.absolute()
+    if root.is_symlink():
+        raise ValueError(f"symlink root is not allowed: {label}")
+    current = root
+    for part in relative.parts:
         current = current / part
         if current.is_symlink():
-            raise ValueError(f"symlink path component is not allowed: {path}")
+            raise ValueError(f"symlink path component is not allowed: {label}")
 
 
 def safe_relative_file(root: Path, relative: object, label: str) -> Path:
@@ -53,7 +60,7 @@ def safe_relative_file(root: Path, relative: object, label: str) -> Path:
     if any(part in ("", ".", "..") for part in candidate.parts):
         raise ValueError(f"{label} contains unsafe path components")
     joined = root / candidate
-    reject_symlink_components(joined)
+    reject_symlink_within_root(root, candidate, label)
     resolved_root = root.resolve()
     resolved = joined.resolve(strict=False)
     if resolved != resolved_root and resolved_root not in resolved.parents:
@@ -81,8 +88,10 @@ def verify(scene_dir: Path, task_dir: Path, runtime_evidence_name: str, max_age_
             raise ValueError("scene directory name is unsafe")
         if not SAFE_NAME.fullmatch(task_dir.name):
             raise ValueError("task directory name is unsafe")
-        reject_symlink_components(scene_dir)
-        reject_symlink_components(task_dir)
+        if scene_dir.is_symlink():
+            raise ValueError("scene directory symlink is not allowed")
+        if task_dir.is_symlink():
+            raise ValueError("task directory symlink is not allowed")
         manifest_path = safe_relative_file(scene_dir, "manifest.json", "manifest.json")
         source_manifest = parse_json(manifest_path)
         if not isinstance(source_manifest, dict):

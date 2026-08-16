@@ -41,6 +41,11 @@ def dsse_pae(payload_type: str, body: bytes) -> bytes:
     return b"DSSEv1 " + str(len(payload_type_bytes)).encode("ascii") + b" " + payload_type_bytes + b" " + str(len(body)).encode("ascii") + b" " + body
 
 
+def is_macos_var_alias(path: Path) -> bool:
+    """Allow only macOS's documented lexical alias `/var` -> `/private/var`."""
+    return path == Path("/var") and path.is_symlink() and path.resolve() == Path("/private/var")
+
+
 def reject_symlink_components(path: Path) -> None:
     current = Path(path.anchor) if path.anchor else Path(".")
     for part in path.parts:
@@ -48,6 +53,9 @@ def reject_symlink_components(path: Path) -> None:
             continue
         current = current / part
         if current.is_symlink():
+            if is_macos_var_alias(current):
+                current = current.resolve()
+                continue
             raise ValueError(f"symlink path component is not allowed: {path}")
 
 

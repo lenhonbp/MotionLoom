@@ -82,14 +82,22 @@ def safe_relative(value: str) -> Path:
     return path
 
 
-def has_symlink_component(path: Path) -> bool:
-    current = path
-    while True:
+def has_symlink_component(path: Path, root: Path) -> bool:
+    """Reject symlinks at or below a trusted root, not system parent aliases."""
+    root = root.absolute()
+    path = path.absolute()
+    try:
+        relative = path.relative_to(root)
+    except ValueError:
+        return True
+    if root.is_symlink():
+        return True
+    current = root
+    for component in relative.parts:
+        current = current / component
         if current.is_symlink():
             return True
-        if current.parent == current:
-            return False
-        current = current.parent
+    return False
 
 
 def within(root: Path, candidate: Path) -> bool:
@@ -104,7 +112,7 @@ def task_artifact(task_dir: Path, relative: str) -> dict[str, Any]:
     safe = safe_relative(relative)
     raw_path = task_dir / safe
     path = raw_path.resolve()
-    if has_symlink_component(raw_path) or not within(task_dir, path) or not path.is_file():
+    if has_symlink_component(raw_path, task_dir) or not within(task_dir, path) or not path.is_file():
         raise ValueError(f"artifact is missing or outside task bundle: {relative}")
     return {
         "id": relative.replace("/", ":"),
@@ -179,7 +187,7 @@ def graph_build(args: argparse.Namespace) -> int:
 
     task_files = []
     for path in sorted(task_dir.rglob("*")):
-        if has_symlink_component(path):
+        if has_symlink_component(path, task_dir):
             raise ValueError(f"task bundle cannot contain symlinked artifact: {path.relative_to(task_dir)}")
         if not path.is_file():
             continue
@@ -363,7 +371,7 @@ def provenance_validate(args: argparse.Namespace) -> int:
     if not isinstance(attestation, dict) or not isinstance(attestation.get("steps"), list):
         raise ValueError("provenance attestation must contain steps")
     task_dir = task_dir_from(args.task_dir)
-    if has_symlink_component(raw_path) or not within(task_dir, path):
+    if has_symlink_component(path, task_dir) or not within(task_dir, path):
         raise ValueError("provenance attestation must be a non-symlink file inside task bundle")
     if attestation.get("task_id") != read_json(task_dir / "task.json").get("task_id"):
         raise ValueError("provenance task_id does not match task.json")
@@ -400,13 +408,13 @@ def capability_build(args: argparse.Namespace) -> int:
     if not isinstance(card, dict):
         raise ValueError("agent-card must be an object")
     raw_evidence_path = Path(args.evidence).expanduser() if args.evidence else ROOT / "scripts" / "runtime-adapters.mjs"
-    if has_symlink_component(raw_evidence_path):
-        raise ValueError("capability evidence cannot traverse symlinks")
     evidence_path = raw_evidence_path.resolve()
     if not evidence_path.is_file():
         raise ValueError(f"capability evidence path does not exist: {evidence_path}")
     if not within(ROOT, evidence_path):
         raise ValueError("capability evidence must be inside the repository")
+    if has_symlink_component(raw_evidence_path, ROOT):
+        raise ValueError("capability evidence cannot traverse symlinks")
     evidence_ref = evidence_path.relative_to(ROOT).as_posix()
     evidence_kind = args.evidence_kind
     entries = []
@@ -453,7 +461,7 @@ def capability_validate(args: argparse.Namespace) -> int:
     for entry in registry["capabilities"]:
         for evidence in entry.get("evidence", []):
             evidence_path = ROOT / safe_relative(str(evidence.get("path", "")))
-            if has_symlink_component(evidence_path) or not within(ROOT, evidence_path):
+            if has_symlink_component(evidence_path, ROOT) or not within(ROOT, evidence_path):
                 raise ValueError(f"capability evidence escapes repository: {evidence.get('path')}")
             if not evidence_path.is_file():
                 raise ValueError(f"capability evidence missing: {evidence.get('path')}")
@@ -488,7 +496,7 @@ def capability_select(args: argparse.Namespace) -> int:
         for evidence in entry.get("evidence", []):
             try:
                 evidence_path = ROOT / safe_relative(str(evidence.get("path", "")))
-                if has_symlink_component(evidence_path) or not within(ROOT, evidence_path) or not evidence_path.is_file() or digest_file(evidence_path) != evidence.get("sha256"):
+                if has_symlink_component(evidence_path, ROOT) or not within(ROOT, evidence_path) or not evidence_path.is_file() or digest_file(evidence_path) != evidence.get("sha256"):
                     evidence_ok = False
                     break
             except (OSError, ValueError):
@@ -1383,7 +1391,7 @@ def replay_capture(args: argparse.Namespace) -> int:
     task_rel = task_dir.relative_to(root).as_posix()
     records = []
     for path in sorted(task_dir.rglob("*")):
-        if has_symlink_component(path):
+        if has_symlink_component(path, task_dir):
             raise ValueError(f"task bundle cannot contain symlinked artifact: {path.relative_to(task_dir)}")
         if not path.is_file():
             continue
@@ -1417,7 +1425,7 @@ def replay_verify(args: argparse.Namespace) -> int:
         task_rel = safe_relative(str(bundle.get("task_dir", "")))
         task_dir = (root / task_rel).resolve()
         task = read_json(task_dir / "task.json")
-        if has_symlink_component(root / task_rel) or not within(root, task_dir) or not task_dir.is_dir():
+        if has_symlink_component(root / task_rel, root) or not within(root, task_dir) or not task_dir.is_dir():
             mismatches.append({"path": str(task_rel), "reason": "task_dir_invalid"})
         else:
             if bundle.get("task_id") != task.get("task_id"):
@@ -1430,7 +1438,7 @@ def replay_verify(args: argparse.Namespace) -> int:
         safe = safe_relative(str(record.get("path", "")))
         raw_path = root / safe
         path = raw_path.resolve()
-        if has_symlink_component(raw_path) or not within(root, path) or "task_dir" in locals() and not within(task_dir, path) or not path.is_file():
+        if has_symlink_component(raw_path, root) or not within(root, path) or "task_dir" in locals() and not within(task_dir, path) or not path.is_file():
             mismatches.append({"path": str(safe), "reason": "missing"})
             continue
         actual = digest_file(path)
@@ -1449,7 +1457,7 @@ def replay_mismatches(bundle: dict[str, Any], root: Path) -> list[dict[str, Any]
         safe = safe_relative(str(record.get("path", "")))
         raw_path = root / safe
         path = raw_path.resolve()
-        if has_symlink_component(raw_path) or not within(root, path) or not path.is_file():
+        if has_symlink_component(raw_path, root) or not within(root, path) or not path.is_file():
             mismatches.append({"path": str(safe), "reason": "missing"})
             continue
         actual = digest_file(path)

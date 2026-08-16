@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/github/license/lenhonbp/MotionLoom)](LICENSE)
 [![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Apple](https://github.com/lenhonbp/MotionLoom/actions/workflows/apple.yml/badge.svg)](https://github.com/lenhonbp/MotionLoom/actions/workflows/apple.yml)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skill-compatible-5B5BD6)](https://agentskills.io/specification)
 
 **Project-aware animation production and runtime verification for coding agents.**
@@ -14,7 +15,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** `motionloom@2.4.0` is the next release target. It adds a truthful `code_authored` runtime-first lane, a Framer Motion end-to-end reference candidate, identity-bound Dev Lab review evidence and task-bundle discovery that binds by declared scene identity rather than an inferred directory name. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
+> **Release posture:** `motionloom@2.4.0` is the current published release (`latest` on npm and GitHub Release `v2.4.0`). It added a truthful `code_authored` runtime-first lane, a Framer Motion end-to-end reference candidate, identity-bound Dev Lab review evidence and task-bundle discovery that binds by declared scene identity rather than an inferred directory name. It also shipped a native macOS/iOS review alpha under `apps/apple/`. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
 
 ## Why MotionLoom
 

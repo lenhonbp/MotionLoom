@@ -15,6 +15,13 @@ on:
       - "references/**"
       - ".github/**"
       - "package.json"
+      - "pnpm-lock.yaml"
+      - "requirements.txt"
+      - "bin/**"
+      - "dev-lab/**"
+      - "tests/runtime-harness/**"
+      - "scripts/package-consumer-smoke.mjs"
+      - "scripts/skill-doctor.py"
       - "scripts/docs-audit.py"
   push:
     branches: [main]
@@ -31,6 +38,13 @@ on:
       - "references/**"
       - ".github/**"
       - "package.json"
+      - "pnpm-lock.yaml"
+      - "requirements.txt"
+      - "bin/**"
+      - "dev-lab/**"
+      - "tests/runtime-harness/**"
+      - "scripts/package-consumer-smoke.mjs"
+      - "scripts/skill-doctor.py"
       - "scripts/docs-audit.py"
   workflow_dispatch:
 
@@ -68,6 +82,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Python runtime dependencies
+        run: python3 -m pip install --requirement requirements.txt
+
       - name: Validate documentation, links and workflow safety
         run: pnpm run docs:check
 
@@ -76,3 +93,6 @@ jobs:
 
       - name: Inspect public npm tarball
         run: npm pack --dry-run --access public
+
+      - name: Test the installed package from a consumer project
+        run: pnpm run package:smoke

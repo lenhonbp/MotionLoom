@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "The render + verify workbench for the MotionLoom pipeline. The static React build in dist/ shows scenes; scripts/ render deterministic snapshots for PR review.",
+  "description": "The render + verify workbench for the MotionLoom pipeline. The static build in dist/ shows scenes; scripts/ render deterministic snapshots for PR review.",
   "scripts": {
-    "build": "vite build",
-    "snapshot": "node scripts/snapshot.mjs"
+    "build": "node scripts/build.mjs",
+    "snapshot": "node scripts/snapshot.mjs",
+    "security:smoke": "node scripts/security-smoke.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"

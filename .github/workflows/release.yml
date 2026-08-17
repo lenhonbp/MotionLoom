@@ -61,6 +61,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Python runtime dependencies
+        run: python3 -m pip install --requirement requirements.txt
+
       - name: Validate docs and package metadata
         run: pnpm run docs:check
 
@@ -69,6 +72,9 @@ jobs:
 
       - name: Run release regression
         run: python3 tests/scripts/run_tests.py
+
+      - name: Test the installed package from a consumer project
+        run: pnpm run package:smoke
 
       - name: Verify release traceability
         env:

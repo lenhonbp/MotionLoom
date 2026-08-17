@@ -47,9 +47,15 @@ def main() -> int:
         print("capture-runtime-telemetry: --max-age-days must be non-negative", file=sys.stderr)
         return 2
 
-    root = Path(__file__).resolve().parents[1]
+    package_root = Path(__file__).resolve().parents[1]
+    root = Path(os.environ.get("MOTIONLOOM_PROJECT_ROOT") or Path.cwd()).expanduser().resolve()
     task_dir = Path(args.task_dir).expanduser()
     task_dir = task_dir.resolve() if task_dir.is_absolute() else (root / task_dir).resolve()
+    try:
+        task_dir.relative_to(root)
+    except ValueError:
+        print("capture-runtime-telemetry: task directory must remain inside the project root", file=sys.stderr)
+        return 2
     scene_dir = (root / "src" / "output" / args.scene).resolve()
     manifest_path = scene_dir / "manifest.json"
     task_path = task_dir / "task.json"
@@ -74,10 +80,6 @@ def main() -> int:
         return 2
 
     output_dir = task_dir / "runtime-adapters"
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     env = os.environ.copy()
     env.update(
         {
@@ -87,17 +89,23 @@ def main() -> int:
             "RUNTIME_SOURCE_PATH": str(source_path),
             "RUNTIME_MANIFEST_PATH": str(manifest_path),
             "RUNTIME_MOTION_IR_PATH": str(task_dir / "motion-ir.json"),
+            "MOTIONLOOM_RUNTIME_OUTPUT_ROOT": str(root),
         }
     )
-    npm = "npm.cmd" if os.name == "nt" else "npm"
-    runtime = subprocess.run([npm, "run", "runtime:test"], cwd=root, env=env, check=False)
+    node = shutil.which("node") or ("node.exe" if os.name == "nt" else "node")
+    runtime = subprocess.run(
+        [node, str(package_root / "scripts" / "runtime-adapters.mjs")],
+        cwd=root,
+        env=env,
+        check=False,
+    )
     if runtime.returncode != 0:
         return runtime.returncode
 
     verifier = subprocess.run(
         [
             sys.executable,
-            str(root / "scripts" / "evidence-verifier.py"),
+            str(package_root / "scripts" / "evidence-verifier.py"),
             "--scene-dir",
             str(scene_dir),
             "--task-dir",

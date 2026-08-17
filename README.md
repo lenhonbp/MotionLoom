@@ -77,7 +77,7 @@ npx --no-install motionloom doctor             # check the installed package
 npx --no-install motionloom repair --yes       # restore only missing managed pieces
 ```
 
-MotionLoom supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
+MotionLoom's onboarding and contract CLI supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. Browser-runtime capture uses the separately declared optional Playwright/Vite dependencies and follows the capability contract's Node.js 22 requirement. Signed-attestation commands additionally require the Python `cryptography` package declared in the shipped `requirements.txt`; `motionloom doctor` reports missing runtime prerequisites. `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
 
 ### When you begin animation work
 
@@ -324,6 +324,7 @@ Read [the Apple workspace guide](apps/apple/README.md), [the contract boundary](
 
 ```bash
 npm install
+python3 -m pip install --requirement requirements.txt
 python3 scripts/skill-doctor.py --json
 python3 tests/scripts/run_tests.py
 python3 scripts/eval-intelligence.py

@@ -4,6 +4,14 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve the caller's working directory through the npm CLI router, so default onboarding targets the consumer project instead of the installed package directory.
+- Ship Dev Lab assets, the runtime harness, Python requirements and optional browser runtime dependencies in the npm tarball; verify the installed package from an isolated consumer project before release.
+- Render Dev Lab metadata and checks with safe DOM APIs, enforce a same-origin script CSP, and reject invalid, terminal or expired browser-review candidates before enabling review.
+- Restrict runtime evidence cleanup to a dedicated child of an explicit policy root and preserve caller data outside that boundary.
+- Read the CLI version from `package.json` and align current status documentation with 2.5.0.
+
 ## [2.5.0] - 2026-08-17
 
 ### Added

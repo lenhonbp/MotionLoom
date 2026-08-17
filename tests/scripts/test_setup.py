@@ -23,6 +23,17 @@ def run_cli(project: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def run_cli_from_project(project: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    """Exercise the installed-CLI default: the caller cwd is the project root."""
+    return subprocess.run(
+        [NODE, str(ROOT / "bin/motionloom.mjs"), *args, "--motionloom-root", str(ROOT), "--json"],
+        cwd=project,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
 def main() -> int:
     errors: list[str] = []
     with tempfile.TemporaryDirectory() as temporary:
@@ -30,6 +41,17 @@ def main() -> int:
         (project / "package.json").write_text(
             json.dumps({"name": "setup-fixture", "private": True}), encoding="utf-8"
         )
+
+        caller_dry = run_cli_from_project(project, "init", "--dry-run")
+        try:
+            caller_payload = json.loads(caller_dry.stdout)
+        except json.JSONDecodeError as exc:
+            errors.append(f"caller-root init did not emit JSON: {exc}")
+            caller_payload = {}
+        if caller_dry.returncode != 0 or Path(caller_payload.get("project_root", "")) != project.resolve():
+            errors.append(f"CLI should preserve the caller working directory: {caller_payload}")
+        if any((project / path).exists() for path in ("AGENTS.md", "project-context.json", ".motionloom")):
+            errors.append("caller-root dry-run changed the project")
 
         dry = run_cli(project, "setup", "--dry-run")
         try:

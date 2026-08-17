@@ -15,7 +15,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** MotionLoom 2.5.0 adds an evidence-bound Agent capability card, benchmark-informed runtime discovery, and the native macOS/iOS review alpha in the GitHub source release under `apps/apple/`. The npm package remains the cross-platform Node/Python Skill and documentation surface; it does not distribute or sign the Xcode app. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
+> **Release posture:** MotionLoom 2.5.1 hardens installed-package onboarding, Dev Lab browser review, runtime-output cleanup and consumer-package acceptance. The native macOS/iOS review app remains an unsigned source alpha under `apps/apple/`; the npm package remains the cross-platform Node/Python Skill and documentation surface. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
 
 ## Why MotionLoom
 

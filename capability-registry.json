@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1",
-  "registry_id": "registry-motionloom-2.5.0",
-  "generated_at": "2026-08-17T16:28:37Z",
+  "registry_id": "registry-motionloom-2.5.1",
+  "generated_at": "2026-08-17T23:50:53Z",
   "selection_policy": {
     "require_verified": true,
     "allow_scaffold_only": false,
@@ -12,7 +12,7 @@
       "id": "runtime.lottie-json",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -30,7 +30,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -49,7 +49,7 @@
       "id": "runtime.dotlottie-package",
       "kind": "packager",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -67,7 +67,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -86,7 +86,7 @@
       "id": "runtime.svg-cutout-rig",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -104,7 +104,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -123,7 +123,7 @@
       "id": "runtime.rive",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -141,7 +141,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -160,7 +160,7 @@
       "id": "runtime.gsap",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -178,7 +178,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -197,7 +197,7 @@
       "id": "runtime.framer-motion",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -215,7 +215,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -234,7 +234,7 @@
       "id": "runtime.spine",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -252,7 +252,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",
@@ -271,7 +271,7 @@
       "id": "runtime.threejs",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "2.5.0",
+      "adapter_version": "2.5.1",
       "inputs": [
         "project-context",
         "motion-spec",
@@ -289,7 +289,7 @@
         ],
         "node": ">=22"
       },
-      "last_verified_at": "2026-08-17T16:28:37Z",
+      "last_verified_at": "2026-08-17T23:50:53Z",
       "evidence": [
         {
           "path": "scripts/runtime-adapters.mjs",

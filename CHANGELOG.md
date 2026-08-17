@@ -4,13 +4,24 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+## [2.5.1] - 2026-08-18
+
 ### Fixed
 
 - Preserve the caller's working directory through the npm CLI router, so default onboarding targets the consumer project instead of the installed package directory.
 - Ship Dev Lab assets, the runtime harness, Python requirements and optional browser runtime dependencies in the npm tarball; verify the installed package from an isolated consumer project before release.
 - Render Dev Lab metadata and checks with safe DOM APIs, enforce a same-origin script CSP, and reject invalid, terminal or expired browser-review candidates before enabling review.
 - Restrict runtime evidence cleanup to a dedicated child of an explicit policy root and preserve caller data outside that boundary.
-- Read the CLI version from `package.json` and align current status documentation with 2.5.0.
+- Read the CLI version from `package.json` so displayed status stays aligned with release metadata.
+
+### Verified
+
+- Pass the full Python/Node regression suite, quality and signed-attestation gate, isolated installed-package smoke test, Dev Lab browser-security smoke test, real Rive/GSAP/Framer Motion runtime capture, 6,900-case deep stress run and twelve Swift package tests.
+- Pass the pull-request Quality, Security Analysis, Documentation and Package Hygiene, Dev Lab and Apple workflows before preparing this patch release.
+
+### Boundary
+
+- This patch does not add framework capability, Apple signing, TestFlight distribution or production approval. Browser review and remote release actions remain explicit human-governed steps.
 
 ## [2.5.0] - 2026-08-17
 

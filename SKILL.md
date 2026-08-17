@@ -7,7 +7,7 @@ description: >-
   validate, review, or deliver animation inside an existing project.
 license: MIT
 metadata:
-  version: "2.5.0"
+  version: "2.5.1"
   target_frameworks: "lottie,dotlottie,rive,gsap,framer-motion,spine,threejs"
   verified_runtimes: "lottie-json,dotlottie-package,svg-cutout-rig,rive,gsap,framer-motion"
 ---

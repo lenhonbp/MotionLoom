@@ -153,10 +153,10 @@
 
 - [x] Khóa phạm vi Apple alpha, capability card và benchmark research; đối chiếu `package.json`, `CHANGELOG.md`, npm dist-tag và GitHub tag hiện có.
 - [x] Bump version package và metadata phát hành sang 2.5.0; viết changelog/release note provider-truthful, không tuyên bố Apple signing/TestFlight hoặc production approval.
-- [ ] Chạy release gates: clean test suite, doctor, docs audit, npm pack dry-run, artifact inspection, git diff check và GitHub Actions trên commit release.
-- [ ] Commit/push release preparation sau khi mọi gate pass; không npm publish hoặc tạo tag/release trước khi branch main được CI xác nhận.
-- [ ] Publish `motionloom@2.5.0` từ máy chủ sở hữu, kiểm tra tarball/shasum/dist-tag rồi tạo GitHub Release `v2.5.0` cùng release note đã kiểm chứng.
-- [ ] Xác minh public npm metadata, GitHub Release, tag/commit binding và CI sau phát hành; cập nhật ledger kết quả.
+- [x] Chạy release gates: clean test suite, doctor, docs audit, npm pack dry-run, artifact inspection, git diff check và GitHub Actions trên commit release.
+- [x] Commit/push release preparation sau khi mọi gate pass; không npm publish hoặc tạo tag/release trước khi branch main được CI xác nhận.
+- [x] Publish `motionloom@2.5.0` từ máy chủ sở hữu, kiểm tra tarball/shasum/dist-tag rồi tạo GitHub Release `v2.5.0` cùng release note đã kiểm chứng.
+- [x] Xác minh public npm metadata, GitHub Release, tag/commit binding và CI sau phát hành; cập nhật ledger kết quả: `latest` → 2.5.0, SHA-1 `3ab16d7e8c87f0ce0090b18cfac4a97caad2f81a`, tag `v2.5.0` → `5efbffe`.
 
 ## Deep audit and development pass
 

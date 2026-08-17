@@ -8,8 +8,11 @@
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const PACKAGE = JSON.parse(readFileSync(resolve(ROOT, "package.json"), "utf8"));
+const VERSION = PACKAGE.version || "unknown";
 const PYTHON = process.env.MOTIONLOOM_PYTHON || (process.platform === "win32" ? "python" : "python3");
 
 const PYTHON_COMMANDS = {
@@ -32,8 +35,6 @@ const PYTHON_COMMANDS = {
   pr: "scripts/pr.py",
   "validate-lottie": "scripts/validate-lottie.py",
   manifest: "scripts/manifest.py",
-  test: "tests/scripts/run_tests.py",
-  "deep-audit": "tests/scripts/deep-stress.py",
   discovery: "scripts/discovery.py",
   "visual-truth": "scripts/visual-truth.py",
   "remediation-learning": "scripts/remediation-learning.py",
@@ -59,7 +60,7 @@ const COMMAND_ALIASES = {
 };
 
 function printHelp() {
-  console.log(`MotionLoom 2.4.0 — project-aware animation production and evidence contracts
+  console.log(`MotionLoom ${VERSION} — project-aware animation production and evidence contracts
 
 Usage:
   motionloom <command> [args...]
@@ -147,7 +148,7 @@ const delegatedArgs = alias
       ? ["init", ...args]
       : args;
 const result = spawnSync(executable, [resolve(ROOT, script), ...delegatedArgs], {
-  cwd: ROOT,
+  cwd: process.cwd(),
   stdio: "inherit",
   env: process.env,
 });

@@ -6,9 +6,11 @@ import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { chromium } from "playwright";
 import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = path.resolve(process.env.RUNTIME_EVIDENCE_DIR || path.join(ROOT, "artifacts/runtime-adapters"));
+const outputPolicyRoot = path.resolve(process.env.MOTIONLOOM_RUNTIME_OUTPUT_ROOT || ROOT);
 const port = Number(process.env.RUNTIME_HARNESS_PORT || 4179);
 const supportedFrameworks = new Set(["rive", "gsap", "framer-motion"]);
 const frameworks = (process.env.RUNTIME_FRAMEWORKS || "rive,gsap,framer-motion")
@@ -17,8 +19,31 @@ const unsupported = frameworks.filter((name) => !supportedFrameworks.has(name));
 if (unsupported.length) {
   throw new Error(`unsupported runtime framework(s): ${unsupported.join(", ")}`);
 }
-if (outputRoot === ROOT || outputRoot === path.parse(outputRoot).root) {
-  throw new Error("RUNTIME_EVIDENCE_DIR must be a dedicated child output directory");
+function canonicalPath(target) {
+  let existing = target;
+  const missing = [];
+  while (!fs.existsSync(existing)) {
+    const parent = path.dirname(existing);
+    if (parent === existing) break;
+    missing.unshift(path.basename(existing));
+    existing = parent;
+  }
+  const base = fs.existsSync(existing) ? fs.realpathSync(existing) : path.resolve(existing);
+  return path.resolve(base, ...missing);
+}
+
+function isStrictChild(target, parent) {
+  const relative = path.relative(parent, target);
+  return Boolean(relative) && relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+}
+
+const canonicalOutputRoot = canonicalPath(outputRoot);
+const canonicalPolicyRoot = canonicalPath(outputPolicyRoot);
+if (!isStrictChild(canonicalOutputRoot, canonicalPolicyRoot)) {
+  throw new Error(
+    `RUNTIME_EVIDENCE_DIR must be a dedicated child of ${outputPolicyRoot}; ` +
+    "set MOTIONLOOM_RUNTIME_OUTPUT_ROOT explicitly to authorize another parent",
+  );
 }
 const baseUrl = `http://127.0.0.1:${port}`;
 const runId = `${Date.now()}-${process.pid}`;

@@ -33,6 +33,10 @@
     "schemas/asset-provenance.schema.json",
     "examples/agent-consumer/ai-generated-pilot-provenance.json",
     "project-context.example.json",
+    "requirements.txt",
+    "dev-lab/public/index.html",
+    "dev-lab/public/devlab.js",
+    "tests/runtime-harness",
     "tests/evals",
     "tests/scripts/run_tests.py",
     "tests/scripts/test_attestation.py",
@@ -124,7 +128,7 @@
   },
   "scripts": {
     "prepack": "node scripts/prepack-clean.mjs",
-    "test": "node bin/motionloom.mjs test",
+    "test": "python3 tests/scripts/run_tests.py",
     "validate": "npm run quality:attestation",
     "doctor": "node bin/motionloom.mjs doctor --json",
     "init": "node bin/motionloom.mjs init",
@@ -147,7 +151,8 @@
     "intelligence:p1": "node bin/motionloom.mjs intelligence",
     "quality:p1": "node bin/motionloom.mjs quality-gate --require-intelligence --require-p1 --require-benchmark",
     "eval:intelligence": "node bin/motionloom.mjs eval-intelligence",
-    "audit:deep": "node bin/motionloom.mjs deep-audit --iterations 5000 --seed 20260813 --report docs/audits/data/deep-stress-latest.json",
+    "audit:deep": "python3 tests/scripts/deep-stress.py --iterations 5000 --seed 20260813 --report docs/audits/data/deep-stress-latest.json",
+    "package:smoke": "node scripts/package-consumer-smoke.mjs",
     "memory:init": "node bin/motionloom.mjs memory init --project-root .",
     "memory:bootstrap": "node bin/motionloom.mjs analyze . --init-memory",
     "memory:recover": "node bin/motionloom.mjs memory recover --project-root .",
@@ -191,9 +196,10 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
-  "devDependencies": {
+  "optionalDependencies": {
     "playwright": "^1.62.1",
     "vite": "^8.2.1"
   },
+  "devDependencies": {},
   "license": "MIT"
 }

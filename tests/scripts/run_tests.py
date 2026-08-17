@@ -402,6 +402,47 @@ def test_task_bundle_resolver_contract():
     )
     check("runtime adapter rejects unsupported framework path", unsafe_runtime.returncode != 0 and "unsupported" in (unsafe_runtime.stderr + unsafe_runtime.stdout))
 
+    with tempfile.TemporaryDirectory() as td:
+        outside = Path(td) / "protected-output"
+        outside.mkdir()
+        sentinel = outside / "keep.txt"
+        sentinel.write_text("do not delete", encoding="utf-8")
+        unsafe_output = subprocess.run(
+            ["node", str(ROOT / "scripts/runtime-adapters.mjs")],
+            env={**os.environ, "RUNTIME_FRAMEWORKS": "rive", "RUNTIME_EVIDENCE_DIR": str(outside)},
+            capture_output=True,
+            text=True,
+        )
+        check(
+            "runtime adapter rejects destructive output outside policy root",
+            unsafe_output.returncode != 0
+            and "MOTIONLOOM_RUNTIME_OUTPUT_ROOT" in (unsafe_output.stderr + unsafe_output.stdout)
+            and sentinel.read_text(encoding="utf-8") == "do not delete",
+        )
+
+    with tempfile.TemporaryDirectory() as td:
+        outside_task = Path(td) / "protected-task"
+        outside_task.mkdir()
+        sentinel = outside_task / "keep.txt"
+        sentinel.write_text("do not delete", encoding="utf-8")
+        unsafe_capture = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts/capture-runtime-telemetry.py"),
+                "browser-review-smoke",
+                str(outside_task),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        check(
+            "runtime telemetry rejects task output outside project before cleanup",
+            unsafe_capture.returncode != 0
+            and "inside the project root" in (unsafe_capture.stderr + unsafe_capture.stdout)
+            and sentinel.read_text(encoding="utf-8") == "do not delete",
+        )
+
 
 def test_runtime_telemetry_verifier_contract():
     with tempfile.TemporaryDirectory() as td:

@@ -3,14 +3,17 @@
 *.py[cod]
 *.pyo
 
-# Repository-only evidence and development surfaces are not part of the npm package.
+# Repository-only evidence and CI metadata are not part of the npm package.
 artifacts/
-dev-lab/
 .github/
 .git/
 .gitignore
 .manus-logs/
 node_modules/
+dev-lab/node_modules/
+dev-lab/dist/
+dev-lab/public/scenes/
+dev-lab/public/tasks/
 
 # Local scratch and editor files.
 *.log

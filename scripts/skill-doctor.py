@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -11,7 +12,15 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED_FILES = ["SKILL.md", "agent-card.json", "package.json"]
+REQUIRED_FILES = [
+    "SKILL.md",
+    "agent-card.json",
+    "package.json",
+    "requirements.txt",
+    "dev-lab/public/index.html",
+    "dev-lab/public/devlab.js",
+    "tests/runtime-harness/index.html",
+]
 REQUIRED_DIRS = ["scripts", "templates", "references", "schemas"]
 REQUIRED_SCRIPT_FILES = [
     "scripts/report-contract.py",
@@ -135,8 +144,25 @@ def run() -> int:
         for script in ("test", "validate", "doctor", "setup", "setup:dry", "status", "repair", "report", "report:check", "review", "memory:bootstrap", "memory:recover", "memory:validate", "devlab", "pack:dotlottie"):
             if script not in package.get("scripts", {}):
                 warnings.append({"code": "missing_package_script", "message": f"package.json has no {script} script."})
+        runtime_dependencies = {
+            **package.get("dependencies", {}),
+            **package.get("optionalDependencies", {}),
+        }
+        for dependency in ("playwright", "vite"):
+            present = dependency in runtime_dependencies
+            checks.append({"id": f"runtime-dependency:{dependency}", "status": "pass" if present else "fail"})
+            if not present:
+                errors.append({"code": "missing_runtime_dependency", "message": f"package.json runtime dependencies omit {dependency}."})
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         errors.append({"code": "invalid_package_json", "message": str(exc)})
+
+    cryptography_available = importlib.util.find_spec("cryptography") is not None
+    checks.append({"id": "python-dependency:cryptography", "status": "pass" if cryptography_available else "fail"})
+    if not cryptography_available:
+        errors.append({
+            "code": "missing_python_dependency",
+            "message": "Python package cryptography is required; install dependencies from requirements.txt.",
+        })
 
     result = {
         "doctor_version": "1.0",

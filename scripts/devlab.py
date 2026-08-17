@@ -87,17 +87,9 @@ def prepare_scene(root: Path, lab: Path, scene: str, task_dir: Path | None) -> t
     return destination, task_destination, task_id
 
 
-def pnpm_executable() -> str:
-    candidate = "pnpm.cmd" if os.name == "nt" else "pnpm"
-    return shutil.which(candidate) or candidate
-
-
 def serve(lab: Path, port: int) -> int:
     if not (lab / "public").is_dir():
         fail(f"Dev Lab public directory not found: {lab / 'public'}")
-    if not (lab / "node_modules").is_dir():
-        print("== installing Dev Lab dependencies (first run) ==")
-        subprocess.run([pnpm_executable(), "install", "--silent"], cwd=lab, check=True)
     print(f"== Dev Lab ready: http://localhost:{port}/ ==")
     return subprocess.run([sys.executable, "-m", "http.server", str(port), "--directory", str(lab / "public")], check=False).returncode
 
@@ -110,8 +102,9 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "3300")))
     parser.add_argument("--prepare-only", action="store_true")
     args = parser.parse_args()
-    root = Path(__file__).resolve().parents[1]
-    lab = Path(args.lab_dir or os.environ.get("MOTIONLOOM_DEV_LAB") or root / "dev-lab").expanduser().resolve()
+    package_root = Path(__file__).resolve().parents[1]
+    root = Path(os.environ.get("MOTIONLOOM_PROJECT_ROOT") or Path.cwd()).expanduser().resolve()
+    lab = Path(args.lab_dir or os.environ.get("MOTIONLOOM_DEV_LAB") or package_root / "dev-lab").expanduser().resolve()
     task_dir = Path(args.task_dir).expanduser().resolve() if args.task_dir else None
     destination, task_destination, task_id = prepare_scene(root, lab, args.scene, task_dir)
     print(f"== Dev Lab scene prepared: {destination} ==")

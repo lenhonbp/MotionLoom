@@ -57,6 +57,7 @@ jobs:
 
           path = Path("dev-lab/public/scenes/browser-review-smoke/browser-review.json")
           payload = json.loads(path.read_text(encoding="utf-8"))
+          payload["status"] = "prepared"
           payload["expires_at"] = "2099-01-01T00:00:00Z"
           path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
           print(f"fixture task_id={payload['task_id']} candidate_id={payload['candidate_id']}")
@@ -98,6 +99,9 @@ jobs:
           --progress 0,50,100
           --out /tmp/motionloom-devlab-snapshot
           --diagnostics /tmp/motionloom-devlab-diagnostics
+
+      - name: Reject DOM injection and expired candidates
+        run: pnpm --dir dev-lab run security:smoke
 
       - name: Upload Dev Lab snapshot artifact
         if: success()

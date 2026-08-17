@@ -149,6 +149,15 @@
 - [x] Bump metadata sang 2.4.0 và thêm CHANGELOG/release note đúng phạm vi runtime-first pilot.
 - [x] Chạy local release gates, tạo commit cục bộ và chỉ xin duyệt riêng trước push hoặc npm publish.
 
+## MotionLoom 2.5.0 release preparation
+
+- [x] Khóa phạm vi Apple alpha, capability card và benchmark research; đối chiếu `package.json`, `CHANGELOG.md`, npm dist-tag và GitHub tag hiện có.
+- [x] Bump version package và metadata phát hành sang 2.5.0; viết changelog/release note provider-truthful, không tuyên bố Apple signing/TestFlight hoặc production approval.
+- [ ] Chạy release gates: clean test suite, doctor, docs audit, npm pack dry-run, artifact inspection, git diff check và GitHub Actions trên commit release.
+- [ ] Commit/push release preparation sau khi mọi gate pass; không npm publish hoặc tạo tag/release trước khi branch main được CI xác nhận.
+- [ ] Publish `motionloom@2.5.0` từ máy chủ sở hữu, kiểm tra tarball/shasum/dist-tag rồi tạo GitHub Release `v2.5.0` cùng release note đã kiểm chứng.
+- [ ] Xác minh public npm metadata, GitHub Release, tag/commit binding và CI sau phát hành; cập nhật ledger kết quả.
+
 ## Deep audit and development pass
 
 - [ ] Kiểm tra trạng thái GitHub Actions thực tế và khả năng tái lập CI từ clean checkout.

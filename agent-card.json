@@ -1,7 +1,7 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Project-aware animation production with durable Project Memory, provider-neutral Artifact Intake, hash-bound control-to-runtime candidates, tiered asset provenance, framework-neutral motion IR, rig compatibility, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "project.setup",

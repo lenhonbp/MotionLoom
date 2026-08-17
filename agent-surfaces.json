@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "motionloom",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "canonical": {
     "skill": "SKILL.md",
     "agent_card": "agent-card.json",

@@ -4,6 +4,26 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-17
+
+### Added
+
+- Read-only `motionloom capability card --format json` discovery surface. It exports the evidence-validated runtime registry for an Agent, including runtime status, adapter/version, compatibility, verification timestamp, inputs/outputs, evidence references, limitations, fallback, risk and side-effect metadata.
+- `pnpm intelligence:card` shortcut and `agent-card.json` command/capability declarations for machine-readable discovery without a parallel capability policy.
+- `capability-registry.json` is included in the npm package allowlist, so the default card command has its verified registry after a normal package installation.
+- Benchmark research ledger comparing public agent workflow, model-serving and AI/video repositories; the release applies the low-risk capability-card lesson and records deferred generation-profile and hash-bound workflow-template work with explicit gates.
+- Native `apps/apple/` alpha in the GitHub source release: shared Swift packages for contracts, review state, macOS bridge, review UI and local-first CloudKit metadata sync, plus unsigned macOS Studio and iOS/iPadOS Review build targets and Apple CI.
+
+### Verified
+
+- Capability-card export validates registry evidence before output and fails closed for missing, altered or out-of-repository evidence. It does not select a runtime or infer review/production approval.
+- The repository release target passes the full regression suite, Skill/doctor and documentation gates, package artifact inspection, and GitHub Quality, Security, Documentation and Apple CI checks.
+
+### Boundary
+
+- The Apple deliverable is an alpha source release. It has no Apple Developer signing, CloudKit production container, TestFlight distribution or iOS Simulator UI-smoke claim.
+- Capability discovery is not execution authority. Runtime selection still validates current evidence, and attestation/production approval remain non-derived human decisions.
+
 ## [2.4.0] - 2026-08-15
 
 ### Added
@@ -109,6 +129,7 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
 [2.2.0]: docs/releases/2.2.0.md
+[2.5.0]: docs/releases/2.5.0.md
 [2.4.0]: docs/releases/2.4.0.md
 [2.3.0]: docs/releases/2.3.0.md
 [2.1.0]: docs/releases/2.1.0.md

@@ -93,9 +93,21 @@ if "--require-asset-provenance" not in (workflow_dir / "quality.yml").read_text(
         errors.append(f"{workflow.relative_to(ROOT)}: secrets referenced in pull_request workflow")
 
 release = (workflow_dir / "release.yml").read_text(encoding="utf-8")
-for required in ["workflow_dispatch:", "environment: npm-release", "id-token: write", "release_version:", "scripts/release-verify.py"]:
+for required in [
+    "workflow_dispatch:",
+    "environment: npm-release",
+    "id-token: write",
+    "release_version:",
+    "scripts/release-verify.py",
+    'node-version: "24"',
+    "npm@11.19.0",
+    'npm publish --access public --tag "$NPM_TAG"',
+]:
     if required not in release:
         errors.append(f"release.yml: missing release safety control {required}")
+for forbidden in ["NODE_AUTH_TOKEN", "secrets.NPM_TOKEN", "--provenance"]:
+    if forbidden in release:
+        errors.append(f"release.yml: token-based or redundant trusted-publishing control remains: {forbidden}")
 
 devlab = (workflow_dir / "devlab.yml").read_text(encoding="utf-8")
 for required in [

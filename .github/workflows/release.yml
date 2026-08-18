@@ -37,7 +37,7 @@ jobs:
     environment: npm-release
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -47,11 +47,13 @@ jobs:
           version: 11.20.0
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
           registry-url: https://registry.npmjs.org
-          cache: pnpm
+
+      - name: Set up npm trusted publishing client
+        run: npm install --global npm@11.19.0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -87,9 +89,8 @@ jobs:
 
       - name: Publish to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TAG: ${{ inputs.npm_tag }}
-        run: npm publish --access public --provenance --tag "$NPM_TAG"
+        run: npm publish --access public --tag "$NPM_TAG"
 
       - name: Create GitHub release
         if: inputs.create_github_release

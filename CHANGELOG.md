@@ -13,6 +13,7 @@ All notable MotionLoom changes are documented here. The project follows semantic
 - Render Dev Lab metadata and checks with safe DOM APIs, enforce a same-origin script CSP, and reject invalid, terminal or expired browser-review candidates before enabling review.
 - Restrict runtime evidence cleanup to a dedicated child of an explicit policy root and preserve caller data outside that boundary.
 - Read the CLI version from `package.json` so displayed status stays aligned with release metadata.
+- Publish from GitHub Actions through npm Trusted Publishing/OIDC with a pinned compatible npm client, without a long-lived `NPM_TOKEN`; provenance is generated automatically by npm.
 
 ### Verified
 

@@ -16,7 +16,7 @@ importers:
         version: 1.0.5
       '@rive-app/canvas':
         specifier: ^2.39.2
-        version: 2.39.2
+        version: 2.40.0
       fflate:
         specifier: ^0.8.3
         version: 0.8.3
@@ -124,8 +124,8 @@ packages:
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
 
-  '@rive-app/canvas@2.39.2':
-    resolution: {integrity: sha512-qC/Wc6gokYwxOD1TXX4hK9AKevLACQC04Xy0pkOseru45SzWxhqIUEWZLzM4LX5B5MQmWAbWhCVmTOTvYFTzHA==}
+  '@rive-app/canvas@2.40.0':
+    resolution: {integrity: sha512-TIZsYC+LoOg7NfF9pQZ5dyAQjkJdiyCisKDYqk11nc29qYzzLz79ybdyCOIBJ4dzgqsVKsC3Wtuw+YII0dg3uQ==}
 
   '@rolldown/binding-android-arm64@1.2.3':
     resolution: {integrity: sha512-zrJtHDcaZJ1Fp7xf4hNl+7seH9Cn/N5TwLYkhgXREtBwAd/jaqW3uqeHxpDugJLVICWg4eW44kOQEGJ1r6jCGw==}
@@ -491,7 +491,7 @@ snapshots:
   '@oxc-project/types@0.143.0':
     optional: true
 
-  '@rive-app/canvas@2.39.2': {}
+  '@rive-app/canvas@2.40.0': {}
 
   '@rolldown/binding-android-arm64@1.2.3':
     optional: true

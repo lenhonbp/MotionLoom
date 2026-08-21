@@ -1,6 +1,6 @@
 {
   "name": "motionloom",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "type": "module",
   "packageManager": "pnpm@11.20.0",
   "description": "MotionLoom: project-aware animation Skill with Agent interoperability, graph, provenance, Motion IR, runtime telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, external evidence verification and Dev Lab review.",
@@ -76,11 +76,11 @@
     "scripts/rive-package-gate.py",
     "schemas/rive-package-manifest.schema.json",
     "examples/agent-consumer/rive-package-gate",
-    "tests/scripts/test_rive_package_gate.py"
-    ,"scripts/build-ai-pilot.py"
-    ,"scripts/isolate-alpha-background.py"
-    ,"tests/scripts/test_ai_pilot_builder.py"
-    ,"tests/scripts/test_alpha_isolation.py"
+    "tests/scripts/test_rive_package_gate.py",
+    "scripts/build-ai-pilot.py",
+    "scripts/isolate-alpha-background.py",
+    "tests/scripts/test_ai_pilot_builder.py",
+    "tests/scripts/test_alpha_isolation.py"
   ],
   "keywords": [
     "animation",
@@ -184,9 +184,9 @@
     "artifact:intake": "node bin/motionloom.mjs artifact-intake intake --root . --registry artifact-adapter-registry.json --receipt examples/agent-consumer/artifact-intake/hero-motion-receipt.json --controls examples/agent-consumer/artifact-intake/hero-motion-controls.json --export-manifest examples/agent-consumer/artifact-intake/hero-motion-export.json --json",
     "runtime:candidate": "node bin/motionloom.mjs runtime-candidate validate --root . --input examples/agent-consumer/runtime-candidate/hero-walk-candidate.json --json",
     "rig:compatibility": "node bin/motionloom.mjs rig-compatibility validate --root . --registry rig-adapter-registry.json --input examples/agent-consumer/rig-compatibility/hero-walk-fixture-rig.json --json",
-    "rive:gate": "node bin/motionloom.mjs rive-package-gate --help"
-    ,"pilot:build": "node bin/motionloom.mjs pilot-build --help"
-    ,"alpha:isolate": "node bin/motionloom.mjs alpha-isolate --help"
+    "rive:gate": "node bin/motionloom.mjs rive-package-gate --help",
+    "pilot:build": "node bin/motionloom.mjs pilot-build --help",
+    "alpha:isolate": "node bin/motionloom.mjs alpha-isolate --help"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-web": "^0.79.0",

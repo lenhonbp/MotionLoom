@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "motionloom",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "canonical": {
     "skill": "SKILL.md",
     "agent_card": "agent-card.json",
@@ -14,7 +14,12 @@
       "path": ".agents/skills/motionloom/SKILL.md",
       "canonical": "SKILL.md",
       "load_mode": "alias",
-      "agents": ["codex", "claude-code", "cursor", "opencode"]
+      "agents": [
+        "codex",
+        "claude-code",
+        "cursor",
+        "opencode"
+      ]
     },
     {
       "id": "claude-code",
@@ -22,7 +27,9 @@
       "path": ".claude/skills/motionloom.md",
       "canonical": "SKILL.md",
       "load_mode": "alias",
-      "agents": ["claude-code"]
+      "agents": [
+        "claude-code"
+      ]
     },
     {
       "id": "codex",
@@ -30,7 +37,9 @@
       "path": ".codex/skills/motionloom.md",
       "canonical": "SKILL.md",
       "load_mode": "alias",
-      "agents": ["codex"]
+      "agents": [
+        "codex"
+      ]
     },
     {
       "id": "repository-agent-guide",
@@ -38,7 +47,12 @@
       "path": "AGENTS.md",
       "canonical": "SKILL.md",
       "load_mode": "router",
-      "agents": ["codex", "claude-code", "cursor", "opencode"]
+      "agents": [
+        "codex",
+        "claude-code",
+        "cursor",
+        "opencode"
+      ]
     }
   ],
   "installations": [
@@ -72,10 +86,19 @@
     }
   ],
   "compatibility": {
-    "operating_systems": ["ubuntu", "macos", "windows"],
+    "operating_systems": [
+      "ubuntu",
+      "macos",
+      "windows"
+    ],
     "node": ">=18",
     "python": ">=3.11",
-    "agents": ["codex", "claude-code", "cursor", "opencode"]
+    "agents": [
+      "codex",
+      "claude-code",
+      "cursor",
+      "opencode"
+    ]
   },
   "rules": {
     "canonical_instruction_source": "SKILL.md",

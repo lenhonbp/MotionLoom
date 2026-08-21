@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@lottiefiles/dotlottie-web':
         specifier: ^0.79.0
-        version: 0.79.0
+        version: 0.79.2
       '@napi-rs/canvas':
         specifier: ^1.0.5
         version: 1.0.5
@@ -42,8 +42,8 @@ importers:
 
 packages:
 
-  '@lottiefiles/dotlottie-web@0.79.0':
-    resolution: {integrity: sha512-i2OCChZvfsoKCnilkI1t72sR/jDLoLpX2q0nm2KpOXYQZvONMooCXcGy+H9J8ioh66d61/tfHUzP78YxZ73ypg==}
+  '@lottiefiles/dotlottie-web@0.79.2':
+    resolution: {integrity: sha512-9/LBOmTqhrFOB6298tD9BEfCmTESHKL51u8meNQF7lgsSsdFMC2Xx7jd/jZTC5svWXzcE2qZ0XvaoGbopIUElw==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
   '@napi-rs/canvas-android-arm64@1.0.5':
@@ -439,7 +439,7 @@ packages:
 
 snapshots:
 
-  '@lottiefiles/dotlottie-web@0.79.0': {}
+  '@lottiefiles/dotlottie-web@0.79.2': {}
 
   '@napi-rs/canvas-android-arm64@1.0.5':
     optional: true

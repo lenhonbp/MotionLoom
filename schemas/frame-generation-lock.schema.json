@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/frame-generation-lock.schema.json",
+  "title": "MotionLoom Frame Generation Lock",
+  "description": "Provider-neutral, machine-readable generation constraints that keep independently generated animation frames on one identity, canvas and geometry lock before deterministic post-generation preflight.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "lock_id",
+    "asset_identity",
+    "action_id",
+    "reference",
+    "canvas",
+    "geometry",
+    "appearance",
+    "source_policy",
+    "frames",
+    "postflight",
+    "trust"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "lock_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$" },
+    "asset_identity": { "type": "string", "minLength": 1 },
+    "action_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image", "sha256", "role"],
+      "properties": {
+        "image": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "role": { "enum": ["identity_anchor", "accepted_frame_anchor"] }
+      }
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "color_space", "alpha_mode"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "color_space": { "enum": ["srgb", "linear-srgb"] },
+        "alpha_mode": { "enum": ["straight", "premultiplied"] }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["center_x", "pivot", "footline_px", "safe_rect", "min_padding_px", "target_alpha_bbox", "tolerances"],
+      "properties": {
+        "center_x": { "type": "number" },
+        "pivot": { "$ref": "#/$defs/point" },
+        "footline_px": { "type": "number" },
+        "safe_rect": { "$ref": "#/$defs/rect" },
+        "min_padding_px": { "type": "integer", "minimum": 0 },
+        "target_alpha_bbox": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "tolerances": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pivot_px", "footline_px", "bbox_width_px", "bbox_height_px"],
+          "properties": {
+            "pivot_px": { "type": "number", "minimum": 0 },
+            "footline_px": { "type": "number", "minimum": 0 },
+            "bbox_width_px": { "type": "number", "minimum": 0 },
+            "bbox_height_px": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preserve", "forbid", "pixel_art"],
+      "properties": {
+        "preserve": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "forbid": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "pixel_art": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "nearest_neighbor_only"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "nearest_neighbor_only": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "source_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["isolated_frames", "max_frames_per_image", "allow_pose_sheet", "allow_post_resize", "reuse_reference"],
+      "properties": {
+        "isolated_frames": { "const": true },
+        "max_frames_per_image": { "const": 1 },
+        "allow_pose_sheet": { "const": false },
+        "allow_post_resize": { "const": false },
+        "reuse_reference": { "const": true }
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frame_id", "pose", "output"],
+        "properties": {
+          "frame_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+          "pose": { "type": "string", "minLength": 1 },
+          "output": { "type": "string", "pattern": ".+\\.png$" }
+        }
+      }
+    },
+    "postflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame_geometry"],
+      "properties": {
+        "frame_geometry": { "type": "string", "minLength": 1 }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "review_only", "approval"],
+      "properties": {
+        "authority": { "enum": ["ai_generated", "ai_assisted", "code_authored", "unknown"] },
+        "review_only": { "const": true },
+        "approval": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 },
+        "y": { "type": "integer", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "space"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "space": { "enum": ["pixels", "normalized"] }
+      }
+    }
+  }
+}

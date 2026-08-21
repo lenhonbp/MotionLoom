@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/devlab-runtime.schema.json",
+  "title": "MotionLoom Dev Lab live runtime descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "mode", "files", "animations", "default_animation", "controls", "review_policy"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "mode": { "enum": ["sprite-sequence", "iframe"] },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/relativePath" }
+    },
+    "entrypoint": { "$ref": "#/$defs/relativePath" },
+    "default_animation": { "$ref": "#/$defs/animationId" },
+    "animations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/animation" }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["play", "pause", "restart", "seek", "step", "speed", "loop"],
+      "properties": {
+        "play": { "type": "boolean" },
+        "pause": { "type": "boolean" },
+        "restart": { "type": "boolean" },
+        "seek": { "type": "boolean" },
+        "step": { "type": "boolean" },
+        "speed": { "type": "boolean" },
+        "loop": { "type": "boolean" }
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "canvas_width": { "type": "number", "exclusiveMinimum": 0 },
+        "canvas_height": { "type": "number", "exclusiveMinimum": 0 },
+        "pixel_art": { "type": "boolean" },
+        "baseline_y": { "type": "number" },
+        "pivot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y"],
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" }
+          }
+        },
+        "background": { "enum": ["checker", "dark", "light", "transparent", "project"] }
+      }
+    },
+    "review_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["require_all_animations"],
+      "properties": {
+        "require_all_animations": { "type": "boolean" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "iframe" } } },
+      "then": { "required": ["entrypoint"] }
+    },
+    {
+      "if": { "properties": { "mode": { "const": "sprite-sequence" } } },
+      "then": {
+        "properties": {
+          "animations": {
+            "items": {
+              "required": ["id", "fps", "frames", "loop"]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "animationId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+"
+    },
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "loop"],
+      "properties": {
+        "id": { "$ref": "#/$defs/animationId" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "fps": { "type": "number", "exclusiveMinimum": 0 },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "loop": { "type": "boolean" },
+        "duration_s": { "type": "number", "exclusiveMinimum": 0 },
+        "review_required": { "type": "boolean", "default": true },
+        "events": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

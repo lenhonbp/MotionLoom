@@ -4,11 +4,23 @@ on:
   pull_request:
     paths:
       - "dev-lab/**"
+      - "scripts/review-hook.py"
+      - "schemas/browser-review-candidate.schema.json"
+      - "schemas/devlab-runtime.schema.json"
+      - "tests/scripts/test_devlab_runtime.py"
+      - "docs/DEV-LAB-RUNTIME.md"
+      - "SKILL.md"
       - ".github/workflows/devlab.yml"
   push:
     branches: [main]
     paths:
       - "dev-lab/**"
+      - "scripts/review-hook.py"
+      - "schemas/browser-review-candidate.schema.json"
+      - "schemas/devlab-runtime.schema.json"
+      - "tests/scripts/test_devlab_runtime.py"
+      - "docs/DEV-LAB-RUNTIME.md"
+      - "SKILL.md"
       - ".github/workflows/devlab.yml"
   workflow_dispatch:
 
@@ -45,6 +57,12 @@ jobs:
 
       - name: Install Chromium for the harness
         run: pnpm --dir dev-lab exec playwright install --with-deps chromium
+
+      - name: Validate live runtime binding contract
+        run: python3 tests/scripts/test_devlab_runtime.py
+
+      - name: Build Dev Lab bundle
+        run: pnpm --dir dev-lab run build
 
       - name: Serve the static Dev Lab fixture
         run: |
@@ -99,6 +117,9 @@ jobs:
           --progress 0,50,100
           --out /tmp/motionloom-devlab-snapshot
           --diagnostics /tmp/motionloom-devlab-diagnostics
+
+      - name: Exercise live sprite and iframe runtimes
+        run: pnpm --dir dev-lab run runtime:smoke
 
       - name: Reject DOM injection and expired candidates
         run: pnpm --dir dev-lab run security:smoke

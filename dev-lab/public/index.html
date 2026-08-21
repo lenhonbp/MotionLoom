@@ -3,28 +3,160 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
-  <title>Animation Dev Lab</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <title>MotionLoom Dev Lab</title>
   <style>
-    :root { color-scheme: dark; --bg:#111218; --panel:#1b1d25; --line:#303440; --text:#e7e9ee; --muted:#8f96a6; --amber:#f59e0b; --good:#46d18c; --bad:#ff6b6b; }
-    * { box-sizing:border-box; } body { margin:0; background:radial-gradient(circle at 40% -10%,#2a2630 0,#111218 40%); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,sans-serif; }
-    header { height:58px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; border-bottom:1px solid var(--line); background:#15171e; }
-    header strong { letter-spacing:.12em; text-transform:uppercase; font-size:12px; } header span { color:var(--amber); font-family:ui-monospace,monospace; }
-    main { display:grid; grid-template-columns:minmax(0,1fr) 330px; min-height:calc(100vh - 58px); } .workbench { padding:24px; min-width:0; }
-    .stage { min-height:430px; display:flex; align-items:center; justify-content:center; border:1px solid #3b3f4c; background:repeating-conic-gradient(#181a22 0 25%,#15171e 0 50%) 50%/32px 32px; position:relative; overflow:hidden; }
-    .stage img { max-width:92%; max-height:390px; object-fit:contain; image-rendering:auto; filter:drop-shadow(0 18px 32px #0009); } .stage .empty { color:var(--muted); text-align:center; }
-    .stage-label { position:absolute; left:14px; top:12px; color:var(--muted); font:11px ui-monospace,monospace; letter-spacing:.08em; } .stage-mode { position:absolute; right:14px; top:12px; color:var(--amber); font:11px ui-monospace,monospace; }
-    .timeline { padding:18px 0 0; } input[type=range] { width:100%; accent-color:var(--amber); } .ticks { display:flex; justify-content:space-between; color:var(--muted); font:11px ui-monospace,monospace; }
-    .meta-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; } .pill { border:1px solid var(--line); background:#191b22; padding:8px 10px; color:var(--muted); } .pill b { color:var(--text); font-weight:600; }
-    aside { border-left:1px solid var(--line); background:#171920; padding:20px; } h1 { font-size:24px; margin:0 0 6px; } h2 { font-size:13px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:24px 0 10px; }
-    p { color:var(--muted); margin:0; } .check { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid #272a34; } .check input { accent-color:var(--good); } .check small { color:var(--muted); display:block; } textarea { width:100%; min-height:90px; resize:vertical; color:var(--text); background:#111218; border:1px solid var(--line); padding:10px; font:13px ui-monospace,monospace; }
-    button { border:0; padding:11px 14px; color:#17120b; background:var(--amber); font-weight:750; cursor:pointer; } button:hover { filter:brightness(1.08); } button:active { transform:scale(.98); } button.secondary { color:var(--text); background:#2a2d38; margin-left:8px; } .actions { margin-top:14px; } #status { margin-top:10px; font:12px ui-monospace,monospace; } .ok { color:var(--good); } .warn { color:var(--bad); }
-    @media (max-width:800px) { main { grid-template-columns:1fr; } aside { border-left:0; border-top:1px solid var(--line); } .stage { min-height:330px; } }
+    :root { color-scheme:dark; --bg:#0d0f14; --panel:#151821; --panel2:#1b1f2a; --line:#303646; --line2:#41485b; --text:#eef1f6; --muted:#929aaa; --amber:#f5a524; --good:#52d49b; --bad:#ff7070; --blue:#77a9ff; --stage:#12151c; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; background:var(--bg); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,input,select,textarea { font:inherit; }
+    button { border:1px solid var(--line2); border-radius:7px; padding:8px 11px; color:var(--text); background:#242936; cursor:pointer; }
+    button:hover:not(:disabled) { border-color:#616a80; background:#2b3140; }
+    button:active:not(:disabled) { transform:translateY(1px); }
+    button:disabled { cursor:not-allowed; opacity:.38; }
+    button.primary { color:#1b1305; background:var(--amber); border-color:var(--amber); font-weight:800; }
+    button.danger { color:#ffe9e9; border-color:#6f363b; background:#382126; }
+    button.active { border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset; }
+    header { height:58px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; border-bottom:1px solid var(--line); background:#12151c; gap:14px; }
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .brand strong { letter-spacing:.12em; font-size:12px; text-transform:uppercase; white-space:nowrap; }
+    .mode-badge { padding:4px 8px; border:1px solid var(--line2); border-radius:999px; color:var(--muted); font:11px ui-monospace,monospace; white-space:nowrap; }
+    .mode-badge.live { color:var(--good); border-color:#286b50; background:#10291f; }
+    .mode-badge.fallback { color:var(--amber); border-color:#6d5423; background:#2b2415; }
+    .header-right { display:flex; align-items:center; gap:10px; min-width:0; }
+    #timecode { color:var(--amber); font:12px ui-monospace,monospace; white-space:nowrap; }
+    .app { display:grid; grid-template-columns:220px minmax(0,1fr) 330px; height:calc(100vh - 58px); min-height:600px; }
+    nav,aside { min-width:0; background:var(--panel); overflow:auto; }
+    nav { border-right:1px solid var(--line); padding:16px 12px; }
+    aside { border-left:1px solid var(--line); padding:18px; }
+    .eyebrow,h2 { margin:0 0 10px; color:var(--muted); font:700 11px/1.3 ui-monospace,monospace; letter-spacing:.11em; text-transform:uppercase; }
+    #animations { display:flex; flex-direction:column; gap:6px; }
+    .animation-btn { width:100%; display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:8px; text-align:left; padding:9px 9px; border-color:transparent; background:transparent; }
+    .animation-btn:hover { background:#202431; }
+    .animation-btn.selected { border-color:#655224; background:#2c2519; }
+    .animation-dot { width:7px; height:7px; border-radius:50%; background:#596173; }
+    .animation-btn.visited .animation-dot { background:var(--good); }
+    .animation-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .animation-meta { color:var(--muted); font:10px ui-monospace,monospace; }
+    .workbench { min-width:0; min-height:0; display:flex; flex-direction:column; padding:14px; gap:12px; }
+    .stage-shell { min-height:0; flex:1; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:#0b0d12; position:relative; }
+    .stage { width:100%; height:100%; min-height:380px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; background-color:var(--stage); }
+    .stage.bg-checker { background-color:#161922; background-image:linear-gradient(45deg,#20242f 25%,transparent 25%),linear-gradient(-45deg,#20242f 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20242f 75%),linear-gradient(-45deg,transparent 75%,#20242f 75%); background-size:28px 28px; background-position:0 0,0 14px,14px -14px,-14px 0; }
+    .stage.bg-dark { background:#11141b; }
+    .stage.bg-light { background:#e7e8ec; }
+    .stage.bg-transparent { background:transparent; }
+    .stage.bg-project { background:radial-gradient(circle at 50% 40%,#202638 0,#11141b 58%,#0b0d12 100%); }
+    .stage-content { position:relative; width:100%; height:100%; min-height:380px; display:flex; align-items:center; justify-content:center; transform-origin:50% 50%; }
+    #frame { max-width:92%; max-height:calc(100% - 30px); object-fit:contain; user-select:none; -webkit-user-drag:none; }
+    #frame.pixelated { image-rendering:pixelated; image-rendering:crisp-edges; }
+    #runtime-frame { width:100%; height:100%; min-height:380px; border:0; background:transparent; }
+    .stage-overlay { pointer-events:none; position:absolute; inset:0; }
+    .overlay-grid { display:none; background-image:linear-gradient(#ffffff10 1px,transparent 1px),linear-gradient(90deg,#ffffff10 1px,transparent 1px); background-size:24px 24px; }
+    .overlay-grid.on { display:block; }
+    .overlay-bounds { display:none; inset:8%; border:1px dashed #78a8ff99; }
+    .overlay-bounds.on { display:block; }
+    .overlay-baseline { display:none; left:8%; right:8%; height:1px; background:#ffb12eaa; top:75%; box-shadow:0 0 0 1px #0004; }
+    .overlay-baseline.on { display:block; }
+    .overlay-pivot { display:none; width:14px; height:14px; left:50%; top:75%; transform:translate(-50%,-50%); border:1px solid #ff7676; border-radius:50%; }
+    .overlay-pivot::before,.overlay-pivot::after { content:""; position:absolute; background:#ff7676; }
+    .overlay-pivot::before { width:20px; height:1px; left:-4px; top:6px; }
+    .overlay-pivot::after { width:1px; height:20px; left:6px; top:-4px; }
+    .overlay-pivot.on { display:block; }
+    .stage-top { position:absolute; top:10px; left:12px; right:12px; z-index:4; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; pointer-events:none; }
+    .stage-label,.stage-mode { padding:5px 8px; background:#0b0e14cc; border:1px solid #303646cc; border-radius:6px; font:10px ui-monospace,monospace; letter-spacing:.07em; }
+    .stage-label { color:var(--muted); }
+    .stage-mode { color:var(--amber); text-align:right; }
+    #empty { max-width:520px; color:var(--muted); text-align:center; padding:24px; }
+    .runtime-error { position:absolute; left:14px; bottom:14px; right:14px; z-index:5; display:none; padding:10px 12px; border:1px solid #774047; background:#301c21e8; color:#ffd5d5; border-radius:7px; font:12px ui-monospace,monospace; }
+    .runtime-error.on { display:block; }
+    .transport { border:1px solid var(--line); border-radius:10px; background:var(--panel); padding:10px 12px; }
+    .transport-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+    .transport-row .spacer { flex:1; }
+    .speed-select,.bg-select { color:var(--text); background:#242936; border:1px solid var(--line2); border-radius:7px; padding:7px 9px; }
+    .timeline { margin-top:10px; }
+    input[type=range] { width:100%; accent-color:var(--amber); }
+    .timeline-meta { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font:11px ui-monospace,monospace; }
+    .tool-row { display:flex; gap:7px; flex-wrap:wrap; margin-top:9px; padding-top:9px; border-top:1px solid #282d39; }
+    .tool-row button,.tool-row select { font-size:12px; padding:6px 8px; }
+    .inspector-title { margin:0; font-size:22px; line-height:1.2; }
+    #description { margin:6px 0 0; color:var(--muted); }
+    .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:14px; }
+    .pill { border:1px solid var(--line); border-radius:6px; background:#11141b; padding:8px; min-width:0; }
+    .pill b { display:block; color:var(--muted); font:10px ui-monospace,monospace; letter-spacing:.06em; }
+    .pill span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px; }
+    .runtime-state { margin:0; max-height:170px; overflow:auto; padding:10px; border:1px solid var(--line); border-radius:6px; background:#0f1117; color:#b9c0ce; white-space:pre-wrap; font:11px/1.4 ui-monospace,monospace; }
+    .check { display:flex; gap:9px; padding:9px 0; border-bottom:1px solid #272c37; }
+    .check input { accent-color:var(--good); margin-top:3px; }
+    .check small { color:var(--muted); display:block; margin-top:2px; }
+    textarea { width:100%; min-height:90px; resize:vertical; color:var(--text); background:#0f1117; border:1px solid var(--line); border-radius:6px; padding:9px; }
+    .review-actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+    #status { margin-top:10px; font:11px/1.4 ui-monospace,monospace; }
+    .ok { color:var(--good); }.warn { color:var(--bad); }.info { color:var(--blue); }
+    .progress-note { margin-top:9px; color:var(--muted); font:11px ui-monospace,monospace; }
+    @media (max-width:1050px) { .app { grid-template-columns:180px minmax(0,1fr) 285px; } }
+    @media (max-width:820px) { header { height:auto; min-height:58px; flex-wrap:wrap; padding:10px 12px; } .app { height:auto; min-height:0; grid-template-columns:1fr; } nav { border-right:0; border-bottom:1px solid var(--line); } #animations { flex-direction:row; overflow:auto; } .animation-btn { width:auto; min-width:130px; } aside { border-left:0; border-top:1px solid var(--line); } .workbench { min-height:620px; } }
   </style>
 </head>
 <body>
-  <header><strong>Animation Dev Lab</strong><span id="timecode">00:00:00.000</span></header>
-  <main><section class="workbench"><div class="stage" id="stage" data-snapshot><div class="stage-label" id="stage-label">LOADING SCENE</div><div class="stage-mode" id="stage-mode"></div><div class="empty" id="empty">Loading evidence…</div><img id="frame" alt="Rendered animation snapshot" hidden /></div><div class="timeline"><input id="scrubber" type="range" min="0" max="100" value="0" aria-label="Animation progress" /><div class="ticks"><span>00%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div></div><div class="meta-row" id="meta"></div></section><aside><h1 id="title">Scene</h1><p id="description">Loading manifest and signed motion spec.</p><h2>Quality checklist</h2><div id="checks"></div><h2>Fix notes</h2><textarea id="notes" placeholder="Describe a fix request or confirmation for the PR…"></textarea><div class="actions"><button id="confirm">Confirm review</button><button class="secondary" id="reset">Reset</button></div><div id="status"></div></aside></main>
+  <header>
+    <div class="brand"><strong>MotionLoom Dev Lab</strong><span class="mode-badge" id="mode-badge">LOADING</span></div>
+    <div class="header-right"><span id="timecode">00:00.000 / 00:00.000</span><button id="fullscreen" type="button">Fullscreen</button></div>
+  </header>
+  <div class="app">
+    <nav aria-label="Animation actions">
+      <div class="eyebrow">Animations</div>
+      <div id="animations"><span id="animation-empty" class="progress-note">Loading actions…</span></div>
+      <div id="review-progress" class="progress-note"></div>
+    </nav>
+
+    <main class="workbench">
+      <div class="stage-shell" id="stage-shell">
+        <div class="stage bg-checker" id="stage" data-snapshot>
+          <div class="stage-top"><div class="stage-label" id="stage-label">LOADING SCENE</div><div class="stage-mode" id="stage-mode"></div></div>
+          <div class="stage-content" id="stage-content">
+            <div class="empty" id="empty">Loading exact candidate evidence…</div>
+            <img id="frame" alt="Animation frame" hidden />
+            <iframe id="runtime-frame" title="Live animation runtime" hidden></iframe>
+          </div>
+          <div class="stage-overlay overlay-grid" id="overlay-grid"></div>
+          <div class="stage-overlay overlay-bounds" id="overlay-bounds"></div>
+          <div class="stage-overlay overlay-baseline" id="overlay-baseline"></div>
+          <div class="stage-overlay overlay-pivot" id="overlay-pivot"></div>
+          <div class="runtime-error" id="runtime-error"></div>
+        </div>
+      </div>
+
+      <section class="transport" aria-label="Animation playback controls">
+        <div class="transport-row">
+          <button id="step-back" type="button" title="Previous frame">−1f</button>
+          <button id="play" type="button">Play</button>
+          <button id="pause" type="button">Pause</button>
+          <button id="restart" type="button">Restart</button>
+          <button id="step-forward" type="button" title="Next frame">+1f</button>
+          <button id="loop" type="button">Loop</button>
+          <select id="speed" class="speed-select" aria-label="Playback speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+          <div class="spacer"></div>
+          <span id="framecode" class="animation-meta">Frame —</span>
+        </div>
+        <div class="timeline"><input id="scrubber" type="range" min="0" max="1000" value="0" aria-label="Animation progress" /><div class="timeline-meta"><span>0%</span><span id="progress-label">0.0%</span><span>100%</span></div></div>
+        <div class="tool-row">
+          <select id="background" class="bg-select" aria-label="Stage background"><option value="checker">Checker</option><option value="dark">Dark</option><option value="light">Light</option><option value="transparent">Transparent</option><option value="project">Project</option></select>
+          <button id="grid" type="button">Grid</button><button id="bounds" type="button">Bounds</button><button id="baseline" type="button">Baseline</button><button id="pivot" type="button">Pivot</button>
+          <button id="zoom-out" type="button">−</button><button id="zoom-reset" type="button">Fit</button><button id="zoom-in" type="button">+</button><span id="zoom-label" class="animation-meta">100%</span>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <h1 class="inspector-title" id="title">Scene</h1><p id="description">Loading manifest and candidate binding.</p>
+      <div class="meta-grid" id="meta"></div>
+      <h2>Runtime inspector</h2><pre class="runtime-state" id="runtime-state">Waiting for runtime…</pre>
+      <h2>Quality checklist</h2><div id="checks"></div>
+      <h2>Fix notes</h2><textarea id="notes" placeholder="Describe a precise fix request, timing issue, visual defect, or confirmation…"></textarea>
+      <div class="review-actions"><button class="danger" id="request-changes" type="button">Request changes</button><button class="primary" id="confirm" type="button">Approve candidate</button><button id="reset" type="button">Reset review</button></div>
+      <div id="status"></div>
+    </aside>
+  </div>
   <script src="/devlab.js" defer></script>
 </body>
 </html>

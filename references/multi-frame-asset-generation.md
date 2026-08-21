@@ -11,6 +11,8 @@ Generated source frames are **isolated-frame assets**, not a pose sheet.
 - Do not pack an atlas or sprite sheet until every isolated source frame has passed identity and frame-geometry validation.
 - Imported third-party atlases may still use the atlas contract; this rule is about Agent-generated source material.
 
+If a generator cannot preserve isolated source canvases reliably, regenerate in smaller isolated calls or use provider outputs that are already separate files. Do not convert one contaminated multi-pose canvas into accepted source frames merely because crops can be extracted from it.
+
 This avoids neighboring poses leaking into a crop, shared-canvas bleed, accidental partial limbs from adjacent frames and ambiguous ownership of opaque pixels.
 
 ## Lock geometry before the second frame

@@ -10,6 +10,7 @@
     "security:smoke": "node scripts/security-smoke.mjs",
     "runtime:smoke": "node scripts/runtime-smoke.mjs",
     "dogfood": "node scripts/dogfood.mjs",
+    "frame-sequence:dogfood": "node scripts/frame-sequence-consumer-dogfood.mjs",
     "action-library:smoke": "node scripts/action-library-smoke.mjs",
     "transition:smoke": "node scripts/state-transition-smoke.mjs"
   },

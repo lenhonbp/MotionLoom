@@ -1,0 +1,125 @@
+name: Published Consumer Frame Dogfood
+
+on:
+  pull_request:
+    paths:
+      - "tests/scripts/consumer_frame_dogfood.py"
+      - "dev-lab/scripts/frame-sequence-consumer-dogfood.mjs"
+      - "dev-lab/package.json"
+      - ".github/workflows/consumer-frame-dogfood.yml"
+      - "docs/STATUS.md"
+  push:
+    branches: [main]
+    paths:
+      - "tests/scripts/consumer_frame_dogfood.py"
+      - "dev-lab/scripts/frame-sequence-consumer-dogfood.mjs"
+      - "dev-lab/package.json"
+      - ".github/workflows/consumer-frame-dogfood.yml"
+      - "docs/STATUS.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  MOTIONLOOM_CONSUMER_VERSION: "2.6.1"
+
+concurrency:
+  group: consumer-frame-dogfood-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dogfood:
+    name: Published package → 12 frames → Dev Lab
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve published MotionLoom version
+        run: |
+          observed=$(npm view "motionloom@$MOTIONLOOM_CONSUMER_VERSION" version)
+          test "$observed" = "$MOTIONLOOM_CONSUMER_VERSION"
+          echo "registry motionloom@$observed"
+
+      - name: Install MotionLoom into an isolated consumer project
+        id: consumer
+        run: |
+          consumer="$RUNNER_TEMP/motionloom-published-consumer"
+          rm -rf "$consumer"
+          mkdir -p "$consumer"
+          cd "$consumer"
+          npm init -y >/dev/null
+          npm install --save-dev "motionloom@$MOTIONLOOM_CONSUMER_VERSION" --omit=optional --ignore-scripts --no-audit --no-fund
+          package_root=$(node -e "const p=require.resolve('motionloom/package.json'); console.log(require('node:path').dirname(p))")
+          echo "root=$package_root" >> "$GITHUB_OUTPUT"
+
+      - name: Exercise Frame Generation Lock and strict preflight from installed package
+        env:
+          DOGFOOD_OUT: ${{ runner.temp }}/motionloom-frame-consumer-dogfood
+        run: |
+          python3 tests/scripts/consumer_frame_dogfood.py \
+            --motionloom-root "${{ steps.consumer.outputs.root }}" \
+            --expected-version "$MOTIONLOOM_CONSUMER_VERSION" \
+            --out "$DOGFOOD_OUT"
+
+      - name: Install Dev Lab dependencies
+        run: pnpm --dir dev-lab install --frozen-lockfile
+
+      - name: Install Chromium for Dev Lab review
+        run: pnpm --dir dev-lab exec playwright install --with-deps chromium
+
+      - name: Review the exact 12-frame source set in live Dev Lab
+        env:
+          MOTIONLOOM_FRAME_CONSUMER_OUT: ${{ runner.temp }}/motionloom-frame-consumer-dogfood
+        run: pnpm --dir dev-lab run frame-sequence:dogfood
+
+      - name: Verify evidence boundary and reports
+        env:
+          DOGFOOD_OUT: ${{ runner.temp }}/motionloom-frame-consumer-dogfood
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["DOGFOOD_OUT"])
+          contract = json.loads((root / "consumer-dogfood-report.json").read_text(encoding="utf-8"))
+          browser = json.loads((root / "devlab" / "devlab-consumer-report.json").read_text(encoding="utf-8"))
+          assert contract["status"] == "pass"
+          assert contract["frame_count"] == 12
+          assert contract["unique_source_images"] == 12
+          assert contract["shared_source_negative_probe"] == "blocked"
+          assert contract["approval"] is False
+          assert browser["status"] == "pass"
+          assert browser["frame_count"] == 12
+          assert browser["unique_frame_hashes"] == 12
+          assert browser["approval"] == "not_granted_by_test"
+          print(json.dumps({"contract": contract, "devlab": browser}, indent=2))
+          PY
+
+      - name: Upload consumer dogfood evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motionloom-published-consumer-frame-dogfood-${{ github.sha }}
+          path: ${{ runner.temp }}/motionloom-frame-consumer-dogfood
+          if-no-files-found: warn
+          retention-days: 14

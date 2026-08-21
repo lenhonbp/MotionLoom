@@ -8,7 +8,8 @@
     "build": "node scripts/build.mjs",
     "snapshot": "node scripts/snapshot.mjs",
     "security:smoke": "node scripts/security-smoke.mjs",
-    "runtime:smoke": "node scripts/runtime-smoke.mjs"
+    "runtime:smoke": "node scripts/runtime-smoke.mjs",
+    "dogfood": "node scripts/dogfood.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const labRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = path.join(labRoot, "public");
 const destination = path.join(labRoot, "dist");
-for (const relative of ["index.html", "devlab.js"]) {
+for (const relative of ["index.html", "devlab.js", "runtime-bridge.js"]) {
   if (!fs.existsSync(path.join(source, relative))) {
     throw new Error(`Dev Lab build input is missing: public/${relative}`);
   }

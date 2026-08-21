@@ -4,11 +4,23 @@ on:
   pull_request:
     paths:
       - "dev-lab/**"
+      - "scripts/review-hook.py"
+      - "schemas/browser-review-candidate.schema.json"
+      - "schemas/devlab-runtime.schema.json"
+      - "tests/scripts/test_devlab_runtime.py"
+      - "docs/DEV-LAB-RUNTIME.md"
+      - "SKILL.md"
       - ".github/workflows/devlab.yml"
   push:
     branches: [main]
     paths:
       - "dev-lab/**"
+      - "scripts/review-hook.py"
+      - "schemas/browser-review-candidate.schema.json"
+      - "schemas/devlab-runtime.schema.json"
+      - "tests/scripts/test_devlab_runtime.py"
+      - "docs/DEV-LAB-RUNTIME.md"
+      - "SKILL.md"
       - ".github/workflows/devlab.yml"
   workflow_dispatch:
 
@@ -46,6 +58,12 @@ jobs:
       - name: Install Chromium for the harness
         run: pnpm --dir dev-lab exec playwright install --with-deps chromium
 
+      - name: Validate live runtime binding contract
+        run: python3 tests/scripts/test_devlab_runtime.py
+
+      - name: Build Dev Lab bundle
+        run: pnpm --dir dev-lab run build
+
       - name: Serve the static Dev Lab fixture
         run: |
           rm -rf dev-lab/public/scenes/browser-review-smoke
@@ -79,16 +97,16 @@ jobs:
           PY
 
       - name: Verify static Dev Lab health
-        run: >-
-          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused
-          http://127.0.0.1:3300/?scene=browser-review-smoke
-          -o /tmp/motionloom-devlab-diagnostics/health.html
-          curl --fail --silent --show-error
-          http://127.0.0.1:3300/scenes/browser-review-smoke/manifest.json
-          -o /tmp/motionloom-devlab-diagnostics/manifest.json
-          curl --fail --silent --show-error
-          http://127.0.0.1:3300/scenes/browser-review-smoke/motion-spec.json
-          -o /tmp/motionloom-devlab-diagnostics/motion-spec.json
+        run: |
+          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused \
+            "http://127.0.0.1:3300/?scene=browser-review-smoke" \
+            -o /tmp/motionloom-devlab-diagnostics/health.html
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3300/scenes/browser-review-smoke/manifest.json \
+            -o /tmp/motionloom-devlab-diagnostics/manifest.json
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3300/scenes/browser-review-smoke/motion-spec.json \
+            -o /tmp/motionloom-devlab-diagnostics/motion-spec.json
 
       - name: Capture deterministic browser review snapshots
         run: >-
@@ -100,6 +118,14 @@ jobs:
           --out /tmp/motionloom-devlab-snapshot
           --diagnostics /tmp/motionloom-devlab-diagnostics
 
+      - name: Exercise live sprite and iframe runtimes
+        run: pnpm --dir dev-lab run runtime:smoke
+
+      - name: Run four-action Dev Lab dogfood
+        env:
+          MOTIONLOOM_DOGFOOD_OUT: /tmp/motionloom-devlab-dogfood
+        run: pnpm --dir dev-lab run dogfood
+
       - name: Reject DOM injection and expired candidates
         run: pnpm --dir dev-lab run security:smoke
 
@@ -110,6 +136,15 @@ jobs:
           name: motionloom-dev-lab-snapshot-${{ github.sha }}
           path: /tmp/motionloom-devlab-snapshot
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Dev Lab dogfood evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motionloom-dev-lab-dogfood-${{ github.sha }}
+          path: /tmp/motionloom-devlab-dogfood
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Upload Dev Lab diagnostics

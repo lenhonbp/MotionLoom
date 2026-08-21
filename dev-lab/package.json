@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "The render + verify workbench for the MotionLoom pipeline. The static build in dist/ shows scenes; scripts/ render deterministic snapshots for PR review.",
+  "description": "The interactive runtime + evidence review workbench for the MotionLoom pipeline. Live candidates expose playback controls; deterministic snapshots remain review evidence.",
   "scripts": {
     "build": "node scripts/build.mjs",
     "snapshot": "node scripts/snapshot.mjs",
-    "security:smoke": "node scripts/security-smoke.mjs"
+    "security:smoke": "node scripts/security-smoke.mjs",
+    "runtime:smoke": "node scripts/runtime-smoke.mjs",
+    "dogfood": "node scripts/dogfood.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"

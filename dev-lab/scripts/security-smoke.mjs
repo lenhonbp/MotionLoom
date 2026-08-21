@@ -40,25 +40,44 @@ const server = http.createServer((request, response) => {
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
   const target = path.resolve(publicRoot, relative);
   if (target !== publicRoot && !target.startsWith(`${publicRoot}${path.sep}`)) {
-    response.writeHead(403).end("forbidden");
+    response.writeHead(403, { "Cache-Control": "no-store" }).end("forbidden");
     return;
   }
+
+  let body;
   try {
-    response.writeHead(200, {
-      "Content-Type": contentTypes.get(path.extname(target)) || "application/octet-stream",
-      "Cache-Control": "no-store",
-    });
-    response.end(fs.readFileSync(target));
+    body = fs.readFileSync(target);
   } catch {
-    response.writeHead(404).end("not found");
+    response.writeHead(404, { "Cache-Control": "no-store" }).end("not found");
+    return;
   }
+
+  response.writeHead(200, {
+    "Content-Type": contentTypes.get(path.extname(target)) || "application/octet-stream",
+    "Cache-Control": "no-store",
+  });
+  response.end(body);
 });
 
 let browser;
 try {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
-  const baseUrl = `http://127.0.0.1:${address.port}/?scene=${scene}&task_id=${encodeURIComponent(candidate.task_id)}&candidate_id=${encodeURIComponent(candidate.candidate_id)}`;
+  const origin = `http://127.0.0.1:${address.port}`;
+
+  // Regression: the live runtime descriptor is optional for legacy/snapshot-only
+  // candidates. A missing optional file must return a clean 404 and must not
+  // corrupt the HTTP response or terminate the security harness.
+  const optionalRuntime = await fetch(`${origin}/scenes/${scene}/devlab-runtime.json`, { cache: "no-store" });
+  if (optionalRuntime.status !== 404) {
+    throw new Error(`Missing optional runtime descriptor returned ${optionalRuntime.status}, expected 404`);
+  }
+  const healthAfter404 = await fetch(`${origin}/`, { cache: "no-store" });
+  if (!healthAfter404.ok) {
+    throw new Error(`Security fixture server became unhealthy after optional 404: ${healthAfter404.status}`);
+  }
+
+  const baseUrl = `${origin}/?scene=${scene}&task_id=${encodeURIComponent(candidate.task_id)}&candidate_id=${encodeURIComponent(candidate.candidate_id)}`;
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto(baseUrl, { waitUntil: "networkidle" });
@@ -93,6 +112,7 @@ try {
 
   console.log(JSON.stringify({
     status: "pass",
+    optional_missing_resource: "safe_404",
     dom_injection: "blocked",
     terminal_candidate: "blocked",
     expired_candidate: "blocked",

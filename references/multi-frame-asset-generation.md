@@ -33,6 +33,38 @@ Create or update the matching `action-set` and `frame-geometry` contracts before
 
 For AI-generated frames, every subsequent generation request should carry the same locked identity reference and geometry requirements. When the image tool can accept an image reference, reuse the accepted identity/anchor frame rather than relying on prose alone.
 
+## Frame Generation Lock
+
+Do not rely on the Agent remembering the same geometry prose across many provider calls. Persist the generation-side constraints in `frame-generation-lock.json` using `schemas/frame-generation-lock.schema.json`.
+
+The lock binds:
+
+- the exact identity/accepted-frame reference path and SHA-256;
+- canvas dimensions, color space and alpha mode;
+- center, pivot, footline, safe rectangle and minimum transparent padding;
+- target measured alpha-bounds plus permitted width/height drift;
+- appearance features that must be preserved and changes that are forbidden;
+- a hard source policy of one isolated frame per image, no pose sheet and no post-generation resize;
+- every `frame_id`, its pose intent and its unique PNG output path;
+- the post-generation `frame-geometry` contract used by deterministic preflight;
+- a review-only trust boundary with `approval: false`.
+
+Before a provider call, validate the lock and compose the exact frame instruction from it:
+
+```bash
+motionloom frame-generation-lock validate \
+  --input src/output/<scene>/<action>-frame-generation-lock.json \
+  --root src/output/<scene> --json
+
+motionloom frame-generation-lock compose \
+  --input src/output/<scene>/<action>-frame-generation-lock.json \
+  --root src/output/<scene> --frame-id <action.frame-id> --json
+```
+
+For batch planning, `compose-all` emits one independent instruction per frame while preserving the same lock hash and reference hash. It does **not** authorize asking a provider for one multi-frame canvas; each returned instruction still represents one isolated source image.
+
+If the reference bytes change, an output path escapes the asset root, two frames target the same PNG, the lock permits a pose sheet/post-resize, or the trust boundary is weakened, validation fails closed before generation.
+
 ## Validate incrementally
 
 Do not generate the complete action and only inspect it at the end. After each candidate frame:
@@ -49,14 +81,14 @@ Do not generate the complete action and only inspect it at the end. After each c
 Use:
 
 ```bash
-python3 scripts/frame-set-preflight.py \
+motionloom frame-set-preflight \
   --input src/output/<scene>/<action>-frame-geometry.json \
   --root src/output/<scene> --json
 ```
 
 The preflight is intentionally stricter than a visual warning: shared source images, non-isolated frame rectangles, scale drift beyond the declared tolerance, guard-band violations, pivot/footline drift, hash mismatch or other deterministic frame-geometry failures block the sequence.
 
-If one frame fails, regenerate or repair **that frame only** using the same lock. Do not silently rescale every previously accepted frame to match a bad frame, and do not weaken tolerances merely to make the set pass.
+If one frame fails, regenerate or repair **that frame only** using the same generation lock. Do not silently rescale every previously accepted frame to match a bad frame, and do not weaken tolerances merely to make the set pass.
 
 ## Apparent-size consistency
 
@@ -74,4 +106,4 @@ Source-frame acceptance and atlas acceptance are separate gates. A clean atlas c
 
 ## Agent decision rule
 
-When the user asks for an animation such as idle, walk, run, attack, hurt, jump or any project-defined multi-frame action, the Agent should apply this contract automatically. Do not ask the user whether they want frame consistency checks; they are part of the default MotionLoom workflow. Only ask the user when a genuine artistic decision is required, such as choosing between materially different silhouettes or motion intent.
+When the user asks for an animation such as idle, walk, run, attack, hurt, jump or any project-defined multi-frame action, the Agent should apply this contract automatically. Do not ask the user whether they want frame consistency checks or a generation lock; they are part of the default MotionLoom workflow. Only ask the user when a genuine artistic decision is required, such as choosing between materially different silhouettes or motion intent.

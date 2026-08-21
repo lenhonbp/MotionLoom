@@ -1,7 +1,7 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Project-aware animation production with durable Project Memory, provider-neutral Artifact Intake, hash-bound control-to-runtime candidates, tiered asset provenance, framework-neutral motion IR, rig compatibility, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, interactive Dev Lab review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "project.setup",
@@ -28,6 +28,9 @@
     "asset.provenance.validate",
     "asset.provenance.report",
     "asset.provenance.production-gate",
+    "asset.frame-generation-lock.validate",
+    "asset.frame-generation-lock.compose",
+    "asset.frame-set-preflight",
     "asset.consistency.validate",
     "asset.consistency.frame-geometry",
     "asset.consistency.atlas",
@@ -94,7 +97,8 @@
     "control-track",
     "export-manifest",
     "runtime-candidate",
-    "rig-compatibility-contract"
+    "rig-compatibility-contract",
+    "frame-generation-lock"
   ],
   "output_artifacts": [
     "agent-discovery-report",
@@ -134,11 +138,23 @@
     "project-memory",
     "continuity-report",
     "fix-plan",
-    "pr-patch"
+    "pr-patch",
+    "frame-generation-instruction",
+    "generated-frame-set-preflight-report"
   ],
   "runtime_capabilities": {
-    "verified": ["lottie-json", "dotlottie-package", "svg-cutout-rig", "rive", "gsap", "framer-motion"],
-    "scaffold_only": ["spine", "threejs"]
+    "verified": [
+      "lottie-json",
+      "dotlottie-package",
+      "svg-cutout-rig",
+      "rive",
+      "gsap",
+      "framer-motion"
+    ],
+    "scaffold_only": [
+      "spine",
+      "threejs"
+    ]
   },
   "side_effects": {
     "read_files": "allowed",
@@ -155,24 +171,46 @@
       "url": "https://github.com/LottieFiles/dotlottie-web/blob/main/SKILL.md",
       "role": "official-runtime-reference",
       "trust": "official",
-      "use_for": ["dotLottie runtime API", "worker rendering", "state machines", "slots"],
-      "not_for": ["project planning", "provenance", "PR acceptance"]
+      "use_for": [
+        "dotLottie runtime API",
+        "worker rendering",
+        "state machines",
+        "slots"
+      ],
+      "not_for": [
+        "project planning",
+        "provenance",
+        "PR acceptance"
+      ]
     },
     {
       "id": "text-to-lottie",
       "url": "https://github.com/diffusionstudio/lottie",
       "role": "optional-scaffold",
       "trust": "community-open-source",
-      "use_for": ["scene setup", "live preview patterns", "prompt conventions"],
-      "not_for": ["runtime truth", "context binding"]
+      "use_for": [
+        "scene setup",
+        "live preview patterns",
+        "prompt conventions"
+      ],
+      "not_for": [
+        "runtime truth",
+        "context binding"
+      ]
     },
     {
       "id": "animation-design",
       "url": "https://github.com/b1rdmania/claude-lottie-skill/blob/main/SKILL.md",
       "role": "optional-asset-discovery",
       "trust": "community-open-source",
-      "use_for": ["brand-aware Lottie/Rive search", "series coherence"],
-      "not_for": ["license authority", "runtime verification"]
+      "use_for": [
+        "brand-aware Lottie/Rive search",
+        "series coherence"
+      ],
+      "not_for": [
+        "license authority",
+        "runtime verification"
+      ]
     }
   ],
   "entrypoints": {
@@ -234,10 +272,21 @@
     "remediation_summary": "motionloom remediation-learning summary --history artifacts/remediation-history.jsonl --output artifacts/remediation-summary.json --json",
     "browser_review_prepare": "python3 scripts/review-hook.py prepare --task-dir artifacts/<task-id> --lab-url <internal-lab-url>",
     "browser_review_validate": "python3 scripts/review-hook.py validate --task-dir artifacts/<task-id>",
-    "pr_prepare": "node scripts/pr.mjs <scene>"
+    "pr_prepare": "node scripts/pr.mjs <scene>",
+    "frame_generation_lock_validate": "motionloom frame-generation-lock validate --input <frame-generation-lock.json> --root <asset-root> --json",
+    "frame_generation_lock_compose": "motionloom frame-generation-lock compose --input <frame-generation-lock.json> --frame-id <frame-id> --root <asset-root> --json",
+    "frame_set_preflight": "motionloom frame-set-preflight --input <frame-geometry.json> --root <asset-root> --json"
   },
   "report_contract": {
-    "required_sections": ["completed", "verified", "not_completed", "problems", "structure_review", "next_agent", "browser_review"],
+    "required_sections": [
+      "completed",
+      "verified",
+      "not_completed",
+      "problems",
+      "structure_review",
+      "next_agent",
+      "browser_review"
+    ],
     "artifact_root": "artifacts/<task-id>/"
   }
 }

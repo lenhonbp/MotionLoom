@@ -15,7 +15,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** MotionLoom 2.6.0 upgrades Dev Lab into an interactive runtime review workbench with live playback controls, arbitrary project-defined Action Libraries and optional state/transition testing, while preserving deterministic snapshots and explicit human approval. The native macOS/iOS review app remains an unsigned source alpha under `apps/apple/`; the npm package remains the cross-platform Node/Python Skill and documentation surface. Verify npm/GitHub publication metadata separately; passing runtime evidence never implies user approval.
+> **Release posture:** MotionLoom 2.6.1 keeps the interactive Dev Lab from 2.6.0 and adds a proactive Frame Generation Lock for generated multi-frame animation assets. Agents now hash-bind one accepted identity/reference, compose one isolated provider instruction per frame from locked canvas/scale/pivot/footline geometry, and run measured frame-set preflight before atlas packing. The native macOS/iOS review app remains an unsigned source alpha under `apps/apple/`; the npm package remains the cross-platform Node/Python Skill and documentation surface. Generation, runtime and validation evidence never imply artist authorship or user approval. See the [2.6.1 release note](docs/releases/2.6.1.md).
 
 ## Why MotionLoom
 

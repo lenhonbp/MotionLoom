@@ -4,6 +4,31 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-08-21
+
+### Added
+
+- Add a machine-readable `frame-generation-lock` contract that hash-binds the accepted identity/reference and locks canvas, alpha/color space, apparent size, pivot, footline, safe rectangle, transparent padding, camera/orientation and per-frame output identity before later frames are generated.
+- Add provider-neutral `motionloom frame-generation-lock validate|compose|compose-all` commands and public Agent routing so every pose instruction is deterministically rebuilt from the same lock instead of relying on repeated prose prompts.
+- Expose the strict generated `motionloom frame-set-preflight` command through the public CLI for post-generation alpha-bounds, scale, pivot/footline, guard-band, contamination and source-isolation checks.
+
+### Hardened
+
+- Default generated multi-frame source policy to one isolated PNG per frame; six-frame-or-longer actions must not use one generated pose sheet/contact sheet as production source material.
+- Fail closed on stale reference hashes, duplicate frame outputs, pose-sheet policy violations, path escape, shared/non-isolated sources, post-generation resize and measured apparent-size drift beyond tolerance.
+- Keep atlas packing as a later, separate gate: a clean atlas cannot repair inconsistent or contaminated source frames.
+
+### Verified
+
+- Dedicated Frame Generation Lock CI validates the public CLI, provider instruction composition and strict post-generation preflight.
+- Pull request #18 passed MotionLoom Quality, Security Analysis, Documentation and Package Hygiene, plus the dedicated Frame Generation Lock workflow before merge.
+
+### Boundary
+
+- Frame locks, generated prompts, SHA-256 bindings, preflight passes and atlas checks are deterministic evidence only. They never grant artist authorship, production eligibility, runtime approval, licence authority or user approval.
+
+See the [2.6.1 release note](docs/releases/2.6.1.md) for the generation/preflight contract and migration guidance.
+
 ## [2.6.0] - 2026-08-21
 
 ### Added
@@ -177,6 +202,7 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
+[2.6.1]: docs/releases/2.6.1.md
 [2.6.0]: docs/releases/2.6.0.md
 [2.5.1]: docs/releases/2.5.1.md
 [2.5.0]: docs/releases/2.5.0.md

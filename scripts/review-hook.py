@@ -14,7 +14,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit, urlunsplit
 
-from browser_review_consistency import candidate_consistency_errors
+try:
+    from browser_review_consistency import candidate_consistency_errors
+except ModuleNotFoundError:  # Support importlib-based contract tests.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from browser_review_consistency import candidate_consistency_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")

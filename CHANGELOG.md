@@ -4,6 +4,35 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-08-21
+
+### Added
+
+- Upgrade Dev Lab from checkpoint-oriented review to an interactive live-runtime workbench with Play, Pause, Restart, scrub, frame-step, speed and loop controls plus fullscreen, zoom/fit, background, grid, bounds, baseline and pivot inspection tools.
+- Discover arbitrary project-defined actions from `devlab-runtime.json` instead of hard-coding `idle`, `walk`, `run` or `attack`; add groups/categories, tags, search, collapsible sections and review-state filters for large action libraries.
+- Add the hash-bound `devlab-state-machine.json` contract, legal transition controls, transition history and bounded multi-step review sequences for flows such as `Idle -> Run -> Attack -> Hurt -> Idle`.
+- Add strict iframe `runtime-trigger` support through `triggerTransition(request)` and portable `select-animation` transitions for sprite/clip runtimes.
+
+### Hardened
+
+- Bind declared live-runtime and state-machine bytes into the browser-review candidate so runtime drift invalidates stale review links.
+- Fail closed on unsafe/missing runtime paths, duplicate animation ids, mismatched candidate/runtime action sets and unsupported runtime triggers; a failed live runtime remains inspectable only through explicit captured-evidence fallback and cannot be approved.
+- Keep Action Library search/group/filter presentation independent from review coverage so hidden required actions do not disappear from the approval gate.
+- Count runtime-trigger transitions only after the target state is observable; never silently replace a failed runtime state transition with a clip switch.
+- Ship `runtime-bridge.js` with the npm package so installed-package iframe/state-machine review uses the same bridge as the repository harness.
+
+### Verified
+
+- Dev Lab CI covers deterministic snapshots, live sprite and iframe runtimes, a four-action interactive dogfood candidate, a twelve-action Action Library fixture, sprite state transitions, real iframe runtime-trigger transitions and browser-security smoke tests.
+- Pull requests #13, #14 and #15 passed Dev Lab Build, MotionLoom Quality, Security Analysis and Documentation and Package Hygiene before this release candidate was prepared.
+
+### Boundary
+
+- Runtime playback, action/transition/sequence coverage, successful triggers, hashes, snapshots and automated checks are evidence only. `approved` remains an explicit user decision bound to the exact candidate.
+- MotionLoom does not promote AI-generated material to artist-authored or production-approved status, and this release does not change the unsigned source-alpha status of the Apple companion apps.
+
+See the [2.6.0 release note](docs/releases/2.6.0.md) for the Dev Lab runtime contract, verification scope and trust boundaries.
+
 ## [2.5.1] - 2026-08-18
 
 ### Fixed
@@ -148,9 +177,11 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
-[2.2.0]: docs/releases/2.2.0.md
+[2.6.0]: docs/releases/2.6.0.md
+[2.5.1]: docs/releases/2.5.1.md
 [2.5.0]: docs/releases/2.5.0.md
 [2.4.0]: docs/releases/2.4.0.md
 [2.3.0]: docs/releases/2.3.0.md
+[2.2.0]: docs/releases/2.2.0.md
 [2.1.0]: docs/releases/2.1.0.md
 [2.0.0]: docs/releases/2.0.0.md

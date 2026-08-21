@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.5.1",
-  "description": "Project-aware animation production with durable Project Memory, provider-neutral Artifact Intake, hash-bound control-to-runtime candidates, tiered asset provenance, framework-neutral motion IR, rig compatibility, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, internal browser review, trust-boundary hardening and deterministic Agent handoff.",
+  "version": "2.6.0",
+  "description": "Project-aware animation production with durable Project Memory, provider-neutral Artifact Intake, hash-bound control-to-runtime candidates, tiered asset provenance, framework-neutral motion IR, rig compatibility, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, interactive Dev Lab review, trust-boundary hardening and deterministic Agent handoff.",
   "capabilities": [
     "project.setup",
     "project.status",
@@ -146,8 +146,8 @@
     "network": "optional-and-declared",
     "git_commit": "explicit-confirmation",
     "git_push": "explicit-confirmation",
-    "open_pull_request": "explicit-confirmation"
-    ,"open_internal_browser": "trigger-or-suggest-after-render; user-review-required"
+    "open_pull_request": "explicit-confirmation",
+    "open_internal_browser": "trigger-or-suggest-after-render; user-review-required"
   },
   "recommended_integrations": [
     {

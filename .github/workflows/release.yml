@@ -14,12 +14,12 @@ on:
       release_version:
         description: package version to verify and publish
         required: true
-        default: 2.5.1
+        default: 2.6.0
         type: string
       create_github_release:
         description: Create a GitHub release after npm publication
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:

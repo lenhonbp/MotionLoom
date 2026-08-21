@@ -96,7 +96,8 @@ Use `mode: "iframe"` when the candidate already has a browser runtime (for examp
     stepFrames(delta) { /* optional */ },
     setSpeed(rate) { /* optional */ },
     setLoop(enabled) { /* optional */ },
-    getState() { return { progress: 0, currentTime: 0, duration: 1, frame: 0, totalFrames: 60 }; }
+    triggerTransition(request) { /* optional: drive a real runtime state transition */ },
+    getState() { return { progress: 0, currentTime: 0, duration: 1, frame: 0, totalFrames: 60, state: "idle" }; }
   };
   MotionLoomRuntimeBridge.attach(adapter);
 </script>
@@ -104,8 +105,56 @@ Use `mode: "iframe"` when the candidate already has a browser runtime (for examp
 
 The parent Dev Lab communicates by `postMessage`; the runtime never grants approval. If the live runtime cannot load or a declared control is unavailable, Dev Lab disables that control and shows an explicit live-runtime failure/fallback state. It must not relabel captured PNG evidence as live runtime.
 
+## State and transition review
+
+A candidate may additionally declare `devlab-state-machine.json` when the reviewer needs to test behavior across clips instead of inspecting each action in isolation. The state-machine file only participates in the candidate runtime hash when it is explicitly listed in `devlab-runtime.json.files`; undeclared state-machine bytes are not accepted as review evidence.
+
+A minimal portable contract can use `select-animation` transitions:
+
+```json
+{
+  "schema_version": "1.0",
+  "initial_state": "idle",
+  "states": [
+    { "id": "idle", "label": "Idle", "animation": "idle" },
+    { "id": "run", "label": "Run", "animation": "run" },
+    { "id": "attack", "label": "Attack", "animation": "attack" },
+    { "id": "hurt", "label": "Hurt", "animation": "hurt" }
+  ],
+  "transitions": [
+    { "id": "idle-run", "from": "idle", "to": "run", "mode": "select-animation", "review_required": true },
+    { "id": "run-attack", "from": "run", "to": "attack", "mode": "select-animation", "review_required": true },
+    { "id": "attack-hurt", "from": "attack", "to": "hurt", "mode": "select-animation", "review_required": true },
+    { "id": "hurt-idle", "from": "hurt", "to": "idle", "mode": "select-animation", "review_required": true }
+  ],
+  "sequences": [
+    {
+      "id": "combat-roundtrip",
+      "label": "Combat roundtrip",
+      "review_required": true,
+      "steps": [
+        { "transition": "idle-run", "wait_ms": 150 },
+        { "transition": "run-attack", "wait_ms": 150 },
+        { "transition": "attack-hurt", "wait_ms": 150 },
+        { "transition": "hurt-idle", "wait_ms": 150 }
+      ]
+    }
+  ],
+  "review_policy": {
+    "require_all_transitions": true,
+    "require_all_sequences": true
+  }
+}
+```
+
+`select-animation` is the portable lane for sprite/clip runtimes: the transition selects the target state's declared animation and may auto-play it. `runtime-trigger` is stricter and is intended for a real state machine such as a Rive state machine or a project-specific runtime. For that mode the iframe adapter must implement `triggerTransition(request)`. Dev Lab sends the declared trigger/payload and only counts the transition as inspected after the runtime reports the target state through `getState()`. It never silently downgrades a failed or unsupported `runtime-trigger` transition into a clip switch.
+
+The State/Transition Tester shows the current state, legal outgoing transitions, required transition coverage, declared review sequences and transition history. Review sequences execute their declared transition steps with bounded waits and may be stopped or reset by the reviewer. They are review helpers, not autonomous approval mechanisms.
+
 ## Review semantics
 
-Dev Lab records which actions the reviewer actually selected. When `review_policy.require_all_animations` is true, approval is disabled until every `review_required` action has been inspected. A user may still request changes at any time. Playback success, runtime readiness, hashes, snapshots, telemetry and automated checks remain evidence only; `approved` is always an explicit user review decision.
+Dev Lab records which actions the reviewer actually selected. When `review_policy.require_all_animations` is true, approval is disabled until every `review_required` action has been inspected. When a state-machine contract is present, its `review_policy` can independently require all review-required transitions and review-required sequences before approval is enabled. A user may still request changes at any time.
+
+Review evidence records action, transition and sequence coverage plus runtime/state history. Playback success, transition success, runtime readiness, hashes, snapshots, telemetry and automated checks remain evidence only; `approved` is always an explicit user review decision.
 
 The deterministic snapshot harness continues to use `window.__lab.selectAnimation()` and `window.__lab.seek()`. For live candidates those calls drive the same runtime controller shown to the user; for legacy scenes without `devlab-runtime.json`, Dev Lab clearly enters `captured-evidence` mode and retains the older checkpoint viewer as a compatibility fallback.

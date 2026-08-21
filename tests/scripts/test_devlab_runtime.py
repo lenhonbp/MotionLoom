@@ -5,10 +5,12 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
 MODULE_PATH = ROOT / "scripts" / "review-hook.py"
 spec = importlib.util.spec_from_file_location("motionloom_review_hook", MODULE_PATH)
 assert spec and spec.loader
@@ -77,7 +79,13 @@ def main() -> int:
     live = review_hook.candidate_id("task", "scene", "context", "source", "render", "f" * 64)
     assert live != actual_legacy, "live runtime bundle must participate in candidate identity"
 
-    print(json.dumps({"status": "pass", "runtime_bundle": "hash-bound", "path_traversal": "blocked", "legacy_candidate_id": "compatible"}))
+    canonical = review_hook.runtime_bundle(ROOT / "examples/agent-consumer/devlab-live-sprite")
+    assert canonical is not None
+    assert canonical["mode"] == "sprite-sequence"
+    assert canonical["animations"] == ["idle", "reverse"]
+    assert len(canonical["files"]) == 6
+
+    print(json.dumps({"status": "pass", "runtime_bundle": "hash-bound", "canonical_fixture": "verified", "path_traversal": "blocked", "legacy_candidate_id": "compatible"}))
     return 0
 
 

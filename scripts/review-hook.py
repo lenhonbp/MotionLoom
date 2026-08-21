@@ -14,6 +14,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit, urlunsplit
 
+from browser_review_consistency import candidate_consistency_errors
+
 ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
 SAFE_ANIMATION = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
@@ -363,6 +365,12 @@ def validate(args: argparse.Namespace) -> int:
         bundle["bundle_sha256"] if bundle else None,
     )
     errors = []
+    errors.extend(candidate_consistency_errors(
+        scene_dir / "browser-review.json",
+        task_dir / "browser-review.json",
+        expected_task_id=task.get("task_id"),
+        expected_scene=task.get("scene"),
+    ))
     if not candidate.get("expires_at"):
         errors.append("browser-review candidate has no expiry")
     else:
@@ -446,17 +454,21 @@ def validate(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("prepare")
     p.add_argument("--task-dir", required=True)
+    p.add_argument("--root", default=str(ROOT), help="Repository root containing the canonical scene artifacts")
     p.add_argument("--lab-url", default="http://127.0.0.1:3300")
     p.set_defaults(func=prepare)
     v = sub.add_parser("validate")
     v.add_argument("--task-dir", required=True)
+    v.add_argument("--root", default=str(ROOT), help="Repository root containing the canonical scene artifacts")
     v.add_argument("--require-approved", action="store_true")
     v.set_defaults(func=validate)
     args = parser.parse_args()
+    ROOT = Path(args.root).expanduser().resolve()
     try:
         return args.func(args)
     except (KeyError, FileNotFoundError, json.JSONDecodeError, ValueError, subprocess.CalledProcessError) as exc:

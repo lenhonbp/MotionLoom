@@ -511,6 +511,9 @@ def test_approved_browser_review_e2e_contract():
         candidate = json.loads(candidate_path.read_text())
         candidate["expires_at"] = "2099-01-01T00:00:00Z"
         candidate_path.write_text(json.dumps(candidate, indent=2) + "\n")
+        scene_candidate_path = root / "src/output/browser-review-smoke/browser-review.json"
+        scene_candidate = dict(candidate)
+        scene_candidate_path.write_text(json.dumps(scene_candidate, indent=2) + "\n")
 
         review = json.loads((task_dir / "review.json").read_text())
         task = json.loads((task_dir / "task.json").read_text())
@@ -524,7 +527,7 @@ def test_approved_browser_review_e2e_contract():
 
         review_hook = subprocess.run([
             sys.executable, str(ROOT / "scripts/review-hook.py"), "validate",
-            "--task-dir", str(task_dir), "--require-approved",
+            "--task-dir", str(task_dir), "--root", str(root), "--require-approved",
         ], capture_output=True, text=True)
         check("e2e review hook accepts approved candidate", review_hook.returncode == 0, review_hook.stdout.strip())
 
@@ -536,7 +539,7 @@ def test_approved_browser_review_e2e_contract():
         check("e2e quality gate accepts task evidence", quality.returncode == 0, quality.stdout.strip())
 
         report_check = subprocess.run([
-            sys.executable, str(ROOT / "scripts/report.py"), "check", "--task-dir", str(task_dir),
+            sys.executable, str(ROOT / "scripts/report.py"), "check", "--task-dir", str(task_dir), "--root", str(root),
         ], capture_output=True, text=True)
         check("e2e report contract accepts confirmed task", report_check.returncode == 0, report_check.stdout.strip())
 
@@ -1162,6 +1165,16 @@ if __name__ == "__main__":
     test_category_coverage()
     test_observability_contract()
     test_quality_workflow_rebuilds_replay_after_generated_artifacts()
+    browser_review_consistency_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_browser_review_consistency.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "browser review scene/task candidate consistency is fail-closed",
+        browser_review_consistency_tests.returncode == 0 and "browser review consistency tests: PASS" in browser_review_consistency_tests.stdout,
+        browser_review_consistency_tests.stdout.strip() or browser_review_consistency_tests.stderr.strip(),
+    )
     print()
     if FAILED:
         print(f"{len(FAILED)} test(s) FAILED: {', '.join(FAILED)}")

@@ -7,6 +7,7 @@ import argparse
 import importlib.util
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -71,9 +72,35 @@ def parse_frontmatter(text: str) -> dict[str, str] | None:
     return values
 
 
+def chromium_executable() -> tuple[Path | None, str | None]:
+    probe = (
+        "import { chromium } from 'playwright'; "
+        "process.stdout.write(chromium.executablePath());"
+    )
+    try:
+        result = subprocess.run(
+            ["node", "--input-type=module", "--eval", probe],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, str(exc)
+    if result.returncode != 0:
+        return None, (result.stderr or result.stdout).strip() or "Playwright import failed"
+    path = Path(result.stdout.strip())
+    return (path if path else None), None
+
+
 def run() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", dest="as_json")
+    parser.add_argument(
+        "--runtime",
+        action="store_true",
+        help="also verify that the Playwright Chromium executable is installed",
+    )
     args = parser.parse_args()
     errors: list[dict] = []
     warnings: list[dict] = []
@@ -155,6 +182,21 @@ def run() -> int:
                 errors.append({"code": "missing_runtime_dependency", "message": f"package.json runtime dependencies omit {dependency}."})
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         errors.append({"code": "invalid_package_json", "message": str(exc)})
+
+    if args.runtime:
+        chromium_path, chromium_error = chromium_executable()
+        chromium_ready = chromium_path is not None and chromium_path.is_file()
+        checks.append({
+            "id": "runtime:chromium",
+            "status": "pass" if chromium_ready else "fail",
+            "path": str(chromium_path) if chromium_path else None,
+        })
+        if not chromium_ready:
+            detail = chromium_error or f"Chromium executable is missing: {chromium_path}"
+            errors.append({
+                "code": "missing_browser_executable",
+                "message": f"Playwright Chromium is unavailable ({detail}); run `npx playwright install chromium`.",
+            })
 
     cryptography_available = importlib.util.find_spec("cryptography") is not None
     checks.append({"id": "python-dependency:cryptography", "status": "pass" if cryptography_available else "fail"})

@@ -6,6 +6,8 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -134,19 +136,33 @@ def main() -> int:
 
         scene_dir = ROOT / "src" / "output" / "browser-review-smoke"
         task_dir = ROOT / "artifacts" / "browser-review-smoke-task"
+        smoke_task_dir = temp / "professional-review-e2e-attestation"
+        shutil.copytree(task_dir, smoke_task_dir)
+        shutil.copy(
+            ROOT / "artifacts" / "browser-review-smoke-task" / "project-context.json",
+            smoke_task_dir / "project-context.json",
+        )
+        shutil.copy(
+            ROOT / "artifacts" / "browser-review-smoke-task" / "evidence-verifier-report.json",
+            smoke_task_dir / "evidence-verifier-report.json",
+        )
+        candidate_path = smoke_task_dir / "browser-review.json"
+        candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+        candidate["expires_at"] = "2099-01-01T00:00:00Z"
+        candidate_path.write_text(json.dumps(candidate, indent=2) + "\n", encoding="utf-8")
         task_statement = make_statement(
             task_id="browser-review-smoke-task",
             scene="browser-review-smoke",
-            context_hash=sha256_file(task_dir / "project-context.json"),
+            context_hash=sha256_file(smoke_task_dir / "project-context.json"),
             source_sha256=sha256_file(scene_dir / "animation.json"),
             manifest_sha256=sha256_file(scene_dir / "manifest.json"),
-            motion_ir_sha256=sha256_file(task_dir / "motion-ir.json"),
+            motion_ir_sha256=sha256_file(smoke_task_dir / "motion-ir.json"),
             evidence={
-                "runtime_evidence_sha256": sha256_file(task_dir / "runtime-adapters" / "runtime-evidence.json"),
-                "runtime_telemetry_sha256": telemetry_bundle_sha256(task_dir),
-                "verifier_report_sha256": sha256_file(task_dir / "evidence-verifier-report.json"),
+                "runtime_evidence_sha256": sha256_file(smoke_task_dir / "runtime-adapters" / "runtime-evidence.json"),
+                "runtime_telemetry_sha256": telemetry_bundle_sha256(smoke_task_dir),
+                "verifier_report_sha256": sha256_file(smoke_task_dir / "evidence-verifier-report.json"),
             },
-            provenance_chain_hash=sha256_file(task_dir / "provenance.json"),
+            provenance_chain_hash=sha256_file(smoke_task_dir / "provenance.json"),
         )
         smoke_statement_file = temp / "smoke-statement.json"
         smoke_statement_file.write_text(json.dumps(task_statement, indent=2) + "\n", encoding="utf-8")
@@ -157,8 +173,8 @@ def main() -> int:
             sys.executable,
             str(ROOT / "scripts" / "quality-gate.py"),
             "--scene", "browser-review-smoke",
-            "--context", str(task_dir / "project-context.json"),
-            "--task-dir", str(task_dir),
+            "--context", str(smoke_task_dir / "project-context.json"),
+            "--task-dir", str(smoke_task_dir),
             "--require-attestation",
             "--attestation", str(smoke_bundle_file),
             "--trust-policy", str(policy_file),

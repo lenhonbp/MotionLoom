@@ -71,6 +71,7 @@ Start here:
   init                   One safe project setup; no animation gate runs
   status                 Short read-only readiness report
   doctor                 Validate the installed Skill package
+  doctor --runtime       Also verify the Playwright Chromium executable
 
 Use when an animation task needs it:
   analyze                Run project analysis and refresh Project Memory
@@ -112,6 +113,7 @@ Cross-platform examples:
   motionloom memory record-decision --project-root . --id ui-easing \\
     --status accepted --summary "Use ease-out for UI entry" --user-confirmed
   motionloom discovery check --root . --json
+  motionloom doctor --runtime --json
   motionloom discovery install-matrix --root . --json
   motionloom capability card --format json
   motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json

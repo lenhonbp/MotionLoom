@@ -20,6 +20,7 @@ def main() -> int:
     parser.add_argument("--changelog", default=str(ROOT / "CHANGELOG.md"))
     parser.add_argument("--release-note", default="")
     parser.add_argument("--tag", default="", help="Optional Git tag; accepts v<version> or <version>")
+    parser.add_argument("--capability-registry", default=str(ROOT / "capability-registry.json"))
     args = parser.parse_args()
 
     errors: list[str] = []
@@ -42,6 +43,30 @@ def main() -> int:
 
     if args.tag and args.tag.removeprefix("v") != expected:
         errors.append(f"tag {args.tag!r} does not match version {expected!r}")
+
+    registry_path = Path(args.capability_registry).resolve()
+    try:
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        expected_registry_id = f"registry-{package.get('name', 'motionloom')}-{expected}"
+        if registry.get("registry_id") != expected_registry_id:
+            errors.append(
+                f"capability registry id {registry.get('registry_id')!r} does not match {expected_registry_id!r}"
+            )
+        capabilities = registry.get("capabilities")
+        if not isinstance(capabilities, list) or not capabilities:
+            errors.append("capability registry must contain a non-empty capabilities array")
+        else:
+            mismatched = [
+                str(item.get("id", "<unknown>"))
+                for item in capabilities
+                if item.get("adapter_version") != expected
+            ]
+            if mismatched:
+                errors.append(
+                    "capability registry adapter_version mismatch: " + ", ".join(mismatched)
+                )
+    except (OSError, json.JSONDecodeError, AttributeError) as exc:
+        errors.append(f"capability registry is invalid: {exc}")
 
     report = {"status": "fail" if errors else "pass", "version": actual, "expected_version": expected, "errors": errors}
     print(json.dumps(report, indent=2))

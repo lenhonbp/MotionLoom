@@ -12,8 +12,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from browser_review_consistency import candidate_consistency_errors
 
-ROOT = Path(__file__).resolve().parents[1]
+
+PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+ROOT = PACKAGE_ROOT
 EVIDENCE_ARTIFACTS = (
     "semantic-lint-benchmark.json",
     "evidence-verifier-report.json",
@@ -56,7 +59,7 @@ def project_memory_path() -> Path:
 
 
 def asset_provenance_module():
-    path = ROOT / "scripts" / "asset-provenance.py"
+    path = PACKAGE_ROOT / "scripts" / "asset-provenance.py"
     loader = importlib.util.spec_from_file_location("motionloom_asset_provenance", path)
     module = importlib.util.module_from_spec(loader)
     loader.loader.exec_module(module)
@@ -64,7 +67,7 @@ def asset_provenance_module():
 
 
 def asset_consistency_module():
-    path = ROOT / "scripts" / "asset-consistency.py"
+    path = PACKAGE_ROOT / "scripts" / "asset-consistency.py"
     loader = importlib.util.spec_from_file_location("motionloom_asset_consistency", path)
     module = importlib.util.module_from_spec(loader)
     sys.modules[loader.name] = module
@@ -73,7 +76,7 @@ def asset_consistency_module():
 
 
 def artifact_intake_module():
-    path = ROOT / "scripts" / "artifact-intake.py"
+    path = PACKAGE_ROOT / "scripts" / "artifact-intake.py"
     loader = importlib.util.spec_from_file_location("motionloom_artifact_intake", path)
     module = importlib.util.module_from_spec(loader)
     sys.modules[loader.name] = module
@@ -450,6 +453,14 @@ def approval_contract_errors(task_dir: Path, task: dict, require_current: bool) 
         return ["ready-for-PR task requires review.json"]
     if candidate.get("task_id") != task.get("task_id"):
         errors.append("browser-review candidate task_id does not match task.json")
+    scene_candidate_path = ROOT / "src" / "output" / str(task.get("scene", "")) / "browser-review.json"
+    if scene_candidate_path.is_file():
+        errors.extend(candidate_consistency_errors(
+            scene_candidate_path,
+            candidate_path,
+            expected_task_id=task.get("task_id"),
+            expected_scene=task.get("scene"),
+        ))
     if candidate.get("scene") != task.get("scene"):
         errors.append("browser-review candidate scene does not match task.json")
     task_review = task.get("browser_review") or {}
@@ -717,6 +728,7 @@ def render(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     init = sub.add_parser("init")
@@ -772,8 +784,11 @@ def main() -> int:
     structure_parser.set_defaults(func=record_structure)
     check_parser = sub.add_parser("check", help="Validate semantic completeness of a task bundle")
     check_parser.add_argument("--task-dir", required=True)
+    check_parser.add_argument("--root", default=str(ROOT), help="Repository root containing the canonical scene artifacts")
     check_parser.set_defaults(func=check_report)
     args = parser.parse_args()
+    if hasattr(args, "root"):
+        ROOT = Path(args.root).expanduser().resolve()
     return args.func(args)
 
 

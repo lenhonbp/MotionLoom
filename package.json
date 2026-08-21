@@ -133,6 +133,7 @@
     "test": "python3 tests/scripts/run_tests.py",
     "validate": "npm run quality:attestation",
     "doctor": "node bin/motionloom.mjs doctor --json",
+    "doctor:runtime": "node bin/motionloom.mjs doctor --runtime --json",
     "init": "node bin/motionloom.mjs init",
     "setup": "node bin/motionloom.mjs setup",
     "setup:dry": "node bin/motionloom.mjs setup --dry-run",

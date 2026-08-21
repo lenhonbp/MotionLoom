@@ -7,8 +7,11 @@ on:
       - "scripts/review-hook.py"
       - "schemas/browser-review-candidate.schema.json"
       - "schemas/devlab-runtime.schema.json"
+      - "schemas/devlab-state-machine.schema.json"
       - "tests/scripts/test_devlab_runtime.py"
+      - "tests/scripts/test_devlab_state_machine.py"
       - "docs/DEV-LAB-RUNTIME.md"
+      - "docs/DEV-LAB-STATE-TRANSITIONS.md"
       - "SKILL.md"
       - ".github/workflows/devlab.yml"
   push:
@@ -18,8 +21,11 @@ on:
       - "scripts/review-hook.py"
       - "schemas/browser-review-candidate.schema.json"
       - "schemas/devlab-runtime.schema.json"
+      - "schemas/devlab-state-machine.schema.json"
       - "tests/scripts/test_devlab_runtime.py"
+      - "tests/scripts/test_devlab_state_machine.py"
       - "docs/DEV-LAB-RUNTIME.md"
+      - "docs/DEV-LAB-STATE-TRANSITIONS.md"
       - "SKILL.md"
       - ".github/workflows/devlab.yml"
   workflow_dispatch:
@@ -60,6 +66,9 @@ jobs:
 
       - name: Validate live runtime binding contract
         run: python3 tests/scripts/test_devlab_runtime.py
+
+      - name: Validate state machine binding contract
+        run: python3 tests/scripts/test_devlab_state_machine.py
 
       - name: Build Dev Lab bundle
         run: pnpm --dir dev-lab run build
@@ -131,6 +140,11 @@ jobs:
           MOTIONLOOM_ACTION_LIBRARY_OUT: /tmp/motionloom-devlab-action-library
         run: pnpm --dir dev-lab run action-library:smoke
 
+      - name: Exercise state and transition tester
+        env:
+          MOTIONLOOM_TRANSITION_OUT: /tmp/motionloom-devlab-state-transitions
+        run: pnpm --dir dev-lab run transition:smoke
+
       - name: Reject DOM injection and expired candidates
         run: pnpm --dir dev-lab run security:smoke
 
@@ -158,6 +172,15 @@ jobs:
         with:
           name: motionloom-dev-lab-action-library-${{ github.sha }}
           path: /tmp/motionloom-devlab-action-library
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Dev Lab state transition evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motionloom-dev-lab-state-transitions-${{ github.sha }}
+          path: /tmp/motionloom-devlab-state-transitions
           if-no-files-found: warn
           retention-days: 14
 

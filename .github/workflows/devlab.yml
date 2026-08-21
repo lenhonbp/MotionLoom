@@ -97,16 +97,16 @@ jobs:
           PY
 
       - name: Verify static Dev Lab health
-        run: >-
-          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused
-          http://127.0.0.1:3300/?scene=browser-review-smoke
-          -o /tmp/motionloom-devlab-diagnostics/health.html
-          curl --fail --silent --show-error
-          http://127.0.0.1:3300/scenes/browser-review-smoke/manifest.json
-          -o /tmp/motionloom-devlab-diagnostics/manifest.json
-          curl --fail --silent --show-error
-          http://127.0.0.1:3300/scenes/browser-review-smoke/motion-spec.json
-          -o /tmp/motionloom-devlab-diagnostics/motion-spec.json
+        run: |
+          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused \
+            "http://127.0.0.1:3300/?scene=browser-review-smoke" \
+            -o /tmp/motionloom-devlab-diagnostics/health.html
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3300/scenes/browser-review-smoke/manifest.json \
+            -o /tmp/motionloom-devlab-diagnostics/manifest.json
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3300/scenes/browser-review-smoke/motion-spec.json \
+            -o /tmp/motionloom-devlab-diagnostics/motion-spec.json
 
       - name: Capture deterministic browser review snapshots
         run: >-

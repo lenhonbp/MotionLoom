@@ -36,6 +36,7 @@
     "requirements.txt",
     "dev-lab/public/index.html",
     "dev-lab/public/devlab.js",
+    "dev-lab/public/action-library.js",
     "tests/runtime-harness",
     "tests/evals",
     "tests/scripts/run_tests.py",

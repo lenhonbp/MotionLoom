@@ -81,9 +81,11 @@ def write_png(path: Path, phase: int) -> None:
     rect(18, 47, 31, 50, dark)
     rect(32, 47, 45, 50, dark)
 
-    # Phase marker keeps hashes distinct without changing geometry.
-    marker_x = 28 + (phase % 8)
-    pixel(marker_x, 33, orange)
+    # A two-row phase marker keeps all 12 frame bytes distinct without changing
+    # the locked alpha geometry. It lives inside the already-opaque torso.
+    marker_x = 28 + (phase % 6)
+    marker_y = 32 + (phase // 6)
+    pixel(marker_x, marker_y, orange)
 
     raw = bytearray()
     for y in range(HEIGHT):
@@ -190,6 +192,10 @@ def main() -> int:
             "bleed_margin_px": 2,
             "sha256": sha256(target),
         })
+
+    frame_hashes = [item["sha256"] for item in geometry_frames]
+    if len(set(frame_hashes)) != FRAME_COUNT:
+        raise RuntimeError("synthetic 12-frame dogfood fixture accidentally produced duplicate frame bytes")
 
     lock = {
         "schema_version": "0.1",
@@ -306,6 +312,7 @@ def main() -> int:
         "action": "run-12",
         "frame_count": FRAME_COUNT,
         "unique_source_images": metrics.get("unique_source_images"),
+        "unique_frame_hashes": len(set(frame_hashes)),
         "lock_ready": validation.get("ready"),
         "compose_all_ready": composed.get("ready"),
         "preflight_ready": preflight.get("ready"),

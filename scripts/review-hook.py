@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 import re
 import shutil
@@ -340,8 +341,24 @@ def prepare(args: argparse.Namespace) -> int:
         )),
     })
     handoff_path.write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    subprocess.run([sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
-    subprocess.run([sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
+    project_env = os.environ.copy()
+    project_env["MOTIONLOOM_PROJECT_ROOT"] = str(ROOT)
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        env=project_env,
+    )
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        env=project_env,
+    )
     print(json.dumps({
         "status": "review_required",
         "task_id": task["task_id"],

@@ -23,6 +23,7 @@
         animations,
         capabilities: {
           selectAnimation: typeof adapter.selectAnimation === "function",
+          transition: typeof adapter.triggerTransition === "function",
           play: typeof adapter.play === "function",
           pause: typeof adapter.pause === "function",
           restart: typeof adapter.restart === "function" || typeof adapter.seek === "function" || typeof adapter.setProgress === "function",
@@ -43,6 +44,16 @@
     if (command === "selectAnimation") {
       if (typeof adapter.selectAnimation !== "function") throw new Error("selectAnimation is not supported");
       return adapter.selectAnimation(payload.id);
+    }
+    if (command === "triggerTransition") {
+      if (typeof adapter.triggerTransition !== "function") throw new Error("triggerTransition is not supported");
+      return adapter.triggerTransition({
+        id: payload.id,
+        from: payload.from,
+        to: payload.to,
+        trigger: payload.trigger,
+        payload: payload.payload && typeof payload.payload === "object" ? payload.payload : {}
+      });
     }
     if (command === "play" || command === "pause" || command === "setSpeed" || command === "setLoop" || command === "stepFrames") {
       const method = command;

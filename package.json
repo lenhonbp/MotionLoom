@@ -37,6 +37,7 @@
     "dev-lab/public/index.html",
     "dev-lab/public/devlab.js",
     "dev-lab/public/action-library.js",
+    "dev-lab/public/runtime-bridge.js",
     "tests/runtime-harness",
     "tests/evals",
     "tests/scripts/run_tests.py",

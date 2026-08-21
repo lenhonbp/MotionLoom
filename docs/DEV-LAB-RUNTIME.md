@@ -17,10 +17,16 @@ The descriptor is scene-local and hash-bound by `scripts/review-hook.py`. Every 
     "sprites/walk-01.png"
   ],
   "default_animation": "idle",
+  "groups": [
+    { "id": "locomotion", "label": "Locomotion", "order": 10 },
+    { "id": "combat", "label": "Combat", "order": 20 }
+  ],
   "animations": [
     {
       "id": "idle",
       "label": "Idle",
+      "group": "locomotion",
+      "tags": ["stance", "loop"],
       "fps": 8,
       "frames": ["sprites/idle-00.png", "sprites/idle-01.png"],
       "loop": true,
@@ -29,6 +35,8 @@ The descriptor is scene-local and hash-bound by `scripts/review-hook.py`. Every 
     {
       "id": "walk",
       "label": "Walk",
+      "group": "locomotion",
+      "tags": ["movement", "grounded"],
       "fps": 12,
       "frames": ["sprites/walk-00.png", "sprites/walk-01.png"],
       "loop": true,
@@ -57,6 +65,16 @@ The descriptor is scene-local and hash-bound by `scripts/review-hook.py`. Every 
 ```
 
 Dev Lab renders the declared frame bytes directly and drives them with a real clock. Play, pause, restart, scrub, frame-step, loop and speed therefore operate on the same candidate frames that are being reviewed. Action names such as `idle`, `walk`, `run`, `attack`, `hurt` or project-specific clips are data, not hard-coded UI.
+
+## Large action libraries
+
+`animations` has no product-level fixed action vocabulary. A consumer can add `jump`, `dash`, `parry`, `skill-fireball`, `teleport-strike`, emotes, cinematic clips, state-machine entries, or any other valid action id and Dev Lab will expose it automatically.
+
+For larger character or UI sets, use optional `groups` plus `animations[].group` and `animations[].tags`. Dev Lab turns those fields into an Action Library with search, group chips, collapsible group sections, and filters for review-required, unreviewed, looping, and one-shot actions. Group metadata changes presentation only; it does not grant runtime capability or approval.
+
+Examples of useful project-defined groups are `locomotion`, `combat`, `skills`, `reactions`, `emotes`, or domain-specific categories. These names are not reserved by MotionLoom. Actions without a declared group remain visible under `Other` rather than being dropped.
+
+Search matches action id, label, group label, tags, and declared events. Filtering never weakens the review gate: hidden required actions still count as unreviewed until the user actually selects them. The selected action remains visible in the `Unreviewed` filter so the reviewer does not lose the current runtime context immediately after opening it.
 
 ## Iframe runtime example
 

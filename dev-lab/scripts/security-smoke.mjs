@@ -80,7 +80,7 @@ try {
   const baseUrl = `${origin}/?scene=${scene}&task_id=${encodeURIComponent(candidate.task_id)}&candidate_id=${encodeURIComponent(candidate.candidate_id)}`;
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(baseUrl, { waitUntil: "networkidle" });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__lab?.ready === true);
   const safeDom = await page.evaluate((expected) => ({
     injectedElement: Boolean(document.querySelector("#checks img")),
@@ -94,7 +94,7 @@ try {
   candidate.status = "approved";
   fs.writeFileSync(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
   const terminalPage = await browser.newPage();
-  await terminalPage.goto(`${baseUrl}&terminal_probe=1`, { waitUntil: "networkidle" });
+  await terminalPage.goto(`${baseUrl}&terminal_probe=1`, { waitUntil: "domcontentloaded" });
   await terminalPage.waitForFunction(() => document.querySelector("#status")?.textContent?.includes("not reviewable"));
   const terminalReady = await terminalPage.evaluate(() => window.__lab?.ready);
   await terminalPage.close();
@@ -104,7 +104,7 @@ try {
   candidate.expires_at = "2000-01-01T00:00:00Z";
   fs.writeFileSync(candidatePath, `${JSON.stringify(candidate, null, 2)}\n`);
   const expiredPage = await browser.newPage();
-  await expiredPage.goto(`${baseUrl}&expired_probe=1`, { waitUntil: "networkidle" });
+  await expiredPage.goto(`${baseUrl}&expired_probe=1`, { waitUntil: "domcontentloaded" });
   await expiredPage.waitForFunction(() => document.querySelector("#status")?.textContent?.includes("expired"));
   const expiredReady = await expiredPage.evaluate(() => window.__lab?.ready);
   await expiredPage.close();

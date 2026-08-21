@@ -126,6 +126,11 @@ jobs:
           MOTIONLOOM_DOGFOOD_OUT: /tmp/motionloom-devlab-dogfood
         run: pnpm --dir dev-lab run dogfood
 
+      - name: Exercise scalable action library
+        env:
+          MOTIONLOOM_ACTION_LIBRARY_OUT: /tmp/motionloom-devlab-action-library
+        run: pnpm --dir dev-lab run action-library:smoke
+
       - name: Reject DOM injection and expired candidates
         run: pnpm --dir dev-lab run security:smoke
 
@@ -144,6 +149,15 @@ jobs:
         with:
           name: motionloom-dev-lab-dogfood-${{ github.sha }}
           path: /tmp/motionloom-devlab-dogfood
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Dev Lab action library evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motionloom-dev-lab-action-library-${{ github.sha }}
+          path: /tmp/motionloom-devlab-action-library
           if-no-files-found: warn
           retention-days: 14
 

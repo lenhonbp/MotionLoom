@@ -21,9 +21,6 @@ on:
         required: true
         default: true
         type: boolean
-  push:
-    branches:
-      - release/publish-2.6.1
 
 permissions:
   contents: write
@@ -36,7 +33,6 @@ concurrency:
 jobs:
   publish:
     name: Verify and publish npm package
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/release/publish-2.6.1'
     runs-on: ubuntu-latest
     environment: npm-release
     steps:
@@ -84,21 +80,20 @@ jobs:
 
       - name: Verify release traceability
         env:
-          RELEASE_VERSION: ${{ github.event_name == 'push' && '2.6.1' || inputs.release_version }}
-          NPM_TAG: ${{ github.event_name == 'push' && 'latest' || inputs.npm_tag }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
         run: |
           python3 scripts/release-verify.py \
             --expected-version "$RELEASE_VERSION" \
             --release-note "docs/releases/$RELEASE_VERSION.md"
-          echo "Publishing motionloom@$RELEASE_VERSION with npm distribution tag $NPM_TAG"
+          echo "Publishing motionloom@$RELEASE_VERSION with npm distribution tag ${{ inputs.npm_tag }}"
 
       - name: Publish to npm
         env:
-          NPM_TAG: ${{ github.event_name == 'push' && 'latest' || inputs.npm_tag }}
+          NPM_TAG: ${{ inputs.npm_tag }}
         run: npm publish --access public --tag "$NPM_TAG"
 
       - name: Create GitHub release
-        if: github.event_name == 'push' || inputs.create_github_release
+        if: inputs.create_github_release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

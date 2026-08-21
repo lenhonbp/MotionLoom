@@ -18,19 +18,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_ROOT = ROOT / "examples/agent-consumer/asset-consistency"
 ANALYZER_PATH = ROOT / "scripts/asset-consistency.py"
+PREFLIGHT_PATH = ROOT / "scripts/frame-set-preflight.py"
 
 
-def load_analyzer():
-    spec = importlib.util.spec_from_file_location("asset_consistency", ANALYZER_PATH)
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
-        raise RuntimeError("cannot load asset consistency analyzer")
+        raise RuntimeError(f"cannot load {path.name}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
 
-AC = load_analyzer()
+AC = load_module(ANALYZER_PATH, "asset_consistency")
+PREFLIGHT = load_module(PREFLIGHT_PATH, "frame_set_preflight")
 
 
 def read_json(name: str) -> dict:
@@ -112,6 +114,65 @@ def test_frame_contamination_and_pivot_drift() -> None:
     check(not result["ready"] and any(item["code"] == "pivot_drift" for item in result["errors"]), "pivot drift must block")
 
 
+def test_generated_frame_set_preflight() -> None:
+    geometry = read_json("hero-walk-frame-geometry.json")
+    result = PREFLIGHT.validate(geometry, FIXTURE_ROOT)
+    check(result["ready"], f"isolated generated frame fixture must pass preflight: {result}")
+    check(result.get("approval") is False, "preflight must never emit approval")
+
+    shared = read_json("hero-walk-frame-geometry.json")
+    shared["frames"][1]["image"] = shared["frames"][0]["image"]
+    shared["frames"][1]["sha256"] = shared["frames"][0]["sha256"]
+    result = PREFLIGHT.validate(shared, FIXTURE_ROOT)
+    check(
+        not result["ready"] and any(item["code"] == "shared_source_image" for item in result["errors"]),
+        "generated multi-frame source must reject a shared pose-sheet image",
+    )
+
+    guard = read_json("hero-walk-frame-geometry.json")
+    guard["frames"][0]["safe_rect"] = {"x": 2, "y": 1, "width": 4, "height": 5}
+    guard["frames"][0]["bleed_margin_px"] = 1
+    result = PREFLIGHT.validate(guard, FIXTURE_ROOT)
+    check(
+        not result["ready"] and any(item["code"] == "guard_band_violation" for item in result["errors"]),
+        "generated frame alpha must preserve the declared transparent guard band",
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        geometry = read_json("hero-walk-frame-geometry.json")
+        geometry["frames"] = [copy.deepcopy(geometry["frames"][0]), copy.deepcopy(geometry["frames"][1])]
+        geometry["invariants"]["bbox_drift_tolerance_px"] = 0
+        for frame in geometry["frames"]:
+            frame["rect"] = {"x": 0, "y": 0, "width": 8, "height": 8}
+            frame["safe_rect"] = {"x": 0, "y": 0, "width": 8, "height": 8}
+            frame["bleed_margin_px"] = 0
+
+        first_pixels = solid(8, 8, (0, 0, 0, 0))
+        for y in range(1, 6):
+            for x in range(2, 6):
+                first_pixels[y * 8 + x] = (120, 160, 220, 255)
+        second_pixels = solid(8, 8, (0, 0, 0, 0))
+        for y in range(1, 6):
+            for x in range(1, 7):
+                second_pixels[y * 8 + x] = (120, 160, 220, 255)
+        write_rgba_png(root / "frame-00.png", 8, 8, first_pixels)
+        write_rgba_png(root / "frame-01.png", 8, 8, second_pixels)
+
+        geometry["frames"][0]["image"] = "frame-00.png"
+        geometry["frames"][0]["alpha_bbox"] = {"x": 2, "y": 1, "width": 4, "height": 5}
+        geometry["frames"][0]["sha256"] = hashlib.sha256((root / "frame-00.png").read_bytes()).hexdigest()
+        geometry["frames"][1]["image"] = "frame-01.png"
+        geometry["frames"][1]["alpha_bbox"] = {"x": 1, "y": 1, "width": 6, "height": 5}
+        geometry["frames"][1]["sha256"] = hashlib.sha256((root / "frame-01.png").read_bytes()).hexdigest()
+
+        result = PREFLIGHT.validate(geometry, root)
+        check(
+            not result["ready"] and any(item["code"] == "bbox_drift" for item in result["errors"]),
+            "generated frame apparent-size drift beyond tolerance must block instead of warning",
+        )
+
+
 def test_atlas_overlap_and_contamination() -> None:
     atlas = read_json("hero-atlas-contract.json")
     atlas["regions"][1]["rect"]["x"] = 4
@@ -179,11 +240,23 @@ def test_missing_file_and_cli_surface() -> None:
     data = json.loads(cli.stdout)
     check(cli.returncode == 0 and data.get("ready") is True and data.get("contract") == "layered_map", "CLI must expose the consistency validator")
 
+    preflight_cli = subprocess.run([
+        sys.executable, str(PREFLIGHT_PATH),
+        "--input", str(FIXTURE_ROOT / "hero-walk-frame-geometry.json"),
+        "--root", str(FIXTURE_ROOT), "--json",
+    ], cwd=ROOT, capture_output=True, text=True)
+    preflight_data = json.loads(preflight_cli.stdout)
+    check(
+        preflight_cli.returncode == 0 and preflight_data.get("ready") is True and preflight_data.get("approval") is False,
+        "generated frame-set preflight CLI must pass isolated fixture without granting approval",
+    )
+
 
 def main() -> int:
     test_pass_fixtures()
     test_identity_and_action_fail_closed()
     test_frame_contamination_and_pivot_drift()
+    test_generated_frame_set_preflight()
     test_atlas_overlap_and_contamination()
     test_layered_map_order_seam_and_bounds()
     test_missing_file_and_cli_surface()

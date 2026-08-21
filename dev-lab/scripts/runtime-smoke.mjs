@@ -11,7 +11,7 @@ const repositoryRoot = path.resolve(labRoot, "..");
 const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "motionloom-devlab-runtime-"));
 const publicRoot = path.join(fixtureRoot, "public");
 fs.mkdirSync(path.join(publicRoot, "scenes"), { recursive: true });
-for (const file of ["index.html", "devlab.js", "runtime-bridge.js"]) {
+for (const file of ["index.html", "devlab.js", "action-library.js", "runtime-bridge.js"]) {
   fs.copyFileSync(path.join(labRoot, "public", file), path.join(publicRoot, file));
 }
 
@@ -95,8 +95,11 @@ const server = http.createServer((request, response) => {
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
   const target = path.resolve(publicRoot, relative);
   if (target !== publicRoot && !target.startsWith(`${publicRoot}${path.sep}`)) { response.writeHead(403).end("forbidden"); return; }
-  try { response.writeHead(200, { "Content-Type": contentTypes.get(path.extname(target)) || "application/octet-stream", "Cache-Control": "no-store" }); response.end(fs.readFileSync(target)); }
-  catch { response.writeHead(404).end("not found"); }
+  let body;
+  try { body = fs.readFileSync(target); }
+  catch { response.writeHead(404, { "Cache-Control": "no-store" }).end("not found"); return; }
+  response.writeHead(200, { "Content-Type": contentTypes.get(path.extname(target)) || "application/octet-stream", "Cache-Control": "no-store" });
+  response.end(body);
 });
 
 let browser;

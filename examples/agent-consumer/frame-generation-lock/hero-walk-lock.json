@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1",
+  "lock_id": "hero-walk-v1",
+  "asset_identity": "character/hero-male",
+  "action_id": "walk",
+  "reference": {
+    "image": "asset-consistency/assets/hero-frame-00.png",
+    "sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248",
+    "role": "accepted_frame_anchor"
+  },
+  "canvas": {
+    "width": 8,
+    "height": 8,
+    "color_space": "srgb",
+    "alpha_mode": "straight"
+  },
+  "geometry": {
+    "center_x": 4,
+    "pivot": { "x": 4, "y": 7, "space": "pixels" },
+    "footline_px": 6,
+    "safe_rect": { "x": 1, "y": 0, "width": 6, "height": 7 },
+    "min_padding_px": 1,
+    "target_alpha_bbox": { "width": 4, "height": 5 },
+    "tolerances": {
+      "pivot_px": 0.01,
+      "footline_px": 0.01,
+      "bbox_width_px": 0,
+      "bbox_height_px": 0
+    }
+  },
+  "appearance": {
+    "preserve": [
+      "same character identity and silhouette",
+      "same camera and left-to-right orientation",
+      "same palette, outline weight and apparent scale"
+    ],
+    "forbid": [
+      "second character or neighboring pose",
+      "background, shadow, text, prop or crop",
+      "camera change, mirror, recolor or post-generation resize"
+    ],
+    "pixel_art": {
+      "enabled": true,
+      "nearest_neighbor_only": true
+    }
+  },
+  "source_policy": {
+    "isolated_frames": true,
+    "max_frames_per_image": 1,
+    "allow_pose_sheet": false,
+    "allow_post_resize": false,
+    "reuse_reference": true
+  },
+  "frames": [
+    {
+      "frame_id": "walk.00",
+      "pose": "Contact-right: right foot forward on the shared footline, left leg trailing, natural counter-swing.",
+      "output": "frame-generation-lock/generated/hero-walk-00.png"
+    },
+    {
+      "frame_id": "walk.01",
+      "pose": "Passing: one leg passes beneath the upright body with compact stride and natural counter-swing.",
+      "output": "frame-generation-lock/generated/hero-walk-01.png"
+    },
+    {
+      "frame_id": "walk.02",
+      "pose": "Contact-left: left foot forward on the shared footline, right leg trailing, natural counter-swing.",
+      "output": "frame-generation-lock/generated/hero-walk-02.png"
+    },
+    {
+      "frame_id": "walk.03",
+      "pose": "Passing complement: opposite leg passes beneath the upright body; preserve the same body scale and baseline.",
+      "output": "frame-generation-lock/generated/hero-walk-03.png"
+    }
+  ],
+  "postflight": {
+    "frame_geometry": "asset-consistency/hero-walk-frame-geometry.json"
+  },
+  "trust": {
+    "authority": "ai_generated",
+    "review_only": true,
+    "approval": false
+  }
+}

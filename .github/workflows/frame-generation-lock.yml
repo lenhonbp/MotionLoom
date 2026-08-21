@@ -1,0 +1,73 @@
+name: Frame Generation Lock
+
+on:
+  pull_request:
+    paths:
+      - "scripts/frame-generation-lock.py"
+      - "scripts/frame-set-preflight.py"
+      - "schemas/frame-generation-lock.schema.json"
+      - "references/multi-frame-asset-generation.md"
+      - "examples/agent-consumer/frame-generation-lock/**"
+      - "tests/scripts/test_frame_generation_lock.py"
+      - "bin/motionloom.mjs"
+      - "AGENTS.md"
+      - ".github/workflows/frame-generation-lock.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/frame-generation-lock.py"
+      - "scripts/frame-set-preflight.py"
+      - "schemas/frame-generation-lock.schema.json"
+      - "references/multi-frame-asset-generation.md"
+      - "examples/agent-consumer/frame-generation-lock/**"
+      - "tests/scripts/test_frame_generation_lock.py"
+      - "bin/motionloom.mjs"
+      - "AGENTS.md"
+      - ".github/workflows/frame-generation-lock.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lock, compose and preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run frame generation lock regression suite
+        run: python3 tests/scripts/test_frame_generation_lock.py
+
+      - name: Validate lock through public CLI
+        run: |
+          node bin/motionloom.mjs frame-generation-lock validate \
+            --input examples/agent-consumer/frame-generation-lock/hero-walk-lock.json \
+            --root examples/agent-consumer --json
+
+      - name: Compose one isolated provider instruction
+        run: |
+          node bin/motionloom.mjs frame-generation-lock compose \
+            --input examples/agent-consumer/frame-generation-lock/hero-walk-lock.json \
+            --root examples/agent-consumer --frame-id walk.01 --json \
+            > /tmp/frame-generation-instruction.json
+          python3 - <<'PY'
+          import json
+          data = json.load(open('/tmp/frame-generation-instruction.json'))
+          assert data['ready'] is True
+          assert data['approval'] is False
+          assert len(data['frames']) == 1
+          assert 'exactly ONE isolated source frame' in data['frames'][0]['instruction']
+          assert 'frame-set-preflight' in data['next_gate']
+          PY
+
+      - name: Verify isolated source fixture through public preflight CLI
+        run: |
+          node bin/motionloom.mjs frame-set-preflight \
+            --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json \
+            --root examples/agent-consumer/asset-consistency --json

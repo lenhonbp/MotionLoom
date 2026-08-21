@@ -15,7 +15,7 @@ MotionLoom is an independent open-source Agent Skill for building UI motion, Lot
 
 > **MotionLoom is not an auto-approval layer.** A valid signature, a passing heuristic, or a successful render proves only the contract it checks. Visual quality, intent, accessibility and PR authorization remain reviewable human decisions.
 
-> **Release posture:** MotionLoom 2.5.1 hardens installed-package onboarding, Dev Lab browser review, runtime-output cleanup and consumer-package acceptance. The native macOS/iOS review app remains an unsigned source alpha under `apps/apple/`; the npm package remains the cross-platform Node/Python Skill and documentation surface. Verify npm/GitHub publication metadata separately; passing evidence never implies user approval.
+> **Release posture:** MotionLoom 2.6.0 upgrades Dev Lab into an interactive runtime review workbench with live playback controls, arbitrary project-defined Action Libraries and optional state/transition testing, while preserving deterministic snapshots and explicit human approval. The native macOS/iOS review app remains an unsigned source alpha under `apps/apple/`; the npm package remains the cross-platform Node/Python Skill and documentation surface. Verify npm/GitHub publication metadata separately; passing runtime evidence never implies user approval.
 
 ## Why MotionLoom
 
@@ -33,7 +33,7 @@ MotionLoom turns that fragile sequence into a bounded production system. Its dur
 | **Asset consistency** | Measured multi-frame geometry, pivot/footline stability, atlas boundaries and layered-map contracts | Treat a heuristic warning or deterministic pass as artist approval or production authorization |
 | **Runtime truth** | Lottie/dotLottie, SVG cutout rig, Rive, GSAP and Framer Motion evidence from real runtime paths | Call scaffold, static validation or a heuristic score visual approval |
 | **Agent intelligence** | Project graph, provenance, Motion IR, replay, semantic lint, continuity and fix plan | Convert confidence, benchmark output or warnings into approval |
-| **Human review** | Exact candidate URL, frame checkpoints, checklist, review artifact and handoff report in Dev Lab | Confirm, push or open a PR without explicit user authorization |
+| **Human review** | Exact candidate URL, live playback, Action Library, state/transition testing, deterministic checkpoints, checklist and review artifact in Dev Lab | Confirm, push or open a PR without explicit user authorization |
 
 ## The production contract
 
@@ -54,6 +54,16 @@ flowchart LR
 ```
 
 Every handoff is machine-readable. The typical bundle under `artifacts/<task-id>/` includes the task ledger, context hash, motion spec, manifest, runtime snapshots, telemetry, project graph, provenance, lint and continuity reports, fix plan, browser-review candidate, review decision, execution report and next-Agent handoff.
+
+## Interactive Dev Lab
+
+Dev Lab is designed to let the user inspect the same candidate behavior that MotionLoom is claiming as runtime evidence, rather than treating three screenshots as an animation review surface. A live candidate can expose Play, Pause, Restart, scrub, frame-step, speed and loop controls together with fullscreen, zoom/fit, background, grid, bounds, baseline and pivot inspection tools. Deterministic snapshots remain available as captured evidence and compatibility fallback.
+
+Actions are data-driven. `devlab-runtime.json` may declare any project-specific action vocabulary and optional groups/tags, so a character can expose `Idle`, `Walk`, `Run`, `Attack`, `Jump`, skills, reactions, emotes or domain-specific clips without a MotionLoom UI change. Dev Lab turns large sets into a searchable/filterable Action Library while keeping review coverage independent from presentation filters.
+
+When interaction between actions matters, an optional hash-bound `devlab-state-machine.json` can declare states, legal transitions and review sequences such as `Idle -> Run -> Attack -> Hurt -> Idle`. Sprite/clip candidates can use portable `select-animation` transitions; iframe runtimes can implement strict `runtime-trigger` transitions through the runtime bridge. A runtime trigger counts as inspected only after the target state is observable, and unsupported triggers are never silently replaced by clip switches.
+
+Review policy may require selected actions, transitions or sequences to be inspected before approval becomes available. **Completing playback or transition coverage does not approve the candidate.** Request Changes remains available and `approved` is still an explicit user decision. See the [Dev Lab live runtime contract](docs/DEV-LAB-RUNTIME.md) and [2.6.0 release note](docs/releases/2.6.0.md).
 
 ## Quick start
 
@@ -175,7 +185,7 @@ MotionLoom keeps distinct layers distinct:
 | Provenance | Which source/material/product bytes were used and how they hash | That the source is appropriate beyond the declared authority/license contract |
 | Semantic lint and benchmark | Bounded rule findings, risk signals and performance measurements | Human visual quality or intent acceptance |
 | Signed attestation | A trusted signer signed the same task-bound hashes under the policy | Reviewer consent, accessibility approval or PR authorization |
-| Dev Lab review | The user saw the exact candidate and recorded a decision | A future candidate is automatically approved |
+| Dev Lab review | The user saw and interacted with the exact candidate and recorded a decision | A future candidate is automatically approved |
 
 `approval` remains `false` in attestation and verifier artifacts. The default PR mode is local-only (`OPEN_PR=0`); commit, push and pull-request operations remain explicit side effects.
 
@@ -307,6 +317,7 @@ Read [the Apple workspace guide](apps/apple/README.md), [the contract boundary](
 | Install or understand the full lifecycle | [SKILL.md](SKILL.md) |
 | Choose a runtime | [Framework selection](docs/FRAMEWORK-SELECTION.md) and [runtime capability reference](references/runtime-capability.md) |
 | Run a review-ready scene | [Production checklist](docs/CHECKLIST.md) and [browser review contract](references/browser-review-contract.md) |
+| Configure live actions, playback or state transitions in Dev Lab | [Dev Lab live runtime contract](docs/DEV-LAB-RUNTIME.md) and [2.6.0 release note](docs/releases/2.6.0.md) |
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
 | Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
@@ -339,17 +350,17 @@ The GitHub Actions workflow is designed to run the Project Memory and CLI contra
 
 ## Automated CI/CD
 
-MotionLoom separates verification from publication. Pull requests and pushes to `main` trigger the quality, documentation, security and relevant Dev Lab workflows when their path filters match. A weekly Dependabot job proposes dependency updates for the root package, Dev Lab and GitHub Actions. The npm release workflow is manual only, protected by the `npm-release` environment, and requires the maintainer to choose the distribution tag; GitHub release creation is an explicit input rather than an automatic side effect.
+MotionLoom separates verification from publication. Pull requests and pushes to `main` trigger the quality, documentation, security and relevant Dev Lab workflows when their path filters match. A weekly Dependabot job proposes dependency updates for the root package, Dev Lab and GitHub Actions. The npm release workflow is manual only, protected by the `npm-release` environment, and requires the maintainer to choose the distribution tag; GitHub release creation is a dispatch input rather than a consequence of ordinary CI.
 
 | Workflow | Trigger | Responsibility |
 |---|---|---|
 | `quality.yml` | Pull request, `main`, manual | Cross-platform memory/CLI matrix and full evidence-aware quality suite |
 | `docs.yml` | Documentation/package changes, `main`, manual | Internal links, metadata, workflow safety, Skill Doctor and npm tarball inspection |
 | `security.yml` | Pull request, `main`, weekly schedule, manual | Dependency review and CodeQL for JavaScript/Python |
-| `devlab.yml` | `dev-lab/**` changes, `main`, manual | Build and retain the browser review workbench artifact |
-| `release.yml` | Manual dispatch only | Regression, npm publish with provenance and optional GitHub release |
+| `devlab.yml` | `dev-lab/**` changes, `main`, manual | Build and retain the interactive browser review workbench artifacts and smoke evidence |
+| `release.yml` | Manual dispatch only | Regression, installed-package smoke, release traceability, npm Trusted Publishing with provenance and optional GitHub Release |
 
-To enable npm publication, configure a protected GitHub environment named `npm-release` and either add the `NPM_TOKEN` environment secret or configure npm trusted publishing for this repository. Each manual run must provide `release_version`; the workflow verifies package/changelog/release-note alignment before publishing. The workflow never runs on a pull request and never changes MotionLoom's user-review or approval contract.
+To enable npm publication, configure the protected GitHub environment named `npm-release` and configure npm Trusted Publishing for this repository/workflow/environment. No long-lived `NPM_TOKEN` is required or expected by the current release workflow. Each manual run provides `release_version`; the workflow verifies package/changelog/release-note alignment before publishing. The workflow never runs on a pull request and never changes MotionLoom's user-review or approval contract.
 
 ## License
 

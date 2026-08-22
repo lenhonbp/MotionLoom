@@ -1185,6 +1185,26 @@ if __name__ == "__main__":
         action_separation_tests.returncode == 0 and "action separation tests: PASS" in action_separation_tests.stdout,
         action_separation_tests.stdout.strip() or action_separation_tests.stderr.strip(),
     )
+    asset_generation_plan_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_asset_generation_plan.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "asset planner recommends explicit provider and canvas adaptations",
+        asset_generation_plan_tests.returncode == 0 and "asset generation planner contract tests: PASS" in asset_generation_plan_tests.stdout,
+        asset_generation_plan_tests.stdout.strip() or asset_generation_plan_tests.stderr.strip(),
+    )
+    asset_adapt_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_asset_adapt.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "asset adaptation preserves target geometry without crop or stretch",
+        asset_adapt_tests.returncode == 0 and "asset adaptation contract tests: PASS" in asset_adapt_tests.stdout,
+        asset_adapt_tests.stdout.strip() or asset_adapt_tests.stderr.strip(),
+    )
     print()
     if FAILED:
         print(f"{len(FAILED)} test(s) FAILED: {', '.join(FAILED)}")

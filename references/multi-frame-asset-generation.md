@@ -2,6 +2,20 @@
 
 This contract applies whenever MotionLoom or an Agent creates two or more source frames for the same character, object, effect or other frame-based animation. It is automatic: the user should not have to ask for consistent frame geometry, isolated source frames or atlas hygiene.
 
+## Plan the provider before generating
+
+Before calling PixelLab, ImageGen, ChatGPT or another provider, create a provider-neutral request that describes the real runtime target. The request must include the target canvas, frame count, alpha mode, pixel-art policy, action cues and whether one source frame per request is required:
+
+```bash
+motionloom asset-generation-plan plan \
+  --request examples/agent-consumer/asset-planning/pixellab-hero-256x448-request.json \
+  --project-root . --json
+```
+
+Treat the result as a recommendation, not an approval. The planner distinguishes a provider-native canvas from a target-runtime canvas and makes adaptation explicit. For example, PixelLab animation tools documented with square canvases can be used as a provisional source for a `256x448` target only through an explicit transparent-padding plan and post-export action/frame validation; the planner must not silently crop, stretch, or claim that batch output satisfies per-frame isolation. If no adapter meets the hard constraints, the Agent must either choose a provider with a declared compatible capability or ask the user to relax a requirement.
+
+The registry is provider-neutral and metadata-driven. A provider adapter remains `scaffold_only` until real export bytes, generation receipt, target-runtime evidence and human review have been recorded. Bearer tokens belong in the connector/secret layer and never in requests, prompts, receipts or project manifests.
+
 ## Default source policy
 
 Generated source frames are **isolated-frame assets**, not a pose sheet.
@@ -44,7 +58,7 @@ The lock binds:
 - center, pivot, footline, safe rectangle and minimum transparent padding;
 - target measured alpha-bounds plus permitted width/height drift;
 - appearance features that must be preserved and changes that are forbidden;
-- a hard source policy of one isolated frame per image, no pose sheet and no post-generation resize;
+- a hard source policy of one isolated frame per image, no pose sheet and no silent post-generation resize;
 - every `frame_id`, its pose intent and its unique PNG output path;
 - the post-generation `frame-geometry` contract used by deterministic preflight;
 - a review-only trust boundary with `approval: false`.
@@ -61,7 +75,7 @@ motionloom frame-generation-lock compose \
   --root src/output/<scene> --frame-id <action.frame-id> --json
 ```
 
-For batch planning, `compose-all` emits one independent instruction per frame while preserving the same lock hash and reference hash. It does **not** authorize asking a provider for one multi-frame canvas; each returned instruction still represents one isolated source image.
+For batch planning, `compose-all` emits one independent instruction per frame while preserving the same lock hash and reference hash. It does **not** authorize asking a provider for one multi-frame canvas; each returned instruction still represents one isolated source image. If the selected provider only emits a batch animation, record it as provisional and create independent envelopes after export; do not promote it to an isolated-source pass automatically.
 
 If the reference bytes change, an output path escapes the asset root, two frames target the same PNG, the lock permits a pose sheet/post-resize, or the trust boundary is weakened, validation fails closed before generation.
 

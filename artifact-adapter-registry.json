@@ -78,7 +78,7 @@
       "capabilities": {
         "official_docs": ["https://api.pixellab.ai/v2/docs", "https://www.pixellab.ai/docs/tools/text2animation"],
         "canvas": {"shapes": ["square"], "allowed_sizes": [[32, 32], [64, 64], [128, 128]], "max_width": 128, "max_height": 128},
-        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "max_frames_per_request": 4},
+        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "frame_count_policy": "depends_on_canvas_size"},
         "adaptation": ["pad_to_target", "integer_upscale"]
       },
       "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],
@@ -99,7 +99,7 @@
       "capabilities": {
         "official_docs": ["https://api.pixellab.ai/v2/docs", "https://www.pixellab.ai/docs/tools/animation-to-animation"],
         "canvas": {"shapes": ["square"], "allowed_sizes": [[16, 16], [32, 32], [64, 64], [128, 128]], "max_width": 128, "max_height": 128},
-        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "max_frames_per_request": 4},
+        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "frame_count_policy": "depends_on_canvas_size"},
         "adaptation": ["pad_to_target", "integer_upscale"]
       },
       "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],

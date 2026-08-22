@@ -49,16 +49,18 @@ PixelLab also documents a Resize tool, but the official page currently states th
 
 ## Decision model
 
-The planner compares the request with adapter capability metadata. It distinguishes four important situations.
+The planner compares the request with adapter capability metadata and the active registry selection policy. It distinguishes provider eligibility from useful informational evidence.
 
 | Situation | Planner behavior |
 |---|---|
-| Native canvas and native frame behavior are declared | Recommend the adapter, but retain the adapter's verification and human-review status. |
-| Provider canvas is incompatible but safe adaptation is declared | Recommend a concrete source canvas, target canvas, anchor and deterministic operation such as transparent padding. |
+| Verified adapter satisfies hard constraints | Classify it as `eligible` and rank it as a recommendation; retain verification and human-review boundaries. |
+| Scaffold-only adapter under verified-only policy | Classify it as `provisional`; it may appear in provider diagnostics but cannot be ranked as an eligible route. |
+| Scaffold-only adapter with explicit policy permission | Classify it as `eligible` only because the active policy permits research/scaffold routing; it remains visibly provisional in its status. |
+| Provider canvas is incompatible but safe adaptation is declared | Recommend a concrete source canvas only when both source dimensions fit the target after the declared integer transform. |
 | Provider emits a batch while per-frame isolation is required | Mark the route provisional or blocked according to policy; require independent envelopes after export and never promote it automatically. |
-| Capability is unknown or no safe adaptation exists | Return `no_provider_meets_hard_constraints` or an explicit unknown warning; suggest manual import or a provider with a compatible contract. |
+| Capability is unknown or no eligible provider/safe adaptation exists | Return `no_eligible_provider_meets_hard_constraints` (and non-zero under `--strict`); suggest manual import or a provider with a compatible contract. |
 
-The current registry includes a manual single-frame import fallback. This is deliberate: when a provider cannot produce the exact target and no verified adapter exists, MotionLoom should give the Agent a useful next route instead of forcing it to invent a workaround or stop with an opaque error.
+The current registry includes a manual single-frame import fallback. Under the default `require_verified: true` policy it is informational/provisional rather than an eligible provider route, because static metadata alone cannot prove runtime capability. This is deliberate: MotionLoom gives the Agent a useful next route without silently relaxing policy or forcing it to invent a workaround.
 
 ## Recommended 256x448 route
 

@@ -95,6 +95,23 @@ def allowed_size_match(canvas: dict[str, Any], width: int, height: int) -> bool 
     return (width, height) in pairs
 
 
+def source_fits(source_width: int, source_height: int, target: dict[str, Any], scale: int = 1) -> bool:
+    return source_width * scale <= target["width"] and source_height * scale <= target["height"]
+
+
+def selection_class(adapter: dict[str, Any], selection_policy: dict[str, Any]) -> str:
+    status = adapter.get("status")
+    if status == "disabled":
+        return "blocked"
+    if status == "verified":
+        return "eligible"
+    if selection_policy.get("require_verified", True):
+        return "provisional"
+    if status == "scaffold_only" and not selection_policy.get("allow_scaffold_only", False):
+        return "provisional"
+    return "eligible" if status in {"verified", "project_integrated", "static_validated"} or (status == "scaffold_only" and selection_policy.get("allow_scaffold_only", False)) else "provisional"
+
+
 def canvas_assessment(adapter: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
     capability = adapter.get("capabilities") or {}
     canvas = capability.get("canvas") or {}
@@ -140,6 +157,7 @@ def frame_assessment(adapter: dict[str, Any], target: dict[str, Any], policy: di
             "status": "unknown",
             "single_frame": False,
             "max_frames_per_request": None,
+            "frame_count_policy": "unknown",
             "reason": "adapter does not declare frame isolation behavior",
         }
     max_frames = behavior.get("max_frames_per_request")
@@ -155,6 +173,7 @@ def frame_assessment(adapter: dict[str, Any], target: dict[str, Any], policy: di
         "status": status,
         "single_frame": single,
         "max_frames_per_request": max_frames,
+        "frame_count_policy": behavior.get("frame_count_policy", "fixed" if max_frames is not None else "unknown"),
         "declared_mode": behavior.get("mode"),
         "reason": "provider can emit one source frame per request" if single else "provider emits multiple frames; per-frame envelopes must be created after export",
     }
@@ -166,8 +185,9 @@ def adaptation_options(adapter: dict[str, Any], target: dict[str, Any], policy: 
     canvas = ((adapter.get("capabilities") or {}).get("canvas") or {})
     allowed = canvas.get("allowed_sizes") or []
     square_sizes = sorted({int(pair[0]) for pair in allowed if isinstance(pair, list) and len(pair) == 2 and pair[0] == pair[1]})
-    source_size = max([size for size in square_sizes if size <= max(target["width"], target["height"])] or square_sizes or [min(target["width"], target["height"])])
-    if target["width"] != target["height"] and ("pad_to_target" in declared or canvas):
+    fitting_sizes = [size for size in square_sizes if source_fits(size, size, target, 1)]
+    source_size = max(fitting_sizes, default=0)
+    if target["width"] != target["height"] and source_size and ("pad_to_target" in declared or canvas):
         options.append({
             "id": "deterministic-pad-to-target",
             "kind": "deterministic_adaptation",
@@ -180,18 +200,21 @@ def adaptation_options(adapter: dict[str, Any], target: dict[str, Any], policy: 
             "approval": False,
             "requires_validation": ["alpha-bounds", "pivot-footline", "frame-geometry", "action-separation"],
         })
-    if policy.get("integer_scale_only") and source_size and target["width"] % source_size == 0 and target["height"] % source_size == 0:
-        options.append({
-            "id": "integer-upscale-and-pad",
-            "kind": "deterministic_adaptation",
-            "operation": "integer nearest-neighbour upscale only, followed by transparent padding",
-            "source_canvas": [source_size, source_size],
-            "target_canvas": [target["width"], target["height"]],
-            "stretch": False,
-            "crop": False,
-            "approval": False,
-            "requires_validation": ["pixel-grid", "alpha-bounds", "frame-geometry"],
-        })
+    if policy.get("integer_scale_only") and source_size:
+        max_scale = min(target["width"] // source_size, target["height"] // source_size)
+        if max_scale >= 2:
+            options.append({
+                "id": "integer-upscale-and-pad",
+                "kind": "deterministic_adaptation",
+                "operation": "integer nearest-neighbour upscale only, followed by transparent padding",
+                "source_canvas": [source_size, source_size],
+                "target_canvas": [target["width"], target["height"]],
+                "scale": max_scale,
+                "stretch": False,
+                "crop": False,
+                "approval": False,
+                "requires_validation": ["pixel-grid", "alpha-bounds", "frame-geometry"],
+            })
     if "provider_native_resize" in declared:
         options.append({
             "id": "provider-native-resize",
@@ -216,9 +239,10 @@ def adaptation_options(adapter: dict[str, Any], target: dict[str, Any], policy: 
     return options
 
 
-def assess_adapter(adapter: dict[str, Any], target: dict[str, Any], policy: dict[str, Any], requested_kind: str) -> dict[str, Any]:
+def assess_adapter(adapter: dict[str, Any], target: dict[str, Any], policy: dict[str, Any], requested_kind: str, selection_policy: dict[str, Any]) -> dict[str, Any]:
     capabilities = adapter.get("capabilities") or {}
     outputs = set(adapter.get("outputs") or [])
+    selection_status = selection_class(adapter, selection_policy)
     kind_ok = requested_kind in outputs or requested_kind.replace("_", "-") in outputs or requested_kind in {"image", "frame_sequence"} and "image" in outputs
     canvas = canvas_assessment(adapter, target)
     frames = frame_assessment(adapter, target, policy)
@@ -235,9 +259,13 @@ def assess_adapter(adapter: dict[str, Any], target: dict[str, Any], policy: dict
     options = adaptation_options(adapter, target, policy)
     if canvas["adaptation_required"] and not options:
         hard_failures.append("no declared safe canvas adaptation strategy")
+    if hard_failures:
+        selection_status = "blocked"
     return {
         "adapter_id": adapter.get("adapter_id"),
         "status": adapter.get("status"),
+        "selection_status": selection_status,
+        "eligible": selection_status == "eligible" and not hard_failures,
         "kind": adapter.get("kind"),
         "invocation_mode": adapter.get("invocation_mode"),
         "cost_class": adapter.get("cost_class"),
@@ -258,22 +286,23 @@ def build_plan(request: dict[str, Any], registry: dict[str, Any], root: Path) ->
     target = target_summary(request)
     policy = request.get("generation_policy") or {}
     adapters = registry.get("adapters") if isinstance(registry.get("adapters"), list) else []
-    assessments = [assess_adapter(adapter, target, policy, request.get("asset_kind", "image")) for adapter in adapters if isinstance(adapter, dict)]
-    usable = [item for item in assessments if not item["hard_failures"]]
-    verified = [item for item in usable if item["status"] in {"verified", "project_integrated"}]
-    adapted = [item for item in usable if item["canvas"]["adaptation_required"] or item["frames"]["status"] != "native"]
-    if verified and any(item["canvas"]["native"] and item["frames"]["status"] == "native" for item in verified):
+    selection_policy = registry.get("selection_policy") if isinstance(registry.get("selection_policy"), dict) else {}
+    assessments = [assess_adapter(adapter, target, policy, request.get("asset_kind", "image"), selection_policy) for adapter in adapters if isinstance(adapter, dict)]
+    eligible = [item for item in assessments if item["eligible"]]
+    provisional = [item for item in assessments if item["selection_status"] == "provisional"]
+    blocked = [item for item in assessments if item["selection_status"] == "blocked"]
+    if eligible and any(item["canvas"]["native"] and item["frames"]["status"] == "native" for item in eligible):
         decision = "compatible_provider_available"
-    elif usable:
+    elif eligible:
         decision = "adaptation_required_or_review_required"
     else:
-        decision = "no_provider_meets_hard_constraints"
+        decision = "no_eligible_provider_meets_hard_constraints"
     recommendations: list[dict[str, Any]] = []
-    for item in (verified + adapted)[:5]:
+    for item in sorted(eligible, key=lambda value: value["adapter_id"])[:5]:
         if item in recommendations:
             continue
         rank = 0
-        if item["status"] in {"verified", "project_integrated"}:
+        if item["selection_status"] == "eligible":
             rank += 4
         if item["canvas"]["native"]:
             rank += 3
@@ -298,8 +327,8 @@ def build_plan(request: dict[str, Any], registry: dict[str, Any], root: Path) ->
         "Run frame geometry, asset consistency and action-separation validation before Dev Lab review.",
         "Keep production_approved and approval false until a human reviews the runtime candidate.",
     ]
-    if decision == "no_provider_meets_hard_constraints":
-        next_steps.insert(0, "Choose a provider that declares single-frame output and the target non-square canvas, or explicitly relax the isolation/geometry requirement; do not silently crop or stretch.")
+    if decision == "no_eligible_provider_meets_hard_constraints":
+        next_steps.insert(0, "No provider satisfies the active registry selection policy. Choose a verified adapter, explicitly allow scaffold-only research routing, or relax the isolation/geometry requirement; do not silently crop or stretch.")
     return {
         "contract": CONTRACT,
         "schema_version": SCHEMA_VERSION,
@@ -321,6 +350,15 @@ def build_plan(request: dict[str, Any], registry: dict[str, Any], root: Path) ->
             "selection_policy": registry.get("selection_policy", {}),
         },
         "providers": assessments,
+        "selection": {
+            "policy": selection_policy,
+            "eligible_count": len(eligible),
+            "provisional_count": len(provisional),
+            "eligible_adapter_ids": [item["adapter_id"] for item in eligible],
+            "provisional_adapter_ids": [item["adapter_id"] for item in provisional],
+            "blocked_count": len(blocked),
+            "blocked_adapter_ids": [item["adapter_id"] for item in blocked],
+        },
         "recommendations": recommendations,
         "next_steps": next_steps,
         "warnings": [
@@ -361,7 +399,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.output:
         write_json(args.output.resolve(), result)
     print(json.dumps(result, indent=2, sort_keys=True))
-    if args.strict and result["decision"] == "no_provider_meets_hard_constraints":
+    if args.strict and result["decision"] == "no_eligible_provider_meets_hard_constraints":
         return 2
     return 0
 

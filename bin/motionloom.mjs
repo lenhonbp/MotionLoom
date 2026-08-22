@@ -44,13 +44,16 @@ const PYTHON_COMMANDS = {
   "frame-set-preflight": "scripts/frame-set-preflight.py",
   "action-separation": "scripts/action-separation.py",
   "asset-generation-plan": "scripts/asset-generation-plan.py",
-  "asset-adapt": "scripts/asset-adapt.mjs",
   "artifact-intake": "scripts/artifact-intake.py",
   "runtime-candidate": "scripts/runtime-candidate.py",
   "rig-compatibility": "scripts/rig-compatibility.py",
   "rive-package-gate": "scripts/rive-package-gate.py",
   "pilot-build": "scripts/build-ai-pilot.py",
   "alpha-isolate": "scripts/isolate-alpha-background.py",
+};
+
+const DIRECT_NODE_COMMANDS = {
+  "asset-adapt": "scripts/asset-adapt.mjs",
 };
 
 const NODE_COMMANDS = {
@@ -149,7 +152,7 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
 }
 
 const alias = COMMAND_ALIASES[command];
-const script = alias?.script || NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
+const script = alias?.script || DIRECT_NODE_COMMANDS[command] || NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
 if (!script) {
   console.error(`Unknown MotionLoom command: ${command}`);
   printHelp();
@@ -159,7 +162,9 @@ if (!script) {
 const executable = script.endsWith(".mjs") ? process.execPath : PYTHON;
 const delegatedArgs = alias
   ? [...alias.args, ...args]
-  : NODE_COMMANDS[command] && !["setup", "init"].includes(command)
+  : DIRECT_NODE_COMMANDS[command]
+    ? args
+    : NODE_COMMANDS[command] && !["setup", "init"].includes(command)
     ? [command, ...args]
     : command === "init"
       ? ["init", ...args]

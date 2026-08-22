@@ -1,8 +1,8 @@
 {
   "card_version": "1.0",
   "name": "motionloom",
-  "version": "2.6.1",
-  "description": "Project-aware animation production with durable Project Memory, provider-neutral Artifact Intake, hash-bound control-to-runtime candidates, tiered asset provenance, framework-neutral motion IR, rig compatibility, runtime verification and telemetry, Visual Truth, Remediation Learning, DSSE-compatible signed attestation, interactive Dev Lab review, trust-boundary hardening and deterministic Agent handoff.",
+  "version": "2.7.0",
+  "description": "Project-aware animation production and Agent guidance with durable Project Memory, provider-neutral tool recommendations, guarded asset-generation planning, action-separated frame evidence, Artifact Intake, provenance, Motion IR, rig compatibility, runtime verification, Visual Truth, signed attestation and Dev Lab review.",
   "capabilities": [
     "project.setup",
     "project.status",
@@ -31,6 +31,11 @@
     "asset.frame-generation-lock.validate",
     "asset.frame-generation-lock.compose",
     "asset.frame-set-preflight",
+    "asset.action-separation.validate",
+    "asset.action-separation.verifier-evidence",
+    "asset.generation-plan",
+    "asset.generation-plan.recommend",
+    "asset.adapt",
     "asset.consistency.validate",
     "asset.consistency.frame-geometry",
     "asset.consistency.atlas",
@@ -98,7 +103,10 @@
     "export-manifest",
     "runtime-candidate",
     "rig-compatibility-contract",
-    "frame-generation-lock"
+    "frame-generation-lock",
+    "action-sequence-manifest",
+    "action-separation-verifier-evidence",
+    "asset-generation-request"
   ],
   "output_artifacts": [
     "agent-discovery-report",
@@ -140,7 +148,10 @@
     "fix-plan",
     "pr-patch",
     "frame-generation-instruction",
-    "generated-frame-set-preflight-report"
+    "generated-frame-set-preflight-report",
+    "action-separation-report",
+    "asset-generation-plan",
+    "asset-adaptation-report"
   ],
   "runtime_capabilities": {
     "verified": [
@@ -256,6 +267,9 @@
     "asset_provenance_report": "motionloom asset-provenance report --input <asset-provenance.json> --json",
     "asset_consistency_validate": "motionloom asset-consistency validate --kind <identity|action-set|frame-geometry|atlas|layered-map> --input <contract.json> --root <asset-root> --json",
     "asset_consistency_report": "motionloom asset-consistency report --kind <identity|action-set|frame-geometry|atlas|layered-map> --input <contract.json> --root <asset-root> --strict --json",
+    "action_separation_validate": "motionloom action-separation validate --input <action-sequence.json> --root <asset-root> --json",
+    "asset_generation_plan": "motionloom asset-generation-plan plan --request <asset-generation-request.json> --project-root <project-root> --json",
+    "asset_adapt": "motionloom asset-adapt pad --input <source.png> --output <target.png> --width <width> --height <height> --anchor <center|footline> --report <adaptation.json> --json",
     "artifact_intake": "motionloom artifact-intake intake --root <project-root> --registry artifact-adapter-registry.json --receipt <generation-receipt.json> --controls <control-track.json> --export-manifest <export-manifest.json> --json",
     "runtime_candidate_validate": "motionloom runtime-candidate validate --root <project-root> --input <runtime-candidate.json> --json",
     "rig_compatibility_validate": "motionloom rig-compatibility validate --root <project-root> --registry rig-adapter-registry.json --input <rig-compatibility.json> --json",

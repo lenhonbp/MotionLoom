@@ -189,6 +189,20 @@ def runtime_bundle(scene_dir: Path) -> dict | None:
     review_policy = descriptor.get("review_policy")
     if not isinstance(review_policy, dict) or not isinstance(review_policy.get("require_all_animations"), bool):
         raise ValueError("devlab-runtime.json review_policy.require_all_animations must be boolean")
+    action_separation = descriptor.get("action_separation")
+    if action_separation is not None:
+        if not isinstance(action_separation, dict):
+            raise ValueError("devlab-runtime.json action_separation must be an object")
+        if action_separation.get("status") not in {"pass", "quarantined"}:
+            raise ValueError("devlab-runtime.json action_separation.status must be pass or quarantined")
+        if not isinstance(action_separation.get("action_id"), str) or not SAFE_ANIMATION.fullmatch(action_separation["action_id"]):
+            raise ValueError("devlab-runtime.json action_separation.action_id is invalid")
+        frame_count = action_separation.get("frame_count")
+        passing_count = action_separation.get("passing_frame_count")
+        if not isinstance(frame_count, int) or frame_count < 1 or not isinstance(passing_count, int) or passing_count < 0 or passing_count > frame_count:
+            raise ValueError("devlab-runtime.json action_separation frame counts are invalid")
+        if not isinstance(action_separation.get("forbidden_action_ids"), list):
+            raise ValueError("devlab-runtime.json action_separation.forbidden_action_ids must be an array")
 
     digest = hashlib.sha256()
     digest.update(b"motionloom-devlab-runtime-v1\0")
@@ -205,6 +219,7 @@ def runtime_bundle(scene_dir: Path) -> dict | None:
         "mode": mode,
         "files": sorted(resolved_files),
         "review_policy": {"require_all_animations": review_policy["require_all_animations"]},
+        "action_separation": action_separation,
     }
 
 
@@ -222,6 +237,7 @@ def runtime_review_payload(bundle: dict | None) -> dict:
         "bundle_sha256": bundle["bundle_sha256"],
         "animations": bundle["animations"],
         "review_policy": bundle["review_policy"],
+        "action_separation": bundle.get("action_separation"),
     }
 
 

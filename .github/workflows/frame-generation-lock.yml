@@ -5,10 +5,16 @@ on:
     paths:
       - "scripts/frame-generation-lock.py"
       - "scripts/frame-set-preflight.py"
+      - "scripts/action-separation.py"
       - "schemas/frame-generation-lock.schema.json"
+      - "schemas/action-sequence-manifest.schema.json"
       - "references/multi-frame-asset-generation.md"
       - "examples/agent-consumer/frame-generation-lock/**"
       - "tests/scripts/test_frame_generation_lock.py"
+      - "tests/scripts/test_action_separation.py"
+      - "dev-lab/public/devlab.js"
+      - "dev-lab/public/index.html"
+      - "examples/agent-consumer/asset-consistency/action-sequence/**"
       - "bin/motionloom.mjs"
       - "AGENTS.md"
       - ".github/workflows/frame-generation-lock.yml"
@@ -17,10 +23,16 @@ on:
     paths:
       - "scripts/frame-generation-lock.py"
       - "scripts/frame-set-preflight.py"
+      - "scripts/action-separation.py"
       - "schemas/frame-generation-lock.schema.json"
+      - "schemas/action-sequence-manifest.schema.json"
       - "references/multi-frame-asset-generation.md"
       - "examples/agent-consumer/frame-generation-lock/**"
       - "tests/scripts/test_frame_generation_lock.py"
+      - "tests/scripts/test_action_separation.py"
+      - "dev-lab/public/devlab.js"
+      - "dev-lab/public/index.html"
+      - "examples/agent-consumer/asset-consistency/action-sequence/**"
       - "bin/motionloom.mjs"
       - "AGENTS.md"
       - ".github/workflows/frame-generation-lock.yml"
@@ -66,8 +78,16 @@ jobs:
           assert 'frame-set-preflight' in data['next_gate']
           PY
 
+      - name: Verify action separation through public CLI
+        run: |
+          node bin/motionloom.mjs action-separation validate \
+            --input examples/agent-consumer/asset-consistency/action-sequence/hero-walk-action-manifest.json \
+            --root examples/agent-consumer/asset-consistency --json
+          python3 tests/scripts/test_action_separation.py
+
       - name: Verify isolated source fixture through public preflight CLI
         run: |
           node bin/motionloom.mjs frame-set-preflight \
             --input examples/agent-consumer/asset-consistency/hero-walk-frame-geometry.json \
-            --root examples/agent-consumer/asset-consistency --json
+            --root examples/agent-consumer/asset-consistency \
+            --action-manifest examples/agent-consumer/asset-consistency/action-sequence/hero-walk-action-manifest.json --json

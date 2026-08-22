@@ -50,5 +50,12 @@
   },
   "review_policy": {
     "require_all_animations": true
+  },
+  "action_separation": {
+    "status": "pass",
+    "action_id": "sprite-sequence",
+    "frame_count": 6,
+    "passing_frame_count": 6,
+    "forbidden_action_ids": ["cross-action-mix"]
   }
 }

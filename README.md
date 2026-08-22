@@ -320,6 +320,7 @@ Read [the Apple workspace guide](apps/apple/README.md), [the contract boundary](
 | Choose a runtime | [Framework selection](docs/FRAMEWORK-SELECTION.md) and [runtime capability reference](references/runtime-capability.md) |
 | Run a review-ready scene | [Production checklist](docs/CHECKLIST.md) and [browser review contract](references/browser-review-contract.md) |
 | Configure live actions, playback or state transitions in Dev Lab | [Dev Lab live runtime contract](docs/DEV-LAB-RUNTIME.md), [canonical live sprite fixture](examples/agent-consumer/devlab-live-sprite/), and [2.6.0 release note](docs/releases/2.6.0.md) |
+| Prevent cross-action frame mixing | [Action-scoped isolated frame pipeline](docs/ACTION-SEPARATION.md), `motionloom action-separation`, and manifest-aware `motionloom frame-set-preflight` |
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
 | Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json), [external corpus workflow](docs/EXTERNAL-CORPUS.md), and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |

@@ -21,6 +21,17 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSET_CONSISTENCY = ROOT / "scripts" / "asset-consistency.py"
+ACTION_SEPARATION = ROOT / "scripts" / "action-separation.py"
+
+
+def load_action_separation():
+    spec = importlib.util.spec_from_file_location("motionloom_action_separation", ACTION_SEPARATION)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("cannot load action-separation.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 def load_asset_consistency():
@@ -34,6 +45,7 @@ def load_asset_consistency():
 
 
 AC = load_asset_consistency()
+AS = load_action_separation()
 
 
 def _error(code: str, message: str, path: str = "") -> dict[str, str]:
@@ -66,7 +78,12 @@ def _shrink(rect: dict[str, int], margin: int) -> dict[str, int] | None:
     }
 
 
-def validate(document: dict[str, Any], root: Path, allow_shared_source: bool = False) -> dict[str, Any]:
+def validate(
+    document: dict[str, Any],
+    root: Path,
+    allow_shared_source: bool = False,
+    action_manifest: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     base = AC.validate_frame_geometry(document, root)
     errors = list(base.get("errors", []))
     warnings = list(base.get("warnings", []))
@@ -143,6 +160,12 @@ def validate(document: dict[str, Any], root: Path, allow_shared_source: bool = F
                     )
                 )
 
+    action_result = None
+    if action_manifest is not None:
+        action_result = AS.validate_manifest(action_manifest, root)
+        errors.extend(action_result.get("errors", []))
+        warnings.extend(action_result.get("warnings", []))
+
     remaining_warnings: list[dict[str, Any]] = []
     for item in warnings:
         if isinstance(item, dict) and item.get("code") == "bbox_drift":
@@ -162,6 +185,7 @@ def validate(document: dict[str, Any], root: Path, allow_shared_source: bool = F
             **base.get("metrics", {}),
             "isolated_source_required": not allow_shared_source,
             "unique_source_images": len(seen_images),
+            "action_manifest": action_result.get("metrics") if action_result else None,
         },
         "approval": False,
     }
@@ -172,6 +196,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", required=True, help="frame-geometry contract JSON")
     parser.add_argument("--root", default=".", help="root used to resolve frame paths")
     parser.add_argument("--allow-shared-source", action="store_true", help="for imported/shared canvases only; not recommended for generated source frames")
+    parser.add_argument("--action-manifest", help="action-sequence manifest; validates frame envelopes and action separation")
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args(argv)
 
@@ -197,7 +222,32 @@ def main(argv: list[str] | None = None) -> int:
                 "approval": False,
             }
         else:
-            result = validate(document, Path(args.root).resolve(), args.allow_shared_source)
+            action_manifest = None
+            if args.action_manifest:
+                try:
+                    action_manifest = json.loads(Path(args.action_manifest).read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError) as exc:
+                    result = {
+                        "contract": "generated_frame_set_preflight",
+                        "ready": False,
+                        "errors": [_error("invalid_action_manifest", str(exc), args.action_manifest)],
+                        "warnings": [],
+                        "metrics": {},
+                        "approval": False,
+                    }
+                    action_manifest = None
+                if action_manifest is not None and not isinstance(action_manifest, dict):
+                    result = {
+                        "contract": "generated_frame_set_preflight",
+                        "ready": False,
+                        "errors": [_error("invalid_action_manifest", "action manifest root must be an object", args.action_manifest)],
+                        "warnings": [],
+                        "metrics": {},
+                        "approval": False,
+                    }
+                    action_manifest = None
+            if action_manifest is not None or not args.action_manifest:
+                result = validate(document, Path(args.root).resolve(), args.allow_shared_source, action_manifest)
 
     if args.as_json:
         print(json.dumps(result, indent=2, ensure_ascii=False))

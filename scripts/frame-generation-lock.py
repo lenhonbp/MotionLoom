@@ -65,8 +65,30 @@ def validate(document: dict[str, Any], root: Path) -> dict[str, Any]:
         if key not in document:
             errors.append(issue("missing_field", f"required field is missing: {key}", key))
 
-    if document.get("schema_version") != "0.1":
-        errors.append(issue("schema_version", "frame generation lock schema_version must be 0.1", "schema_version"))
+    if document.get("schema_version") not in {"0.1", "0.2"}:
+        errors.append(issue("schema_version", "frame generation lock schema_version must be 0.1 or 0.2", "schema_version"))
+    enhanced = document.get("schema_version") == "0.2"
+    if enhanced:
+        if not ID_RE.match(str(document.get("sequence_id", ""))):
+            errors.append(issue("invalid_sequence_id", "schema_version 0.2 requires a safe sequence_id", "sequence_id"))
+        forbidden = document.get("forbidden_action_ids")
+        if not isinstance(forbidden, list) or not forbidden or any(not FRAME_RE.match(str(item)) for item in forbidden):
+            errors.append(issue("invalid_forbidden_actions", "schema_version 0.2 requires a non-empty safe forbidden_action_ids array", "forbidden_action_ids"))
+        elif str(document.get("action_id")) in {str(item) for item in forbidden}:
+            errors.append(issue("expected_action_forbidden", "action_id must not also be forbidden", "forbidden_action_ids"))
+        contract = document.get("action_contract") if isinstance(document.get("action_contract"), dict) else {}
+        action_manifest = str(document.get("action_manifest", ""))
+        if not action_manifest.lower().endswith(".json"):
+            errors.append(issue("invalid_action_manifest", "schema_version 0.2 requires a JSON action_manifest path", "action_manifest"))
+        else:
+            _, manifest_error = inside(root, action_manifest)
+            if manifest_error:
+                manifest_error["path"] = "action_manifest"
+                errors.append(manifest_error)
+        for key in ("positive_cues", "negative_cues"):
+            values = contract.get(key)
+            if not isinstance(values, list) or not values or any(not isinstance(item, str) or not item.strip() for item in values):
+                errors.append(issue("invalid_action_contract", f"action_contract.{key} must be a non-empty string array", f"action_contract.{key}"))
     if not ID_RE.match(str(document.get("lock_id", ""))):
         errors.append(issue("invalid_lock_id", "lock_id must use lowercase safe identifier characters", "lock_id"))
     if not FRAME_RE.match(str(document.get("action_id", ""))):
@@ -228,8 +250,13 @@ def compose_instruction(document: dict[str, Any], frame: dict[str, Any]) -> str:
     preserve = "; ".join(str(value).strip() for value in appearance["preserve"])
     forbid = "; ".join(str(value).strip() for value in appearance["forbid"])
     pixel_rule = " Use crisp nearest-neighbor pixel edges; do not resample or blur." if appearance.get("pixel_art", {}).get("enabled") else ""
+    sequence_clause = f" Sequence {document['sequence_id']} is immutable across this action." if document.get("sequence_id") else ""
+    contract = document.get("action_contract") if isinstance(document.get("action_contract"), dict) else {}
+    positive_clause = "; ".join(str(item).strip() for item in contract.get("positive_cues", []))
+    negative_clause = "; ".join(str(item).strip() for item in contract.get("negative_cues", []))
+    action_clause = f" Positive action cues: {positive_clause}. Negative action cues: {negative_clause}. Forbidden competing actions: {', '.join(str(item) for item in document.get('forbidden_action_ids', []))}." if positive_clause and negative_clause else ""
     return (
-        f"MotionLoom Frame Generation Lock {document['lock_id']} for action {document['action_id']}. "
+        f"MotionLoom Frame Generation Lock {document['lock_id']} for action {document['action_id']}.{sequence_clause} "
         f"Use reference image {reference['image']} as the locked {reference['role']} with SHA-256 {reference['sha256']}. "
         f"Generate exactly ONE isolated source frame for {frame['frame_id']}; never create a pose sheet, contact sheet, collage, atlas, or multiple poses in one image. "
         f"Pose: {frame['pose']} "
@@ -238,7 +265,7 @@ def compose_instruction(document: dict[str, Any], frame: dict[str, Any]) -> str:
         f"Keep all opaque pixels inside safe rect x={safe['x']}, y={safe['y']}, width={safe['width']}, height={safe['height']} and preserve at least {geometry['min_padding_px']} px transparent padding. "
         f"Target apparent alpha bounds are approximately {target['width']} × {target['height']} px; do not introduce whole-subject zoom drift beyond ±{tolerances['bbox_width_px']} px width or ±{tolerances['bbox_height_px']} px height, pivot drift beyond ±{tolerances['pivot_px']} px, or footline drift beyond ±{tolerances['footline_px']} px. "
         f"Preserve: {preserve}. Forbid: {forbid}.{pixel_rule} "
-        f"Do not mirror, crop from a shared canvas, silently change camera/scale, or resize the generated frame afterward. "
+        f"Do not mirror, crop from a shared canvas, silently change camera/scale, or resize the generated frame afterward.{action_clause} "
         f"Return/save only the single PNG as {frame['output']}. This is review evidence only; generation success does not imply artist authorship, production eligibility, runtime approval, licence, or user approval."
     )
 
@@ -267,15 +294,18 @@ def compose(document: dict[str, Any], root: Path, frame_id: str | None = None) -
         for frame in frames
         if isinstance(frame, dict)
     ]
+    manifest_flag = f" --action-manifest {document['action_manifest']}" if document.get("action_manifest") else ""
     return {
         "contract": "frame_generation_lock",
         "ready": True,
         "lock_id": document["lock_id"],
         "action_id": document["action_id"],
+        "sequence_id": document.get("sequence_id"),
+        "forbidden_action_ids": document.get("forbidden_action_ids", []),
         "lock_sha256": validation["metrics"]["lock_sha256"],
         "reference_sha256": validation["metrics"]["reference_sha256"],
         "frames": items,
-        "next_gate": f"motionloom frame-set-preflight --input {postflight} --root {root} --json",
+        "next_gate": f"motionloom frame-set-preflight --input {postflight} --root {root}{manifest_flag} --json",
         "approval": False,
     }
 

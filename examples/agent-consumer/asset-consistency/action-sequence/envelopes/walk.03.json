@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1",
+  "generator_agent_id": "motionloom-generator-v1",
+  "sequence_id": "hero-walk-v1",
+  "action_id": "walk",
+  "frame_id": "walk.03",
+  "frame_index": 3,
+  "image": "assets/hero-frame-03.png",
+  "image_sha256": "161d906dc850cd3d3ee970b97406fc36bcdf1c34222ac94171a05672bf64d957",
+  "identity_lock_sha256": "59d6b09622b19839b8c9342fb043965ea3f515c8979d769284d413f60a5f7e2d",
+  "verifier": {
+    "verifier_id": "motionloom-separation-verifier-v1",
+    "expected_action": "walk",
+    "top_competitor": "run",
+    "margin": 0.32999999999999996,
+    "threshold": 0.2,
+    "status": "pass",
+    "method": "independent-action-rubric-v1"
+  },
+  "approval": false
+}

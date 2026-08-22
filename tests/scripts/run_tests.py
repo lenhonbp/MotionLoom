@@ -1175,6 +1175,16 @@ if __name__ == "__main__":
         browser_review_consistency_tests.returncode == 0 and "browser review consistency tests: PASS" in browser_review_consistency_tests.stdout,
         browser_review_consistency_tests.stdout.strip() or browser_review_consistency_tests.stderr.strip(),
     )
+    action_separation_tests = subprocess.run(
+        [sys.executable, str(ROOT / "tests/scripts/test_action_separation.py")],
+        capture_output=True,
+        text=True,
+    )
+    check(
+        "action-scoped frame manifests reject cross-action and ambiguous frames",
+        action_separation_tests.returncode == 0 and "action separation tests: PASS" in action_separation_tests.stdout,
+        action_separation_tests.stdout.strip() or action_separation_tests.stderr.strip(),
+    )
     print()
     if FAILED:
         print(f"{len(FAILED)} test(s) FAILED: {', '.join(FAILED)}")

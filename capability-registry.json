@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1",
-  "registry_id": "registry-motionloom-2.6.1",
-  "generated_at": "2026-08-21T18:23:59Z",
+  "registry_id": "registry-motionloom-2.7.0",
+  "generated_at": "2026-08-22T06:55:00Z",
   "selection_policy": {
     "require_verified": true,
     "allow_scaffold_only": false,
@@ -12,35 +12,13 @@
       "id": "runtime.lottie-json",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -49,35 +27,13 @@
       "id": "runtime.dotlottie-package",
       "kind": "packager",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -86,35 +42,13 @@
       "id": "runtime.svg-cutout-rig",
       "kind": "renderer",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -123,35 +57,13 @@
       "id": "runtime.rive",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -160,35 +72,13 @@
       "id": "runtime.gsap",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -197,35 +87,13 @@
       "id": "runtime.framer-motion",
       "kind": "runtime-adapter",
       "status": "verified",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Capability evidence is refreshed by runtime:test."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Capability evidence is refreshed by runtime:test."],
       "fallback": "",
       "risk_level": "low",
       "side_effect_level": "local_write"
@@ -234,35 +102,13 @@
       "id": "runtime.spine",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Scaffold only; do not use for production acceptance."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Scaffold only; do not use for production acceptance."],
       "fallback": "runtime.lottie-json",
       "risk_level": "high",
       "side_effect_level": "local_write"
@@ -271,35 +117,13 @@
       "id": "runtime.threejs",
       "kind": "renderer",
       "status": "scaffold_only",
-      "adapter_version": "2.6.1",
-      "inputs": [
-        "project-context",
-        "motion-spec",
-        "source-binding"
-      ],
-      "outputs": [
-        "runtime-evidence"
-      ],
-      "compatibility": {
-        "browsers": [
-          "chromium"
-        ],
-        "os": [
-          "linux"
-        ],
-        "node": ">=22"
-      },
+      "adapter_version": "2.7.0",
+      "inputs": ["project-context", "motion-spec", "source-binding"],
+      "outputs": ["runtime-evidence"],
+      "compatibility": {"browsers": ["chromium"], "os": ["linux"], "node": ">=22"},
       "last_verified_at": "2026-08-21T18:23:59Z",
-      "evidence": [
-        {
-          "path": "scripts/runtime-adapters.mjs",
-          "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d",
-          "kind": "ci"
-        }
-      ],
-      "limitations": [
-        "Scaffold only; do not use for production acceptance."
-      ],
+      "evidence": [{"path": "scripts/runtime-adapters.mjs", "sha256": "6f135e75e700a7bb105903db59445fcd3577669b595082a2b542db639f5fe56d", "kind": "ci"}],
+      "limitations": ["Scaffold only; do not use for production acceptance."],
       "fallback": "runtime.lottie-json",
       "risk_level": "high",
       "side_effect_level": "local_write"

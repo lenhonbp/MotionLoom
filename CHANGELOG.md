@@ -4,15 +4,46 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [2.7.0] - 2026-08-22
+
+### Added
+
+- Add action-scoped frame separation contracts with schema `0.2`, immutable sequence/action identity, forbidden competitor actions, per-frame envelopes and separate verifier evidence artifacts.
+- Add `motionloom asset-generation-plan plan`, a project-aware recommendation layer that evaluates tool/provider routes against the real project target before an Agent executes them.
+- Separate MotionLoom recommendation status from execution status, evidence status, availability and execution eligibility, so provisional routes can be suggested without being misrepresented as verified.
+- Add explicit `preferred`, `neutral` and `excluded` provider preference handling; user preference influences ranking but cannot override hard project, canvas, isolation or evidence constraints.
+- Add deterministic transparent padding and integer nearest-neighbour scaling through `motionloom asset-adapt`, with hash-bound adaptation reports and no silent crop/stretch.
+- Expose the new MotionLoom planning/action-separation capabilities, inputs, outputs and entrypoints in `agent-card.json` so compatible Agents can discover the workflow from an installed package.
+
 ### Hardened
 
+- Treat generator-created verifier envelopes as `declared` and quarantined; only hash-bound separate verifier artifacts may become `independently_bound` evidence, and machine paths preserve `approval: false`.
 - Enforce hash-bound scene/task browser-review candidate consistency in review-hook validation, quality gates and ready-for-PR report checks.
 - Add an opt-in `doctor --runtime` preflight and `doctor:runtime` npm script that verifies the installed Playwright Chromium executable and prints a concrete remediation command.
 - Require capability registry identifiers and adapter evidence versions to align with the package version during release verification.
+- Keep normal asset planning useful when only provisional/manual routes exist while `--strict` stays fail-closed unless an execution-eligible route satisfies the active MotionLoom policy.
+- Model provider availability separately from registry presence so unknown/unavailable tools are explained instead of being silently treated as executable.
+
+### Changed
+
+- MotionLoom is now the explicit project-aware decision and guidance layer in asset-generation plans: it assesses project constraints, ranks routes, explains tradeoffs, produces MotionLoom Agent Guidance and routes generated output back through MotionLoom validation/review.
+- No provider is a hard-coded default. PixelLab routes remain scaffold metadata and are represented as provider choices inside MotionLoom recommendations rather than as a product dependency.
 
 ### Verified
 
-- Add an adversarial regression fixture proving that foreign, divergent and expired scene/task candidates fail closed.
+- Pull requests #21 and #22 passed hosted MotionLoom Quality, Security Analysis, Documentation and Package Hygiene, Dev Lab Build, Frame Generation Lock and Apple compatibility checks before integration.
+- Planner/adaptation regression tests cover user-preferred provisional tools, incompatible preferred tools, strict-mode failure, availability states, safe canvas adaptation and MotionLoom-branded Agent guidance.
+- Deep audit remains green at 6,900/6,900 with 0 false positives and 0 false negatives, preserving the approval-false invariant.
+- Add adversarial regression coverage proving foreign/divergent browser-review candidates and malformed or self-declared verifier evidence fail closed.
+
+### Boundary
+
+- Recommendation is not execution authority. A provisional/scaffold provider may be useful to suggest but never becomes verified merely because MotionLoom ranks it highly or the user prefers it.
+- MotionLoom planning does not invoke provider APIs, store credentials, publish assets or grant human approval. Provider output must return through MotionLoom provenance, geometry/action-separation, runtime and Dev Lab review gates.
+
+See the [2.7.0 release note](docs/releases/2.7.0.md) for the project-aware recommendation model, trust boundaries and project update steps.
 
 ## [2.6.1] - 2026-08-21
 
@@ -212,6 +243,7 @@ See the [2.0.0 release note](docs/releases/2.0.0.md).
 
 The 1.5.0–1.9.0 milestones established runtime evidence, browser review, Intelligence Core, semantic lint, continuity, telemetry and trust-boundary hardening. Their detailed notes are available in [`docs/releases/`](docs/releases/).
 
+[2.7.0]: docs/releases/2.7.0.md
 [2.6.1]: docs/releases/2.6.1.md
 [2.6.0]: docs/releases/2.6.0.md
 [2.5.1]: docs/releases/2.5.1.md

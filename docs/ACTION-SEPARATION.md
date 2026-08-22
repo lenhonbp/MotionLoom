@@ -6,7 +6,7 @@ MotionLoom keeps generated source frames isolated: one source PNG per frame, no 
 
 A frame belongs to an immutable `sequence_id` and `action_id`. The sequence manifest declares the expected action, explicitly forbidden competitor actions, the ordered frame set, the identity-lock hash and one envelope for every image. A verifier result is evidence only; it cannot grant approval or move a file.
 
-The lock and manifest deliberately use two independent layers:
+The lock and manifest deliberately use two separate layers. Verifier identity is not the same thing as verifier provenance: a different `verifier_id` alone does not prove that a separate verifier ran.
 
 | Layer | Source of truth | Purpose |
 |---|---|---|
@@ -46,11 +46,11 @@ motionloom action-separation envelope \
   --output examples/agent-consumer/asset-consistency/action-sequence/envelopes/walk.00.json --json
 ```
 
-A margin below threshold produces a `quarantined` envelope and a non-zero exit code; it is still written as evidence, but the manifest cannot pass until the frame is independently verified again.
+The `envelope` command is generator-side convenience only: it emits `verification_mode: declared`, keeps the result `quarantined` and returns non-zero even when the supplied numbers meet the rubric. A separate verifier process/agent must create the evidence artifact and a review workflow must bind it into an `independently_bound` envelope. The validator checks those bindings, but cryptographic hashes prove artifact integrity and provenance claims, not the truthfulness of a claimed producer identity.
 
 ## Frame envelope
 
-Every manifest frame points to an envelope. The envelope binds the frame to the exact sequence, action, frame index, identity lock and image bytes. The verifier must provide an expected action, a top competitor, a numeric confidence margin and a declared threshold. A margin below threshold is quarantined; it is not silently assigned to the nearest action.
+Every manifest frame points to an envelope. The envelope binds the frame to the exact sequence, action, frame index, identity lock and image bytes. The verifier must provide an expected action, a top competitor, a numeric confidence margin and a declared threshold. Schema 0.2 also classifies the result as `declared` or `independently_bound`. A `declared` result may describe a check, but it is never accepted as independent proof. An `independently_bound` result must reference a separate verifier artifact whose bytes, canonical result, producer provenance and frame binding all match the envelope. A margin below threshold is quarantined; it is not silently assigned to the nearest action.
 
 ```json
 {
@@ -62,18 +62,30 @@ Every manifest frame points to an envelope. The envelope binds the frame to the 
   "image_sha256": "<sha256>",
   "identity_lock_sha256": "<lock-sha256>",
   "verifier": {
+    "verifier_id": "motionloom-separation-verifier-v1",
+    "verification_mode": "independently_bound",
     "expected_action": "walk",
     "top_competitor": "run",
     "margin": 0.42,
     "threshold": 0.20,
     "status": "pass",
-    "method": "independent-action-rubric-v1"
+    "method": "independent-action-rubric-v1",
+    "evidence": {
+      "artifact": "action-sequence/verifier-evidence/walk.01.json",
+      "artifact_sha256": "<sha256>",
+      "result_sha256": "<sha256>",
+      "provenance": {
+        "kind": "separate_verifier_artifact",
+        "producer_id": "motionloom-independent-verifier-v1",
+        "run_id": "verifier-run-2026-08-22"
+      }
+    }
   },
   "approval": false
 }
 ```
 
-The validator rejects duplicate images, non-contiguous frame indexes, path escapes, mismatched envelope fields, stale image hashes, undeclared competitors, low margins and any verifier status other than `pass`. It never repairs, renames, relocates or approves an asset.
+The validator rejects duplicate images, non-contiguous frame indexes, path escapes, mismatched envelope fields, stale image hashes, missing/tampered verifier provenance, verifier-generator collisions, undeclared competitors, low margins and any verifier status other than `pass`. It never repairs, renames, relocates or approves an asset.
 
 ## Generation lock 0.2
 
@@ -89,4 +101,4 @@ For live runtime fixtures, the optional `action_separation` summary in `devlab-r
 
 ## Adversarial coverage
 
-The regression suite covers a valid four-frame sequence and rejects a cross-action envelope, a low-confidence action margin and a reused image. The canonical fixture also runs through geometry preflight, so a sequence can only pass when both the measured PNG contract and the action-scoped evidence pass.
+The regression suite covers a valid four-frame sequence with independently bound evidence and rejects cross-action envelopes, verifier-generator collisions, missing provenance, modified verifier results, modified evidence hashes, low-confidence margins, wrong expected actions, undeclared competitors, quarantined evidence, reused images and approval assertions. The canonical fixture also runs through geometry preflight, so a sequence can only pass when both the measured PNG contract and the action-scoped evidence pass.

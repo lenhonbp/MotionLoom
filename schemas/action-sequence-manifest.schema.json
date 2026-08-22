@@ -2,53 +2,47 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://motionloom.dev/schemas/action-sequence-manifest.schema.json",
   "title": "MotionLoom Action Sequence Manifest",
-  "description": "Manifest-only binding for isolated frame sequences and independent action-separation evidence.",
+  "description": "Manifest binding for isolated frame sequences and explicitly classified action-separation evidence.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "sequence_id", "asset_identity", "action_id", "identity_lock_sha256", "generator_agent_id", "forbidden_action_ids", "actions", "frames", "status", "approval"],
   "properties": {
-    "schema_version": { "const": "0.1" },
-    "sequence_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$" },
-    "asset_identity": { "type": "string", "minLength": 1 },
-    "action_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-    "identity_lock_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "generator_agent_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+    "schema_version": {"const": "0.2"},
+    "sequence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$"},
+    "asset_identity": {"type": "string", "minLength": 1},
+    "action_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "identity_lock_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "generator_agent_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
     "forbidden_action_ids": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" }
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"}
     },
     "actions": {
-      "type": "array",
-      "minItems": 2,
+      "type": "array", "minItems": 2,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
+        "type": "object", "additionalProperties": false,
         "required": ["action_id", "positive_cues", "negative_cues"],
         "properties": {
-          "action_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-          "positive_cues": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-          "negative_cues": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          "action_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+          "positive_cues": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "negative_cues": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
         }
       }
     },
     "frames": {
-      "type": "array",
-      "minItems": 2,
+      "type": "array", "minItems": 2,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
+        "type": "object", "additionalProperties": false,
         "required": ["frame_index", "frame_id", "image", "envelope"],
         "properties": {
-          "frame_index": { "type": "integer", "minimum": 0 },
-          "frame_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-          "image": { "type": "string", "pattern": "^.+\\.png$" },
-          "envelope": { "type": "string", "pattern": "^.+\\.json$" }
+          "frame_index": {"type": "integer", "minimum": 0},
+          "frame_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+          "image": {"type": "string", "pattern": "^.+\\.png$"},
+          "envelope": {"type": "string", "pattern": "^.+\\.json$"}
         }
       }
     },
-    "status": { "enum": ["review_required", "quarantined"] },
-    "approval": { "const": false }
+    "status": {"enum": ["review_required", "quarantined"]},
+    "approval": {"const": false}
   }
 }

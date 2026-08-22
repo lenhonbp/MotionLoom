@@ -2,35 +2,61 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://motionloom.dev/schemas/frame-envelope.schema.json",
   "title": "MotionLoom Frame Envelope",
-  "description": "Hash-bound identity and independent action-separation evidence for one isolated frame.",
+  "description": "Hash-bound identity and explicitly classified action-separation evidence for one isolated frame.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "sequence_id", "action_id", "frame_id", "frame_index", "image", "image_sha256", "identity_lock_sha256", "generator_agent_id", "verifier", "approval"],
   "properties": {
-    "schema_version": { "const": "0.1" },
-    "sequence_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$" },
-    "action_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-    "frame_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-    "frame_index": { "type": "integer", "minimum": 0 },
-    "image": { "type": "string", "pattern": "^.+\\.png$" },
-    "image_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "identity_lock_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "generator_agent_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+    "schema_version": {"const": "0.2"},
+    "sequence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$"},
+    "action_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "frame_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "frame_index": {"type": "integer", "minimum": 0},
+    "image": {"type": "string", "pattern": "^.+\\.png$"},
+    "image_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "identity_lock_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "generator_agent_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
     "verifier": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["verifier_id", "expected_action", "top_competitor", "margin", "threshold", "status", "method"],
-            "properties": {
-        "verifier_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-        "expected_action": {
- "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-        "top_competitor": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
-        "margin": { "type": "number", "minimum": 0 },
-        "threshold": { "type": "number", "minimum": 0 },
-        "status": { "enum": ["pass", "quarantined"] },
-        "method": { "type": "string", "minLength": 1 }
-      }
+      "required": ["verifier_id", "verification_mode", "expected_action", "top_competitor", "margin", "threshold", "status", "method"],
+      "properties": {
+        "verifier_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "verification_mode": {"type": "string", "enum": ["declared", "independently_bound"]},
+        "expected_action": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "top_competitor": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "margin": {"type": "number", "minimum": 0},
+        "threshold": {"type": "number", "minimum": 0},
+        "status": {"enum": ["pass", "quarantined"]},
+        "method": {"type": "string", "minLength": 1},
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["artifact", "artifact_sha256", "result_sha256", "provenance"],
+          "properties": {
+            "artifact": {"type": "string", "pattern": "^.+\\.json$"},
+            "artifact_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "result_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "provenance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "producer_id", "run_id"],
+              "properties": {
+                "kind": {"const": "separate_verifier_artifact"},
+                "producer_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+                "run_id": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"verification_mode": {"const": "independently_bound"}}},
+          "then": {"required": ["evidence"]}
+        }
+      ]
     },
-    "approval": { "const": false }
+    "approval": {"const": false}
   }
 }

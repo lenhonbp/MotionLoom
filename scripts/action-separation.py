@@ -55,6 +55,18 @@ def sha256(path: Path) -> str | None:
         return None
 
 
+def canonical(value: Any) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def result_payload(verifier: dict[str, Any]) -> dict[str, Any]:
+    return {key: verifier.get(key) for key in ("expected_action", "top_competitor", "margin", "threshold", "status", "method")}
+
+
+def result_hash(verifier: dict[str, Any]) -> str:
+    return hashlib.sha256(canonical(result_payload(verifier))).hexdigest()
+
+
 def action_ids(document: dict[str, Any]) -> tuple[str, list[str]]:
     expected = str(document.get("action_id", ""))
     forbidden = document.get("forbidden_action_ids")
@@ -63,8 +75,8 @@ def action_ids(document: dict[str, Any]) -> tuple[str, list[str]]:
 
 def validate_manifest(document: dict[str, Any], root: Path) -> dict[str, Any]:
     errors: list[dict[str, str]] = []
-    if document.get("schema_version") != "0.1":
-        errors.append(error("schema_version", "action sequence manifest schema_version must be 0.1", "schema_version"))
+    if document.get("schema_version") != "0.2":
+        errors.append(error("schema_version", "action sequence manifest schema_version must be 0.2", "schema_version"))
     for key in ("sequence_id", "asset_identity", "action_id", "identity_lock_sha256", "generator_agent_id", "forbidden_action_ids", "actions", "frames"):
         if key not in document:
             errors.append(error("missing_field", f"required field is missing: {key}", key))
@@ -187,12 +199,64 @@ def validate_manifest(document: dict[str, Any], root: Path) -> dict[str, Any]:
             errors.append(error("image_sha256_mismatch", "frame envelope image hash does not match file bytes", f"{item['path']}.envelope.image_sha256"))
         if envelope.get("generator_agent_id") != generator_agent_id:
             errors.append(error("generator_binding_mismatch", "envelope generator_agent_id does not match manifest", f"{item['path']}.envelope.generator_agent_id"))
+        if envelope.get("approval") is not False:
+            errors.append(error("approval_boundary", "frame envelope validation must preserve approval=false", f"{item['path']}.envelope.approval"))
         verifier = envelope.get("verifier") if isinstance(envelope.get("verifier"), dict) else {}
         verifier_id = verifier.get("verifier_id")
         if not isinstance(verifier_id, str) or not FRAME_RE.fullmatch(verifier_id):
             errors.append(error("invalid_verifier_id", "verifier_id must use lowercase safe identifier characters", f"{item['path']}.envelope.verifier.verifier_id"))
         elif verifier_id == generator_agent_id:
             errors.append(error("non_independent_verifier", "verifier_id must differ from generator_agent_id", f"{item['path']}.envelope.verifier.verifier_id"))
+        verification_mode = verifier.get("verification_mode")
+        verifier_path = f"{item['path']}.envelope.verifier"
+        if verification_mode not in {"declared", "independently_bound"}:
+            errors.append(error("invalid_verification_mode", "verification_mode must be declared or independently_bound", f"{verifier_path}.verification_mode"))
+        elif verification_mode == "declared":
+            errors.append(error("verifier_evidence_declared", "declared verifier evidence cannot be treated as independently verified", f"{verifier_path}.verification_mode"))
+        else:
+            evidence = verifier.get("evidence") if isinstance(verifier.get("evidence"), dict) else {}
+            evidence_value = evidence.get("artifact")
+            if not isinstance(evidence_value, str) or not evidence_value.strip():
+                errors.append(error("missing_verifier_provenance", "independently_bound evidence must include an artifact path", f"{verifier_path}.evidence.artifact"))
+                evidence_path, evidence_path_error = None, None
+            else:
+                evidence_path, evidence_path_error = inside(root, evidence_value)
+            if evidence_path_error or evidence_path is None:
+                if not (not isinstance(evidence_value, str) or not evidence_value.strip()):
+                    errors.append(error("missing_verifier_provenance", "independently_bound evidence must reference a safe artifact path", f"{verifier_path}.evidence.artifact"))
+            else:
+                evidence_doc, evidence_errors = read_json(evidence_path)
+                errors.extend({**entry, "path": f"{verifier_path}.evidence.artifact"} for entry in evidence_errors)
+                actual_evidence_hash = sha256(evidence_path)
+                if actual_evidence_hash is None or evidence.get("artifact_sha256") != actual_evidence_hash:
+                    errors.append(error("verifier_evidence_hash_mismatch", "verifier evidence artifact hash does not match file bytes", f"{verifier_path}.evidence.artifact_sha256"))
+                if evidence_doc is not None:
+                    provenance = evidence_doc.get("provenance") if isinstance(evidence_doc.get("provenance"), dict) else {}
+                    if provenance.get("kind") != "separate_verifier_artifact":
+                        errors.append(error("missing_verifier_provenance", "verifier evidence must declare separate_verifier_artifact provenance", f"{verifier_path}.evidence.artifact.provenance.kind"))
+                    producer_id = provenance.get("producer_id")
+                    if not isinstance(producer_id, str) or not FRAME_RE.fullmatch(producer_id) or producer_id == generator_agent_id:
+                        errors.append(error("non_independent_verifier", "verifier evidence producer_id must be valid and differ from generator_agent_id", f"{verifier_path}.evidence.artifact.provenance.producer_id"))
+                    expected_evidence_binding = {
+                        "sequence_id": sequence_id,
+                        "action_id": action_id,
+                        "frame_id": item["frame_id"],
+                        "frame_index": item["frame_index"],
+                        "image_sha256": envelope.get("image_sha256"),
+                        "identity_lock_sha256": lock_hash,
+                        "generator_agent_id": generator_agent_id,
+                        "verifier_id": verifier_id,
+                    }
+                    for field, expected in expected_evidence_binding.items():
+                        if evidence_doc.get(field) != expected:
+                            errors.append(error("verifier_evidence_binding_mismatch", f"verifier evidence {field} does not match envelope", f"{verifier_path}.evidence.artifact.{field}"))
+                    evidence_result = evidence_doc.get("result") if isinstance(evidence_doc.get("result"), dict) else None
+                    current_result = result_payload(verifier)
+                    if evidence_result != current_result:
+                        errors.append(error("verifier_result_mismatch", "verifier result does not match independently bound evidence", f"{verifier_path}.evidence.result_sha256"))
+                    expected_result_hash = result_hash(verifier)
+                    if evidence.get("result_sha256") != expected_result_hash or evidence_doc.get("result_sha256") != expected_result_hash:
+                        errors.append(error("verifier_result_hash_mismatch", "verifier result hash does not match canonical result", f"{verifier_path}.evidence.result_sha256"))
         expected_action = verifier.get("expected_action")
         competitor = verifier.get("top_competitor")
         try:
@@ -208,7 +272,7 @@ def validate_manifest(document: dict[str, Any], root: Path) -> dict[str, Any]:
             errors.append(error("action_confidence_margin", "action separation margin is below its declared threshold", f"{item['path']}.envelope.verifier.margin"))
         if verifier.get("status") != "pass":
             errors.append(error("action_verification_required", "ambiguous or failed action verification must remain quarantined", f"{item['path']}.envelope.verifier.status"))
-        if expected_action == action_id and competitor in forbidden and margin >= threshold >= 0 and verifier.get("status") == "pass":
+        if verification_mode == "independently_bound" and expected_action == action_id and competitor in forbidden and margin >= threshold >= 0 and verifier.get("status") == "pass":
             passing_count += 1
 
     if document.get("approval") is not False:
@@ -228,6 +292,7 @@ def validate_manifest(document: dict[str, Any], root: Path) -> dict[str, Any]:
             "frame_count": len(frames),
             "envelope_count": envelope_count,
             "passing_action_verifications": passing_count,
+            "independently_bound_verifications": passing_count,
             "manifest_sha256": hashlib.sha256(canonical).hexdigest(),
             "approval": False,
         },
@@ -257,9 +322,10 @@ def build_envelope(
         return {"contract": "frame_envelope", "ready": False, "errors": [error("image_unreadable", f"cannot read image: {image_value}", "image")], "warnings": [], "approval": False}
     expected = str(document.get("action_id", ""))
     forbidden = document.get("forbidden_action_ids", [])
-    status = "pass" if expected_action == expected and top_competitor in forbidden and margin >= threshold >= 0 else "quarantined"
+    criteria_pass = expected_action == expected and top_competitor in forbidden and margin >= threshold >= 0
+    status = "quarantined"
     payload = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "sequence_id": document.get("sequence_id"),
         "action_id": expected,
         "frame_id": frame_id,
@@ -270,6 +336,7 @@ def build_envelope(
         "generator_agent_id": document.get("generator_agent_id"),
         "verifier": {
             "verifier_id": "motionloom-separation-verifier-v1",
+            "verification_mode": "declared",
             "expected_action": expected_action,
             "top_competitor": top_competitor,
             "margin": margin,
@@ -279,7 +346,10 @@ def build_envelope(
         },
         "approval": False,
     }
-    return {"contract": "frame_envelope", "ready": status == "pass", "errors": [] if status == "pass" else [error("action_verification_required", "generated envelope remains quarantined until verifier evidence passes", "verifier")], "warnings": [], "envelope": payload, "approval": False}
+    reason = "generated envelope contains declared verifier fields only; an independently bound evidence artifact is required"
+    if not criteria_pass:
+        reason = "generated verifier criteria do not pass; envelope remains quarantined"
+    return {"contract": "frame_envelope", "ready": False, "errors": [error("verifier_evidence_declared", reason, "verifier")], "warnings": [], "envelope": payload, "approval": False}
 
 
 def emit(result: dict[str, Any], as_json: bool) -> None:

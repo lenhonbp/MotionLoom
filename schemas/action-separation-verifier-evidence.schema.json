@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionloom.dev/schemas/action-separation-verifier-evidence.schema.json",
+  "title": "MotionLoom Action Separation Verifier Evidence",
+  "description": "Separate verifier artifact bound to one frame result. Hashes verify binding integrity, not the truthfulness of an asserted producer identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract", "sequence_id", "action_id", "frame_id", "frame_index", "image_sha256", "identity_lock_sha256", "generator_agent_id", "verifier_id", "result", "result_sha256", "provenance"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "contract": {"const": "action-separation-verifier-evidence"},
+    "sequence_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$"},
+    "action_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "frame_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "frame_index": {"type": "integer", "minimum": 0},
+    "image_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "identity_lock_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "generator_agent_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "verifier_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["expected_action", "top_competitor", "margin", "threshold", "status", "method"],
+      "properties": {
+        "expected_action": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "top_competitor": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "margin": {"type": "number", "minimum": 0},
+        "threshold": {"type": "number", "minimum": 0},
+        "status": {"enum": ["pass", "quarantined"]},
+        "method": {"type": "string", "minLength": 1}
+      }
+    },
+    "result_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "producer_id", "run_id"],
+      "properties": {
+        "kind": {"const": "separate_verifier_artifact"},
+        "producer_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$"},
+        "run_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

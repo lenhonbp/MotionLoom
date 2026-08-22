@@ -15,7 +15,18 @@
     "margin": 0.39,
     "threshold": 0.2,
     "status": "pass",
-    "method": "independent-action-rubric-v1"
+    "method": "independent-action-rubric-v1",
+    "verification_mode": "independently_bound",
+    "evidence": {
+      "artifact": "action-sequence/verifier-evidence/walk.01.json",
+      "artifact_sha256": "9e9ec13a79d2384cb9320ed04204e31262a640104685307ede836dd9f3a0244e",
+      "result_sha256": "0ad134eda50c1d6a161d0395d03f43a51a15767665bc06b203564dd327ce0904",
+      "provenance": {
+        "kind": "separate_verifier_artifact",
+        "producer_id": "motionloom-independent-verifier-v1",
+        "run_id": "fixture-run-2026-08-22"
+      }
+    }
   },
   "approval": false
 }

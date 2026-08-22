@@ -60,6 +60,7 @@
     "schemas/control-track.schema.json",
     "schemas/export-manifest.schema.json",
     "schemas/artifact-adapter-registry.schema.json",
+    "schemas/action-separation-verifier-evidence.schema.json",
     "artifact-adapter-registry.json",
     "examples/agent-consumer/artifact-intake",
     "tests/scripts/test_artifact_intake.py",

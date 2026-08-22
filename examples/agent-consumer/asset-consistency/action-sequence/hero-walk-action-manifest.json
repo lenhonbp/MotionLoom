@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "sequence_id": "hero-walk-v1",
   "asset_identity": "character/hero-male",
   "action_id": "walk",

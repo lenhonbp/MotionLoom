@@ -43,12 +43,17 @@ const PYTHON_COMMANDS = {
   "frame-generation-lock": "scripts/frame-generation-lock.py",
   "frame-set-preflight": "scripts/frame-set-preflight.py",
   "action-separation": "scripts/action-separation.py",
+  "asset-generation-plan": "scripts/asset-generation-plan.py",
   "artifact-intake": "scripts/artifact-intake.py",
   "runtime-candidate": "scripts/runtime-candidate.py",
   "rig-compatibility": "scripts/rig-compatibility.py",
   "rive-package-gate": "scripts/rive-package-gate.py",
   "pilot-build": "scripts/build-ai-pilot.py",
   "alpha-isolate": "scripts/isolate-alpha-background.py",
+};
+
+const DIRECT_NODE_COMMANDS = {
+  "asset-adapt": "scripts/asset-adapt.mjs",
 };
 
 const NODE_COMMANDS = {
@@ -99,6 +104,8 @@ Use when an animation task needs it:
   frame-generation-lock  Validate or compose locked per-frame generation instructions
   frame-set-preflight    Fail closed on shared canvases, scale drift, frame contamination and action manifest binding
   action-separation      Validate action-scoped frame manifests and independent competitor-action evidence
+  asset-generation-plan  Produce a MotionLoom project assessment, ranked routes and explicit canvas/frame guidance without invoking APIs
+  asset-adapt             Apply deterministic transparent padding/integer upscale with a hash-bound report
   artifact-intake        Bind generation controls, provenance, adapter metadata and exported bytes
   runtime-candidate      Bind intake exports to consistency contracts before runtime testing
   rig-compatibility      Validate rig bones, sockets, actions, events and runtime adapter evidence
@@ -125,6 +132,9 @@ Cross-platform examples:
   motionloom frame-generation-lock compose --input <frame-generation-lock.json> --root <asset-root> --frame-id walk.00 --json
   motionloom frame-set-preflight --input <frame-geometry.json> --root <asset-root> --action-manifest <action-sequence.json> --json
   motionloom action-separation validate --input <action-sequence.json> --root <asset-root> --json
+  motionloom asset-generation-plan plan --request <asset-generation-request.json> --project-root .
+  motionloom asset-generation-plan plan --request <asset-generation-request.json> --project-root . --json --strict
+  motionloom asset-adapt pad --input source.png --output target.png --width 256 --height 448 --anchor footline --report adaptation.json --json
   motionloom artifact-intake intake --root <asset-dir> --registry artifact-adapter-registry.json \\
     --receipt <generation-receipt.json> --controls <control-track.json> --export-manifest <export-manifest.json> --json
   motionloom alpha-isolate <opaque.png> <isolated.png> --report <alpha-report.json>
@@ -143,7 +153,7 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
 }
 
 const alias = COMMAND_ALIASES[command];
-const script = alias?.script || NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
+const script = alias?.script || DIRECT_NODE_COMMANDS[command] || NODE_COMMANDS[command] || PYTHON_COMMANDS[command];
 if (!script) {
   console.error(`Unknown MotionLoom command: ${command}`);
   printHelp();
@@ -153,7 +163,9 @@ if (!script) {
 const executable = script.endsWith(".mjs") ? process.execPath : PYTHON;
 const delegatedArgs = alias
   ? [...alias.args, ...args]
-  : NODE_COMMANDS[command] && !["setup", "init"].includes(command)
+  : DIRECT_NODE_COMMANDS[command]
+    ? args
+    : NODE_COMMANDS[command] && !["setup", "init"].includes(command)
     ? [command, ...args]
     : command === "init"
       ? ["init", ...args]

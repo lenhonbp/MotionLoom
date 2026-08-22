@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "request_id": "hero-attack-pixellab-256x448",
+  "asset_id": "hero.character.attack",
+  "asset_kind": "frame_sequence",
+  "target": {
+    "canvas": {"width": 256, "height": 448},
+    "frame_count": 8,
+    "fps": 8,
+    "alpha_mode": "straight",
+    "pixel_art": true,
+    "anchor": "footline"
+  },
+  "generation_policy": {
+    "frame_isolation": "required",
+    "allow_crop": false,
+    "allow_stretch": false,
+    "allow_silent_resize": false,
+    "allow_provider_batch_as_provisional": true,
+    "integer_scale_only": true
+  },
+  "project_context": {
+    "runtime": "custom-2d-game-runtime",
+    "framework": "canvas-sprite-runtime",
+    "existing_assets": ["examples/agent-consumer/asset-consistency/assets/hero-frame-00.png"],
+    "rig_requirements": ["preserve footline and pivot across frames", "keep action-specific frame identity"],
+    "provenance_requirements": ["generation receipt", "hash-bound export manifest", "human review"],
+    "validation_requirements": ["MotionLoom frame geometry", "MotionLoom action separation", "MotionLoom Dev Lab review"]
+  },
+  "actions": [
+    {
+      "action_id": "attack",
+      "positive_cues": ["forward sword swing", "weight shifts into strike", "weapon leads the silhouette"],
+      "negative_cues": ["walking cycle", "running cycle", "jumping", "idle stance"],
+      "frame_count": 8
+    }
+  ],
+  "references": [
+    {"id": "hero-identity", "role": "identity"},
+    {"id": "hero-style", "role": "style"},
+    {"id": "attack-pose-reference", "role": "pose"}
+  ]
+}

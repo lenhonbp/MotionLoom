@@ -69,6 +69,26 @@ try {
   if (!fs.existsSync(path.join(installedRoot, "dev-lab", "public", "scenes", scene, "browser-review.json"))) {
     throw new Error("installed Dev Lab did not prepare the consumer scene");
   }
+  const requestSource = path.join(installedRoot, "examples", "agent-consumer", "asset-planning", "pixellab-hero-256x448-request.json");
+  const requestCopy = path.join(consumer, "asset-generation-request.json");
+  const registryCopy = path.join(consumer, "artifact-adapter-registry.json");
+  fs.copyFileSync(requestSource, requestCopy);
+  fs.copyFileSync(path.join(installedRoot, "artifact-adapter-registry.json"), registryCopy);
+  const plan = JSON.parse(run(bin, ["asset-generation-plan", "plan", "--request", requestCopy, "--registry", registryCopy, "--project-root", consumer.toString(), "--json"], { cwd: consumer }));
+  if (plan.contract !== "motionloom-asset-generation-plan" || plan.schema_version !== "0.2" || plan.producer !== "MotionLoom" || plan.approval !== false) throw new Error("installed planner contract failed");
+  if (!Array.isArray(plan.recommendations) || plan.recommendations.length === 0) throw new Error("installed planner returned no normal-planning recommendations");
+  if (!plan.recommendations.some((item) => item.recommendation_status === "recommended" && item.execution_status === "provisional")) throw new Error("installed planner lost provisional recommendation/execution separation");
+  if (!plan.agent_guidance || plan.agent_guidance.recommended_by !== "MotionLoom") throw new Error("installed planner omitted MotionLoom agent guidance");
+  const humanPlan = run(bin, ["asset-generation-plan", "plan", "--request", requestCopy, "--registry", registryCopy, "--project-root", consumer.toString()], { cwd: consumer });
+  if (!humanPlan.includes("MotionLoom Project Assessment") || !humanPlan.includes("MotionLoom Recommendations")) throw new Error("installed planner human output lost MotionLoom identity");
+
+  const sourceImage = path.join(installedRoot, "examples", "agent-consumer", "asset-consistency", "assets", "hero-frame-00.png");
+  const adaptedImage = path.join(consumer, "adapted-frame.png");
+  const adaptationReport = path.join(consumer, "adaptation-report.json");
+  const adaptation = JSON.parse(run(bin, ["asset-adapt", "pad", "--input", sourceImage, "--output", adaptedImage, "--width", "256", "--height", "448", "--anchor", "footline", "--report", adaptationReport, "--json"], { cwd: consumer }));
+  if (adaptation.contract !== "motionloom-asset-adaptation" || adaptation.approval !== false || adaptation.output.canvas[0] !== 256 || adaptation.output.canvas[1] !== 448) throw new Error("installed Node asset-adapt contract failed");
+  if (!fs.existsSync(adaptedImage) || !fs.existsSync(adaptationReport)) throw new Error("installed asset-adapt omitted output/report");
+
   run(process.execPath, ["--input-type=module", "-e", "await import('playwright'); await import('vite');"], { cwd: consumer });
   console.log(JSON.stringify({ status: "pass", project_root: init.project_root, installed_root: installedRoot }, null, 2));
 } finally {

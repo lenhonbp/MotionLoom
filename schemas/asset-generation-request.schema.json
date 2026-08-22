@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/asset-generation-request.schema.json",
+  "title": "MotionLoom asset generation request",
+  "description": "Provider-neutral request used to plan generation and adaptation. It never invokes a provider or grants approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "request_id", "asset_id", "asset_kind", "target", "generation_policy"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+    "asset_id": {"type": "string", "minLength": 1},
+    "asset_kind": {"type": "string", "enum": ["image", "frame_sequence", "sprite_atlas", "layered_map", "video", "rigged_2d", "rigged_3d", "runtime_scene"]},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canvas", "alpha_mode"],
+      "properties": {
+        "canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height"],
+          "properties": {
+            "width": {"type": "integer", "minimum": 1},
+            "height": {"type": "integer", "minimum": 1}
+          }
+        },
+        "frame_count": {"type": "integer", "minimum": 1},
+        "fps": {"type": "number", "exclusiveMinimum": 0},
+        "alpha_mode": {"type": "string", "enum": ["straight", "premultiplied", "opaque"]},
+        "pixel_art": {"type": "boolean"},
+        "anchor": {"type": "string", "enum": ["center", "footline", "pivot", "top_left"]}
+      }
+    },
+    "generation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame_isolation", "allow_crop", "allow_stretch", "allow_silent_resize"],
+      "properties": {
+        "frame_isolation": {"type": "string", "enum": ["required", "preferred", "not_required"]},
+        "allow_crop": {"const": false},
+        "allow_stretch": {"const": false},
+        "allow_silent_resize": {"const": false},
+        "allow_provider_batch_as_provisional": {"type": "boolean"},
+        "integer_scale_only": {"type": "boolean"}
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action_id", "positive_cues", "negative_cues"],
+        "properties": {
+          "action_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"},
+          "positive_cues": {"type": "array", "items": {"type": "string"}},
+          "negative_cues": {"type": "array", "items": {"type": "string"}},
+          "frame_count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "project_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runtime": {"type": "string", "minLength": 1},
+        "framework": {"type": "string", "minLength": 1},
+        "existing_assets": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "rig_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "provenance_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "validation_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "provider_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preferred_adapter_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"}
+        },
+        "excluded_adapter_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"}
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "enum": ["identity", "style", "pose", "motion", "palette", "other"]},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    }
+  }
+}

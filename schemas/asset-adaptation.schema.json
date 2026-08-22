@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/asset-adaptation.schema.json",
+  "title": "MotionLoom asset adaptation report",
+  "description": "Deterministic canvas adaptation evidence. It does not grant approval or production eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "schema_version", "operation", "status", "approval", "production_approved", "source", "output", "transform"],
+  "properties": {
+    "contract": {"const": "motionloom-asset-adaptation"},
+    "schema_version": {"const": "0.1"},
+    "operation": {"const": "pad"},
+    "status": {"const": "built"},
+    "approval": {"const": false},
+    "production_approved": {"const": false},
+    "source": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "canvas"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "canvas": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}}}},
+    "output": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "canvas"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "canvas": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}}}},
+    "transform": {"type": "object", "additionalProperties": false, "required": ["scale", "x", "y", "anchor", "crop", "stretch", "interpolation"], "properties": {"scale": {"type": "integer", "minimum": 1}, "x": {"type": "integer", "minimum": 0}, "y": {"type": "integer", "minimum": 0}, "anchor": {"type": "string", "enum": ["center", "footline"]}, "crop": {"const": false}, "stretch": {"const": false}, "interpolation": {"const": "nearest-neighbour"}}},
+    "note": {"type": "string"}
+  }
+}

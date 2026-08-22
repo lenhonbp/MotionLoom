@@ -5,10 +5,12 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
 MODULE_PATH = ROOT / "scripts" / "review-hook.py"
 spec = importlib.util.spec_from_file_location("motionloom_review_hook", MODULE_PATH)
 assert spec and spec.loader
@@ -33,6 +35,7 @@ def descriptor() -> dict:
         "controls": {"play": True, "pause": True, "restart": True, "seek": True, "step": True, "speed": True, "loop": True},
         "viewport": {"canvas_width": 1920, "canvas_height": 1920, "pixel_art": True},
         "review_policy": {"require_all_animations": True},
+        "action_separation": {"status": "pass", "action_id": "sprite-sequence", "frame_count": 3, "passing_frame_count": 3, "forbidden_action_ids": ["cross-action-mix"]},
     }
 
 
@@ -53,6 +56,8 @@ def main() -> int:
         assert first["mode"] == "sprite-sequence"
         assert first["animations"] == ["idle", "attack"]
         assert len(first["bundle_sha256"]) == 64
+        assert first["action_separation"]["status"] == "pass"
+        assert first["action_separation"]["passing_frame_count"] == 3
 
         second = review_hook.runtime_bundle(scene)
         assert second["bundle_sha256"] == first["bundle_sha256"], "runtime bundle hashing must be deterministic"
@@ -77,7 +82,16 @@ def main() -> int:
     live = review_hook.candidate_id("task", "scene", "context", "source", "render", "f" * 64)
     assert live != actual_legacy, "live runtime bundle must participate in candidate identity"
 
-    print(json.dumps({"status": "pass", "runtime_bundle": "hash-bound", "path_traversal": "blocked", "legacy_candidate_id": "compatible"}))
+    canonical = review_hook.runtime_bundle(ROOT / "examples/agent-consumer/devlab-live-sprite")
+    assert canonical is not None
+    assert canonical["mode"] == "sprite-sequence"
+    assert canonical["animations"] == ["idle", "reverse"]
+    assert len(canonical["files"]) == 6
+    canonical_descriptor = json.loads((ROOT / "examples/agent-consumer/devlab-live-sprite/devlab-runtime.json").read_text(encoding="utf-8"))
+    assert canonical_descriptor["action_separation"]["status"] == "pass"
+    assert canonical_descriptor["action_separation"]["passing_frame_count"] == 6
+
+    print(json.dumps({"status": "pass", "runtime_bundle": "hash-bound", "canonical_fixture": "verified", "path_traversal": "blocked", "legacy_candidate_id": "compatible"}))
     return 0
 
 

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "mode": "sprite-sequence",
+  "files": [
+    "frames/idle-00.png",
+    "frames/idle-01.png",
+    "frames/idle-02.png",
+    "frames/reverse-00.png",
+    "frames/reverse-01.png",
+    "frames/reverse-02.png"
+  ],
+  "default_animation": "idle",
+  "animations": [
+    {
+      "id": "idle",
+      "fps": 6,
+      "frames": [
+        "frames/idle-00.png",
+        "frames/idle-01.png",
+        "frames/idle-02.png"
+      ],
+      "loop": true,
+      "review_required": true
+    },
+    {
+      "id": "reverse",
+      "fps": 6,
+      "frames": [
+        "frames/reverse-00.png",
+        "frames/reverse-01.png",
+        "frames/reverse-02.png"
+      ],
+      "loop": false,
+      "review_required": true
+    }
+  ],
+  "controls": {
+    "play": true,
+    "pause": true,
+    "restart": true,
+    "seek": true,
+    "step": true,
+    "speed": true,
+    "loop": true
+  },
+  "viewport": {
+    "canvas_width": 1920,
+    "canvas_height": 1920,
+    "pixel_art": false
+  },
+  "review_policy": {
+    "require_all_animations": true
+  },
+  "action_separation": {
+    "status": "pass",
+    "action_id": "sprite-sequence",
+    "frame_count": 6,
+    "passing_frame_count": 6,
+    "forbidden_action_ids": ["cross-action-mix"]
+  }
+}

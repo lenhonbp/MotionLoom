@@ -4,7 +4,7 @@
 The resolver intentionally does not infer a task path from a scene slug. A
 bundle is eligible only when its direct ``artifacts/<task-id>/task.json``
 declares the requested scene and remains inside the repository artifacts root.
-Multiple matching bundles are rejected rather than ranked implicitly.
+Multiple matching bundles are rejected rather than ranked implicitly. A task bundle with a browser-review candidate that conflicts with the canonical scene candidate is not eligible; the later quality/review gates still report that divergence when the bundle is checked directly.
 """
 
 from __future__ import annotations
@@ -44,6 +44,7 @@ def resolve_task_dirs(root: Path, scene: str) -> list[Path]:
     if not artifacts.is_dir() or artifacts.is_symlink():
         return []
     resolved_artifacts = artifacts.resolve()
+    scene_candidate = read_json(root / "src" / "output" / scene / "browser-review.json")
     matches: list[Path] = []
     for task_path in sorted(artifacts.glob("*/task.json")):
         if has_symlink_component(task_path, root):
@@ -53,8 +54,15 @@ def resolve_task_dirs(root: Path, scene: str) -> list[Path]:
                 continue
         except (OSError, RuntimeError):
             continue
-        if read_json(task_path).get("scene") == scene:
-            matches.append(task_path.parent)
+        task = read_json(task_path)
+        if task.get("scene") != scene:
+            continue
+        task_candidate = read_json(task_path.parent / "browser-review.json")
+        if scene_candidate and task_candidate:
+            identity_fields = ("candidate_id", "task_id", "scene", "source_sha256", "context_sha256", "expires_at")
+            if any(scene_candidate.get(field) != task_candidate.get(field) for field in identity_fields):
+                continue
+        matches.append(task_path.parent)
     return matches
 
 

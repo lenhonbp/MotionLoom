@@ -16,9 +16,10 @@ cd MotionLoom
 npm install
 python3 -m pip install --requirement requirements.txt
 python3 scripts/skill-doctor.py --json
+python3 scripts/skill-doctor.py --runtime --json
 ```
 
-Node.js 18+ and Python 3.11+ are required. On Windows, use `python` if `python3` is not available or set `MOTIONLOOM_PYTHON` for the npm wrapper. Runtime adapter tests may require the Playwright browser installation described by the CI workflow.
+Node.js 18+ and Python 3.11+ are required. On Windows, use `python` if `python3` is not available or set `MOTIONLOOM_PYTHON` for the npm wrapper. Runtime adapter tests require a Playwright browser executable; run `python3 scripts/skill-doctor.py --runtime --json` before the suite, then `npx playwright install chromium` if the diagnostic reports `missing_browser_executable`.
 
 ## Validation commands
 
@@ -30,6 +31,7 @@ python3 tests/scripts/test_project_memory.py
 python3 tests/scripts/run_tests.py
 python3 scripts/eval-intelligence.py
 python3 scripts/skill-doctor.py --json
+python3 scripts/skill-doctor.py --runtime --json
 npm run runtime:test
 npm publish --dry-run --access public
 ```

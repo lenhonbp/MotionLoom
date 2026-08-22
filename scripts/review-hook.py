@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 import re
 import shutil
@@ -13,6 +14,12 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit, urlunsplit
+
+try:
+    from browser_review_consistency import candidate_consistency_errors
+except ModuleNotFoundError:  # Support importlib-based contract tests.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from browser_review_consistency import candidate_consistency_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
@@ -182,6 +189,20 @@ def runtime_bundle(scene_dir: Path) -> dict | None:
     review_policy = descriptor.get("review_policy")
     if not isinstance(review_policy, dict) or not isinstance(review_policy.get("require_all_animations"), bool):
         raise ValueError("devlab-runtime.json review_policy.require_all_animations must be boolean")
+    action_separation = descriptor.get("action_separation")
+    if action_separation is not None:
+        if not isinstance(action_separation, dict):
+            raise ValueError("devlab-runtime.json action_separation must be an object")
+        if action_separation.get("status") not in {"pass", "quarantined"}:
+            raise ValueError("devlab-runtime.json action_separation.status must be pass or quarantined")
+        if not isinstance(action_separation.get("action_id"), str) or not SAFE_ANIMATION.fullmatch(action_separation["action_id"]):
+            raise ValueError("devlab-runtime.json action_separation.action_id is invalid")
+        frame_count = action_separation.get("frame_count")
+        passing_count = action_separation.get("passing_frame_count")
+        if not isinstance(frame_count, int) or frame_count < 1 or not isinstance(passing_count, int) or passing_count < 0 or passing_count > frame_count:
+            raise ValueError("devlab-runtime.json action_separation frame counts are invalid")
+        if not isinstance(action_separation.get("forbidden_action_ids"), list):
+            raise ValueError("devlab-runtime.json action_separation.forbidden_action_ids must be an array")
 
     digest = hashlib.sha256()
     digest.update(b"motionloom-devlab-runtime-v1\0")
@@ -198,6 +219,7 @@ def runtime_bundle(scene_dir: Path) -> dict | None:
         "mode": mode,
         "files": sorted(resolved_files),
         "review_policy": {"require_all_animations": review_policy["require_all_animations"]},
+        "action_separation": action_separation,
     }
 
 
@@ -215,6 +237,7 @@ def runtime_review_payload(bundle: dict | None) -> dict:
         "bundle_sha256": bundle["bundle_sha256"],
         "animations": bundle["animations"],
         "review_policy": bundle["review_policy"],
+        "action_separation": bundle.get("action_separation"),
     }
 
 
@@ -334,8 +357,24 @@ def prepare(args: argparse.Namespace) -> int:
         )),
     })
     handoff_path.write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    subprocess.run([sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
-    subprocess.run([sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)], check=True, capture_output=True, text=True)
+    project_env = os.environ.copy()
+    project_env["MOTIONLOOM_PROJECT_ROOT"] = str(ROOT)
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts/devlab.py"), scene, "--prepare-only", "--task-dir", str(task_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        env=project_env,
+    )
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts/report.py"), "collect", "--task-dir", str(task_dir)],
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        env=project_env,
+    )
     print(json.dumps({
         "status": "review_required",
         "task_id": task["task_id"],
@@ -363,6 +402,12 @@ def validate(args: argparse.Namespace) -> int:
         bundle["bundle_sha256"] if bundle else None,
     )
     errors = []
+    errors.extend(candidate_consistency_errors(
+        scene_dir / "browser-review.json",
+        task_dir / "browser-review.json",
+        expected_task_id=task.get("task_id"),
+        expected_scene=task.get("scene"),
+    ))
     if not candidate.get("expires_at"):
         errors.append("browser-review candidate has no expiry")
     else:
@@ -446,17 +491,21 @@ def validate(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
+    global ROOT
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("prepare")
     p.add_argument("--task-dir", required=True)
+    p.add_argument("--root", default=str(ROOT), help="Repository root containing the canonical scene artifacts")
     p.add_argument("--lab-url", default="http://127.0.0.1:3300")
     p.set_defaults(func=prepare)
     v = sub.add_parser("validate")
     v.add_argument("--task-dir", required=True)
+    v.add_argument("--root", default=str(ROOT), help="Repository root containing the canonical scene artifacts")
     v.add_argument("--require-approved", action="store_true")
     v.set_defaults(func=validate)
     args = parser.parse_args()
+    ROOT = Path(args.root).expanduser().resolve()
     try:
         return args.func(args)
     except (KeyError, FileNotFoundError, json.JSONDecodeError, ValueError, subprocess.CalledProcessError) as exc:

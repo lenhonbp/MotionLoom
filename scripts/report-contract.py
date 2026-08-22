@@ -91,7 +91,7 @@ def main() -> int:
         passing: list[Path] = []
         for task_dir in complete:
             result = subprocess.run(
-                [sys.executable, str(report_script), "check", "--task-dir", str(task_dir)],
+                [sys.executable, str(report_script), "check", "--task-dir", str(task_dir), "--root", str(root)],
                 cwd=root,
                 capture_output=True,
                 text=True,

@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SAFE_SCENE = re.compile(r"^[A-Za-z0-9._-]+$")
 sys.path.insert(0, str(ROOT / "scripts"))
 from intelligence import validate_task_benchmark, validate_task_intelligence, validate_task_p1  # noqa: E402
+from browser_review_consistency import candidate_consistency_errors  # noqa: E402
 sys.path.insert(0, str(ROOT / "src"))
 from core.spec import validate_spec  # noqa: E402
 
@@ -321,6 +322,12 @@ def validate_scene(scene_dir: Path, context_path: Path, require_review: bool = F
                     issues.append("browser review candidate scene mismatch")
                 if task_dir:
                     task = _json(task_dir / "task.json")
+                    issues.extend(candidate_consistency_errors(
+                        scene_dir / "browser-review.json",
+                        task_dir / "browser-review.json",
+                        expected_task_id=task.get("task_id"),
+                        expected_scene=scene_dir.name,
+                    ))
                     if candidate.get("task_id") != task.get("task_id"):
                         issues.append("browser review candidate task_id mismatch")
                 if candidate.get("source_sha256") != source_sha:

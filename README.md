@@ -84,10 +84,12 @@ Use these only if you need them:
 ```bash
 npx --yes motionloom init --dry-run --json     # preview; no install or file changes
 npx --no-install motionloom doctor             # check the installed package
+npx --no-install motionloom doctor --runtime --json  # include Playwright Chromium preflight
 npx --no-install motionloom repair --yes       # restore only missing managed pieces
 ```
 
-MotionLoom's onboarding and contract CLI supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. Browser-runtime capture uses the separately declared optional Playwright/Vite dependencies and follows the capability contract's Node.js 22 requirement. Signed-attestation commands additionally require the Python `cryptography` package declared in the shipped `requirements.txt`; `motionloom doctor` reports missing runtime prerequisites. `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
+MotionLoom's onboarding and contract CLI supports **Node.js 18+** and **Python 3.11+** on Ubuntu, macOS and Windows. Browser-runtime capture uses the separately declared optional Playwright/Vite dependencies and follows the capability contract's Node.js 22 requirement. Signed-attestation commands additionally require the Python `cryptography` package declared in the shipped `requirements.txt`; `motionloom doctor` reports package prerequisites, while `motionloom doctor --runtime` additionally verifies the installed Playwright Chromium executable and prints `npx playwright install chromium` when it is missing.
+ `npx` is the recommended first-run surface; after setup, use the project-local binary through `npx --no-install motionloom ...`. A global install remains optional, not required.
 
 ### When you begin animation work
 
@@ -317,9 +319,10 @@ Read [the Apple workspace guide](apps/apple/README.md), [the contract boundary](
 | Install or understand the full lifecycle | [SKILL.md](SKILL.md) |
 | Choose a runtime | [Framework selection](docs/FRAMEWORK-SELECTION.md) and [runtime capability reference](references/runtime-capability.md) |
 | Run a review-ready scene | [Production checklist](docs/CHECKLIST.md) and [browser review contract](references/browser-review-contract.md) |
-| Configure live actions, playback or state transitions in Dev Lab | [Dev Lab live runtime contract](docs/DEV-LAB-RUNTIME.md) and [2.6.0 release note](docs/releases/2.6.0.md) |
+| Configure live actions, playback or state transitions in Dev Lab | [Dev Lab live runtime contract](docs/DEV-LAB-RUNTIME.md), [canonical live sprite fixture](examples/agent-consumer/devlab-live-sprite/), and [2.6.0 release note](docs/releases/2.6.0.md) |
+| Prevent cross-action frame mixing | [Action-scoped isolated frame pipeline](docs/ACTION-SEPARATION.md), `motionloom action-separation`, and manifest-aware `motionloom frame-set-preflight` |
 | Understand Agent intelligence | [Intelligence Core](references/intelligence-core.md) and [roadmap](ROADMAP.md) |
-| Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json) and `python3 scripts/eval-projects.py --allow-insufficient` |
+| Run labeled project evaluation | [Project corpus manifest](tests/evals/project-corpus.json), [external corpus workflow](docs/EXTERNAL-CORPUS.md), and `python3 scripts/eval-projects.py --allow-insufficient` |
 | Understand trust boundaries | [Signed attestation](references/signed-attestation.md) and [2.0.0 release note](docs/releases/2.0.0.md) |
 | Classify AI-generated or assisted assets | [Asset provenance tiers](schemas/asset-provenance.schema.json), `motionloom asset-provenance`, and the [production checklist](docs/CHECKLIST.md) |
 | Bind an internal skill or provider output before runtime testing | [Artifact Intake examples](examples/agent-consumer/artifact-intake/), `motionloom artifact-intake`, and [AI/Agent research](docs/research/ai-animation-tools-2026-report.md) |

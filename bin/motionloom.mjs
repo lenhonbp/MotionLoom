@@ -42,6 +42,7 @@ const PYTHON_COMMANDS = {
   "asset-consistency": "scripts/asset-consistency.py",
   "frame-generation-lock": "scripts/frame-generation-lock.py",
   "frame-set-preflight": "scripts/frame-set-preflight.py",
+  "action-separation": "scripts/action-separation.py",
   "artifact-intake": "scripts/artifact-intake.py",
   "runtime-candidate": "scripts/runtime-candidate.py",
   "rig-compatibility": "scripts/rig-compatibility.py",
@@ -71,6 +72,7 @@ Start here:
   init                   One safe project setup; no animation gate runs
   status                 Short read-only readiness report
   doctor                 Validate the installed Skill package
+  doctor --runtime       Also verify the Playwright Chromium executable
 
 Use when an animation task needs it:
   analyze                Run project analysis and refresh Project Memory
@@ -95,7 +97,8 @@ Use when an animation task needs it:
   asset-provenance       Validate, classify or report asset origin and production readiness
   asset-consistency      Validate frame geometry, atlas contamination and layered-map contracts
   frame-generation-lock  Validate or compose locked per-frame generation instructions
-  frame-set-preflight    Fail closed on shared canvases, scale drift and frame contamination
+  frame-set-preflight    Fail closed on shared canvases, scale drift, frame contamination and action manifest binding
+  action-separation      Validate action-scoped frame manifests and independent competitor-action evidence
   artifact-intake        Bind generation controls, provenance, adapter metadata and exported bytes
   runtime-candidate      Bind intake exports to consistency contracts before runtime testing
   rig-compatibility      Validate rig bones, sockets, actions, events and runtime adapter evidence
@@ -112,6 +115,7 @@ Cross-platform examples:
   motionloom memory record-decision --project-root . --id ui-easing \\
     --status accepted --summary "Use ease-out for UI entry" --user-confirmed
   motionloom discovery check --root . --json
+  motionloom doctor --runtime --json
   motionloom discovery install-matrix --root . --json
   motionloom capability card --format json
   motionloom visual-truth validate --root . --input src/output/<scene>/visual-truth.json
@@ -119,7 +123,8 @@ Cross-platform examples:
   motionloom asset-provenance check --input <asset-provenance.json> --root <scene-dir> --mode runtime --json
   motionloom asset-consistency validate --kind frame-geometry --input <frame-geometry.json> --root <scene-dir> --json
   motionloom frame-generation-lock compose --input <frame-generation-lock.json> --root <asset-root> --frame-id walk.00 --json
-  motionloom frame-set-preflight --input <frame-geometry.json> --root <asset-root> --json
+  motionloom frame-set-preflight --input <frame-geometry.json> --root <asset-root> --action-manifest <action-sequence.json> --json
+  motionloom action-separation validate --input <action-sequence.json> --root <asset-root> --json
   motionloom artifact-intake intake --root <asset-dir> --registry artifact-adapter-registry.json \\
     --receipt <generation-receipt.json> --controls <control-track.json> --export-manifest <export-manifest.json> --json
   motionloom alpha-isolate <opaque.png> <isolated.png> --report <alpha-report.json>

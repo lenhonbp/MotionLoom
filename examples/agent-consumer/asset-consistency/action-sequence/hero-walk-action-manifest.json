@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.2",
+  "sequence_id": "hero-walk-v1",
+  "asset_identity": "character/hero-male",
+  "action_id": "walk",
+  "identity_lock_sha256": "59d6b09622b19839b8c9342fb043965ea3f515c8979d769284d413f60a5f7e2d",
+  "generator_agent_id": "motionloom-generator-v1",
+  "forbidden_action_ids": [
+    "run",
+    "jump",
+    "attack"
+  ],
+  "actions": [
+    {
+      "action_id": "walk",
+      "positive_cues": [
+        "alternating contact and passing phases",
+        "upright body and natural counter-swing"
+      ],
+      "negative_cues": [
+        "no airborne phase",
+        "no attack or hurt silhouette"
+      ]
+    },
+    {
+      "action_id": "run",
+      "positive_cues": [
+        "longer stride and stronger forward lean"
+      ],
+      "negative_cues": [
+        "not an upright alternating walk"
+      ]
+    },
+    {
+      "action_id": "jump",
+      "positive_cues": [
+        "airborne body and compressed takeoff/landing"
+      ],
+      "negative_cues": [
+        "feet do not remain on shared footline"
+      ]
+    },
+    {
+      "action_id": "attack",
+      "positive_cues": [
+        "directed weapon or strike motion"
+      ],
+      "negative_cues": [
+        "no locomotion cycle"
+      ]
+    }
+  ],
+  "frames": [
+    {
+      "frame_index": 0,
+      "frame_id": "walk.00",
+      "image": "assets/hero-frame-00.png",
+      "envelope": "action-sequence/envelopes/walk.00.json"
+    },
+    {
+      "frame_index": 1,
+      "frame_id": "walk.01",
+      "image": "assets/hero-frame-01.png",
+      "envelope": "action-sequence/envelopes/walk.01.json"
+    },
+    {
+      "frame_index": 2,
+      "frame_id": "walk.02",
+      "image": "assets/hero-frame-02.png",
+      "envelope": "action-sequence/envelopes/walk.02.json"
+    },
+    {
+      "frame_index": 3,
+      "frame_id": "walk.03",
+      "image": "assets/hero-frame-03.png",
+      "envelope": "action-sequence/envelopes/walk.03.json"
+    }
+  ],
+  "status": "review_required",
+  "approval": false
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "generator_agent_id": "motionloom-generator-v1",
+  "sequence_id": "hero-walk-v1",
+  "action_id": "walk",
+  "frame_id": "walk.00",
+  "frame_index": 0,
+  "image": "assets/hero-frame-00.png",
+  "image_sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248",
+  "identity_lock_sha256": "59d6b09622b19839b8c9342fb043965ea3f515c8979d769284d413f60a5f7e2d",
+  "verifier": {
+    "verifier_id": "motionloom-separation-verifier-v1",
+    "expected_action": "walk",
+    "top_competitor": "run",
+    "margin": 0.42,
+    "threshold": 0.2,
+    "status": "pass",
+    "method": "independent-action-rubric-v1",
+    "verification_mode": "independently_bound",
+    "evidence": {
+      "artifact": "action-sequence/verifier-evidence/walk.00.json",
+      "artifact_sha256": "cd9adf1eafb82e1a36056934495a012b0caa87eb26e26213fff28cc25d90e8a0",
+      "result_sha256": "c1e08d34fc0fab0c32a6eb1ad2c8e5e4c2c659f91a0d2f8295759c6c8e5fd804",
+      "provenance": {
+        "kind": "separate_verifier_artifact",
+        "producer_id": "motionloom-independent-verifier-v1",
+        "run_id": "fixture-run-2026-08-22"
+      }
+    }
+  },
+  "approval": false
+}

@@ -20,10 +20,27 @@
     "trust"
   ],
   "properties": {
-    "schema_version": { "const": "0.1" },
+    "schema_version": { "enum": ["0.1", "0.2"] },
     "lock_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$" },
     "asset_identity": { "type": "string", "minLength": 1 },
     "action_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" },
+    "sequence_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,95}$" },
+    "forbidden_action_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$" }
+    },
+    "action_manifest": { "type": "string", "pattern": "^.+\\.json$" },
+    "action_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive_cues", "negative_cues"],
+      "properties": {
+        "positive_cues": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "negative_cues": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
     "reference": {
       "type": "object",
       "additionalProperties": false,
@@ -140,6 +157,12 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "schema_version": { "const": "0.2" } } },
+      "then": { "required": ["sequence_id", "forbidden_action_ids", "action_contract", "action_manifest"] }
+    }
+  ],
   "$defs": {
     "rect": {
       "type": "object",

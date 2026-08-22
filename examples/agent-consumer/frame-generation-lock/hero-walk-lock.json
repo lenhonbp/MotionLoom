@@ -1,8 +1,21 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "lock_id": "hero-walk-v1",
   "asset_identity": "character/hero-male",
   "action_id": "walk",
+  "sequence_id": "hero-walk-v1",
+  "forbidden_action_ids": ["run", "jump", "attack"],
+  "action_manifest": "asset-consistency/action-sequence/hero-walk-action-manifest.json",
+  "action_contract": {
+    "positive_cues": [
+      "alternating contact and passing phases with an upright body",
+      "weight transfers along the shared footline with a natural counter-swing"
+    ],
+    "negative_cues": [
+      "no airborne jump, attack wind-up, or running stride",
+      "no casting, hurt, dodge, or second character silhouette"
+    ]
+  },
   "reference": {
     "image": "asset-consistency/assets/hero-frame-00.png",
     "sha256": "75ce90653a01a23bcfab1aef83647d6364d3edbf6e4a44b84c635338c12b9248",

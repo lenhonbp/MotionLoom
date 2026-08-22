@@ -9,6 +9,7 @@ let manifest;
 let spec;
 let candidate;
 let runtimeDescriptor = null;
+let actionSeparation = null;
 let review;
 let driver;
 let currentAnimationId = null;
@@ -114,6 +115,17 @@ function validateRuntimeDescriptor(value) {
       throw new Error("Candidate runtime animation set does not match descriptor");
     }
   }
+  return value;
+}
+
+function validateActionSeparation(value) {
+  if (!value) return null;
+  if (typeof value !== "object") throw new Error("Action-separation evidence must be an object");
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$/.test(value.action_id || "")) throw new Error("Action-separation evidence requires a safe action_id");
+  if (!new Set(["pass", "quarantined"]).has(value.status)) throw new Error("Action-separation evidence has an invalid status");
+  if (!Number.isInteger(value.frame_count) || value.frame_count < 1) throw new Error("Action-separation evidence requires a positive frame_count");
+  if (!Number.isInteger(value.passing_frame_count) || value.passing_frame_count < 0 || value.passing_frame_count > value.frame_count) throw new Error("Action-separation passing_frame_count is invalid");
+  if (!Array.isArray(value.forbidden_action_ids)) throw new Error("Action-separation evidence requires forbidden_action_ids");
   return value;
 }
 
@@ -386,7 +398,8 @@ function currentReview(decision) {
       mode: runtimeDescriptor ? "live-runtime" : "captured-evidence",
       descriptor_sha256: candidate.runtime_review?.bundle_sha256 || null,
       selected_animation: currentAnimationId,
-      state
+      state,
+      action_separation: actionSeparation
     },
     spec: { framework: spec.framework, category: spec.category, context_binding: spec.context_binding },
     candidate: { source_sha256: candidate.source_sha256, context_sha256: candidate.context_sha256 }
@@ -420,6 +433,20 @@ function renderMetadata() {
     const text = document.createElement("span"); text.textContent = value ?? "—";
     pill.append(label, text); return pill;
   }));
+}
+
+function renderActionSeparation() {
+  const node = $("action-separation");
+  if (!node) return;
+  if (!actionSeparation) {
+    node.className = "progress-note";
+    node.textContent = "No action-separation evidence bound; legacy review compatibility mode.";
+    return;
+  }
+  const pass = actionSeparation.status === "pass";
+  node.className = `progress-note ${pass ? "pass" : "quarantine"}`;
+  const forbidden = actionSeparation.forbidden_action_ids.join(", ") || "none";
+  node.textContent = `${pass ? "PASS" : "QUARANTINED"} · expected ${actionSeparation.action_id} · ${actionSeparation.passing_frame_count}/${actionSeparation.frame_count} frames separated · competitors: ${forbidden}`;
 }
 
 function renderChecks() {
@@ -474,10 +501,15 @@ function updateReviewGate() {
   const checks = currentChecks();
   const checksPass = checks.length > 0 && checks.every((item) => item.pass);
   const coverage = reviewCoverageComplete();
+  const actionGate = !actionSeparation || actionSeparation.status === "pass";
   const liveRuntimeBlocked = candidate?.runtime_review?.live === true && driver instanceof SnapshotDriver;
-  $("confirm").disabled = !(checksPass && coverage && !liveRuntimeBlocked);
+  $("confirm").disabled = !(checksPass && coverage && actionGate && !liveRuntimeBlocked);
   if (liveRuntimeBlocked) {
     setStatus("warn", "LIVE RUNTIME UNAVAILABLE · approval is blocked; captured evidence remains inspectable and changes may still be requested.");
+    return;
+  }
+  if (!actionGate) {
+    setStatus("warn", "ACTION SEPARATION QUARANTINED · regenerate or independently verify the ambiguous frame before approval.");
     return;
   }
   const missing = requiredAnimationIds().filter((id) => !inspectedAnimations.has(id));
@@ -669,6 +701,7 @@ async function load() {
   ]);
   validateCandidate();
   runtimeDescriptor = validateRuntimeDescriptor(runtimeDescriptor);
+  actionSeparation = validateActionSeparation(runtimeDescriptor?.action_separation || null);
   const expectedLiveRuntimeMissing = candidate.runtime_review?.live === true && !runtimeDescriptor;
 
   $("title").textContent = `${manifest.name || scene}`;
@@ -680,7 +713,7 @@ async function load() {
   const saved = JSON.parse(localStorage.getItem(`devlab:${taskId}:${candidateId}`) || "null");
   review = saved || { checks: (manifest.checks || []).map((check) => ({ id: check.id, pass: false })), notes: "", decision: "pending", animations_inspected: [] };
   for (const id of review.animations_inspected || []) inspectedAnimations.add(id);
-  renderChecks(); $("notes").value = review.notes || ""; expose(review);
+  renderActionSeparation(); renderChecks(); $("notes").value = review.notes || ""; expose(review);
   wireControls(); applyViewportOverlays(); setZoom(1);
 
   if (expectedLiveRuntimeMissing) {

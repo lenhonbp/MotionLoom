@@ -42,11 +42,16 @@ def write_variant(document: dict, directory: Path, name: str = "lock.json") -> P
     return path
 
 
+def base_schema_version() -> str:
+    return json.loads(FIXTURE.read_text(encoding="utf-8")).get("schema_version", "")
+
+
 def test_valid_lock_and_compose() -> None:
     code, result = run("validate", "--input", str(FIXTURE), "--root", str(ASSET_ROOT))
     check(code == 0 and result.get("ready") is True, f"valid lock should pass: {result}")
     check(result.get("approval") is False, "lock validation must preserve approval=false")
     check(result.get("metrics", {}).get("frame_count") == 4, "fixture must expose four frames")
+    check(base_schema_version() == "0.2", "canonical lock fixture must exercise enhanced schema 0.2")
 
     code, result = run(
         "compose", "--input", str(FIXTURE), "--root", str(ASSET_ROOT), "--frame-id", "walk.01"
@@ -61,6 +66,8 @@ def test_valid_lock_and_compose() -> None:
     check("do not introduce whole-subject zoom drift" in instruction, "composer must bind apparent-size tolerance")
     check("approval" in instruction.lower(), "composer must preserve review-only trust boundary")
     check("frame-set-preflight" in result.get("next_gate", ""), "composer must point to deterministic postflight")
+    check("--action-manifest" in result.get("next_gate", ""), "enhanced composer must point to manifest-aware postflight")
+    check("hero-walk-v1" in instruction and "Forbidden competing actions" in instruction, "composer must bind sequence and action-separation cues")
 
     code, result = run("compose-all", "--input", str(FIXTURE), "--root", str(ASSET_ROOT))
     check(code == 0 and len(result.get("frames", [])) == 4, "compose-all must emit one instruction per locked frame")

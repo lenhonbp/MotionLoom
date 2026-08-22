@@ -4,6 +4,16 @@ All notable MotionLoom changes are documented here. The project follows semantic
 
 ## [Unreleased]
 
+### Hardened
+
+- Enforce hash-bound scene/task browser-review candidate consistency in review-hook validation, quality gates and ready-for-PR report checks.
+- Add an opt-in `doctor --runtime` preflight and `doctor:runtime` npm script that verifies the installed Playwright Chromium executable and prints a concrete remediation command.
+- Require capability registry identifiers and adapter evidence versions to align with the package version during release verification.
+
+### Verified
+
+- Add an adversarial regression fixture proving that foreign, divergent and expired scene/task candidates fail closed.
+
 ## [2.6.1] - 2026-08-21
 
 ### Added

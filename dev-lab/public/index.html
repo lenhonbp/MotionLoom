@@ -93,6 +93,8 @@
     #status { margin-top:10px; font:11px/1.4 ui-monospace,monospace; }
     .ok { color:var(--good); }.warn { color:var(--bad); }.info { color:var(--blue); }
     .progress-note { margin-top:9px; color:var(--muted); font:11px ui-monospace,monospace; }
+    #action-separation.pass { color:var(--good); }
+    #action-separation.quarantine { color:var(--bad); }
     @media (max-width:1050px) { .app { grid-template-columns:180px minmax(0,1fr) 285px; } }
     @media (max-width:820px) { header { height:auto; min-height:58px; flex-wrap:wrap; padding:10px 12px; } .app { height:auto; min-height:0; grid-template-columns:1fr; } nav { border-right:0; border-bottom:1px solid var(--line); } #animations { flex-direction:row; overflow:auto; } .animation-btn { width:auto; min-width:130px; } aside { border-left:0; border-top:1px solid var(--line); } .workbench { min-height:620px; } }
   </style>
@@ -150,8 +152,10 @@
     <aside>
       <h1 class="inspector-title" id="title">Scene</h1><p id="description">Loading manifest and candidate binding.</p>
       <div class="meta-grid" id="meta"></div>
-      <h2>Runtime inspector</h2><pre class="runtime-state" id="runtime-state">Waiting for runtime…</pre>
-      <h2>Quality checklist</h2><div id="checks"></div>
+            <h2>Runtime inspector</h2><pre class="runtime-state" id="runtime-state">Waiting for runtime…</pre>
+      <h2>Action separation</h2><div class="progress-note" id="action-separation">No action-separation evidence bound.</div>
+      <h2>Quality checklist</h2>
+<div id="checks"></div>
       <h2>Fix notes</h2><textarea id="notes" placeholder="Describe a precise fix request, timing issue, visual defect, or confirmation…"></textarea>
       <div class="review-actions"><button class="danger" id="request-changes" type="button">Request changes</button><button class="primary" id="confirm" type="button">Approve candidate</button><button id="reset" type="button">Reset review</button></div>
       <div id="status"></div>

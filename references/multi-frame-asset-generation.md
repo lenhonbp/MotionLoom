@@ -65,6 +65,27 @@ For batch planning, `compose-all` emits one independent instruction per frame wh
 
 If the reference bytes change, an output path escapes the asset root, two frames target the same PNG, the lock permits a pose sheet/post-resize, or the trust boundary is weakened, validation fails closed before generation.
 
+## Keep action identity across isolated frames
+
+Isolated canvases prevent neighboring pixels from leaking into a crop, but they do not prove that a frame belongs to the intended action. For every multi-frame action, use an action-scoped manifest with one immutable `sequence_id`, `action_id`, `identity_lock_sha256`, ordered `frame_index` values and explicit `forbidden_action_ids`. Each image must have a frame envelope binding those fields to the image SHA-256.
+
+The independent action verifier must record `expected_action`, `top_competitor`, `margin`, `threshold` and `status`. A low margin or a competitor mismatch is **quarantined**, not silently relabeled or moved to another action. Validate the manifest before packing:
+
+```bash
+motionloom action-separation validate \\
+  --input src/output/<scene>/<action>-action-manifest.json \\
+  --root src/output/<scene> --json
+
+motionloom frame-set-preflight \\
+  --input src/output/<scene>/<action>-frame-geometry.json \\
+  --root src/output/<scene> \\
+  --action-manifest src/output/<scene>/<action>-action-manifest.json --json
+```
+
+A contact sheet may be generated after isolated frames pass as a review projection, but it is never the production source. When one frame is ambiguous, regenerate that frame from the accepted anchor and the same action lock; do not auto-move it, use a neighboring action as a reference, or let the agent infer its action from the filename.
+
+See [`docs/ACTION-SEPARATION.md`](../docs/ACTION-SEPARATION.md) for the manifest/envelope contract and quarantine policy.
+
 ## Validate incrementally
 
 Do not generate the complete action and only inspect it at the end. After each candidate frame:

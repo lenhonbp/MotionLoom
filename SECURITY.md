@@ -4,9 +4,9 @@
 
 | Version | Security fixes |
 |---|---|
-| `2.6.x` | Current supported line |
-| `2.5.x` | Previous line; security fixes are best effort while consumers upgrade |
-| `2.4.x` and earlier | Upgrade recommended; no routine support commitment |
+| `2.7.x` | Current supported line |
+| `2.6.x` | Previous line; security fixes are best effort while consumers upgrade |
+| `2.5.x` and earlier | Upgrade recommended; no routine support commitment |
 
 ## Reporting a vulnerability
 
@@ -18,9 +18,9 @@ If private reporting is unavailable, open a minimal issue titled **Security cont
 
 MotionLoom can read and write files in the host project, invoke runtimes and prepare Git operations. The npm CLI does not silently push, open a PR or turn evidence into approval. Treat project context, artifact bundles, trust policies, private keys and browser sessions as sensitive. Keep managed signing keys outside the repository and never use CI fixture keys as production trust anchors.
 
-Path guards, task identity, source/manifest hashes, runtime bundle hashes, state-machine bindings, evidence freshness, signer policy and approval invariants are security-relevant contracts. Report any bypass that allows cross-project memory, cross-task evidence, stale runtime output, undeclared runtime/state-machine bytes or unreviewed Git side effects.
+Path guards, task identity, source/manifest hashes, runtime bundle hashes, state-machine bindings, action-separation verifier bindings, provider/tool execution status, evidence freshness, signer policy and approval invariants are security-relevant contracts. Report any bypass that allows cross-project memory, cross-task evidence, stale runtime output, undeclared runtime/state-machine bytes, provisional provider evidence to become verified without proof, or unreviewed Git side effects.
 
-See the [signed attestation reference](references/signed-attestation.md), [browser review contract](references/browser-review-contract.md), [Dev Lab runtime contract](docs/DEV-LAB-RUNTIME.md) and [2.6.0 release note](docs/releases/2.6.0.md) for the current trust boundaries and limitations.
+See the [signed attestation reference](references/signed-attestation.md), [browser review contract](references/browser-review-contract.md), [Dev Lab runtime contract](docs/DEV-LAB-RUNTIME.md) and [2.7.0 release note](docs/releases/2.7.0.md) for the current trust boundaries and limitations.
 
 ## CI/CD controls
 

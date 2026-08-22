@@ -2,7 +2,10 @@
   "schema_version": "0.1",
   "registry_id": "motionloom-artifact-adapters",
   "generated_at": "2026-08-22T00:00:00Z",
-  "selection_policy": {"require_verified": true, "allow_scaffold_only": false},
+  "selection_policy": {
+    "require_verified": true,
+    "allow_scaffold_only": false
+  },
   "adapters": [
     {
       "adapter_id": "fixture.local-artifact-intake",
@@ -11,18 +14,59 @@
       "adapter_version": "0.1",
       "invocation_mode": "none",
       "cost_class": "included",
-      "inputs": ["hash-bound-fixture", "control-track"],
-      "outputs": ["generation-receipt", "export-manifest", "frame_sequence"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {
-        "canvas": {"max_width": 8192, "max_height": 8192, "shapes": ["square", "portrait", "landscape"]},
-        "frame_behavior": {"mode": "single_frame", "single_frame": true, "max_frames_per_request": 1},
-        "adaptation": ["pad_to_target", "integer_upscale"]
+      "inputs": [
+        "hash-bound-fixture",
+        "control-track"
+      ],
+      "outputs": [
+        "generation-receipt",
+        "export-manifest",
+        "frame_sequence"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
       },
-      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
-      "limitations": ["Fixture adapter is regression evidence only and never generates an asset."],
+      "capabilities": {
+        "canvas": {
+          "max_width": 8192,
+          "max_height": 8192,
+          "shapes": [
+            "square",
+            "portrait",
+            "landscape"
+          ]
+        },
+        "frame_behavior": {
+          "mode": "single_frame",
+          "single_frame": true,
+          "max_frames_per_request": 1
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/agent-skill-ecosystem-notes.md",
+          "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "Fixture adapter is regression evidence only and never generates an asset."
+      ],
       "risk_level": "low",
-      "side_effect_level": "read"
+      "side_effect_level": "read",
+      "availability": {
+        "status": "available",
+        "environment": "repository fixture",
+        "reason": "static regression fixture is present in the repository"
+      }
     },
     {
       "adapter_id": "manual.import-frame-sequence",
@@ -31,18 +75,61 @@
       "adapter_version": "0.1",
       "invocation_mode": "manual",
       "cost_class": "external",
-      "inputs": ["user-provided-images", "reference-images", "control-track"],
-      "outputs": ["image", "frame_sequence", "generation-receipt", "export-manifest"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {
-        "canvas": {"max_width": 16384, "max_height": 16384, "shapes": ["square", "portrait", "landscape"]},
-        "frame_behavior": {"mode": "single_frame", "single_frame": true, "max_frames_per_request": 1},
-        "adaptation": ["pad_to_target", "integer_upscale"]
+      "inputs": [
+        "user-provided-images",
+        "reference-images",
+        "control-track"
+      ],
+      "outputs": [
+        "image",
+        "frame_sequence",
+        "generation-receipt",
+        "export-manifest"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
       },
-      "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],
-      "limitations": ["This adapter does not generate or authenticate provider output; it imports user-managed bytes and remains review_required."],
+      "capabilities": {
+        "canvas": {
+          "max_width": 16384,
+          "max_height": 16384,
+          "shapes": [
+            "square",
+            "portrait",
+            "landscape"
+          ]
+        },
+        "frame_behavior": {
+          "mode": "single_frame",
+          "single_frame": true,
+          "max_frames_per_request": 1
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/ai-animation-tools-2026-report.md",
+          "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "This adapter does not generate or authenticate provider output; it imports user-managed bytes and remains review_required."
+      ],
       "risk_level": "medium",
-      "side_effect_level": "user_review_required"
+      "side_effect_level": "user_review_required",
+      "availability": {
+        "status": "known",
+        "environment": "user-managed",
+        "reason": "route is known to MotionLoom but requires user-provided frame files"
+      }
     },
     {
       "adapter_id": "pixellab.animate-skeleton",
@@ -51,38 +138,280 @@
       "adapter_version": "0.1",
       "invocation_mode": "api",
       "cost_class": "external",
-      "inputs": ["reference-images", "skeleton-poses", "control-track", "action-cues"],
-      "outputs": ["frame_sequence", "generation-receipt"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {
-        "official_docs": ["https://api.pixellab.ai/v2/docs", "https://www.pixellab.ai/docs/tools/animate-with-skeleton"],
-        "canvas": {"shapes": ["square"], "allowed_sizes": [[16, 16], [32, 32], [64, 64], [128, 128], [256, 256]], "max_width": 256, "max_height": 256},
-        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "max_frames_per_request": 4},
-        "adaptation": ["pad_to_target", "integer_upscale"]
+      "inputs": [
+        "reference-images",
+        "skeleton-poses",
+        "control-track",
+        "action-cues"
+      ],
+      "outputs": [
+        "frame_sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
       },
-      "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],
-      "limitations": ["PixelLab skeleton animation is square-canvas and batch-oriented; a non-square target such as 256x448 requires explicit transparent padding and independent post-export envelopes.", "The adapter is metadata-only and does not call PixelLab, store Bearer tokens or prove a provider-native job receipt.", "A batch animation is not equivalent to required per-frame isolated generation."],
+      "capabilities": {
+        "official_docs": [
+          "https://api.pixellab.ai/v2/docs",
+          "https://www.pixellab.ai/docs/tools/animate-with-skeleton"
+        ],
+        "canvas": {
+          "shapes": [
+            "square"
+          ],
+          "allowed_sizes": [
+            [
+              16,
+              16
+            ],
+            [
+              32,
+              32
+            ],
+            [
+              64,
+              64
+            ],
+            [
+              128,
+              128
+            ],
+            [
+              256,
+              256
+            ]
+          ],
+          "max_width": 256,
+          "max_height": 256
+        },
+        "frame_behavior": {
+          "mode": "batch_animation",
+          "single_frame": false,
+          "max_frames_per_request": 4,
+          "frame_count_policy": "fixed"
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/ai-animation-tools-2026-report.md",
+          "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "PixelLab skeleton animation is square-canvas and batch-oriented; a non-square target such as 256x448 requires explicit transparent padding and independent post-export envelopes.",
+        "The adapter is metadata-only and does not call PixelLab, store Bearer tokens or prove a provider-native job receipt.",
+        "A batch animation is not equivalent to required per-frame isolated generation."
+      ],
       "risk_level": "medium",
-      "side_effect_level": "remote_write"
+      "side_effect_level": "remote_write",
+      "availability": {
+        "status": "unknown",
+        "environment": "external API/extension",
+        "reason": "API key, subscription and provider connectivity are not asserted by the registry"
+      }
     },
     {
-      "adapter_id": "pixellab.animate-text",
+      "adapter_id": "pixellab.create-animated-object-character",
       "kind": "external_provider",
       "status": "scaffold_only",
       "adapter_version": "0.1",
       "invocation_mode": "api",
       "cost_class": "external",
-      "inputs": ["reference-images", "action-cues", "control-track"],
-      "outputs": ["frame_sequence", "generation-receipt"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {
-        "official_docs": ["https://api.pixellab.ai/v2/docs", "https://www.pixellab.ai/docs/tools/text2animation"],
-        "canvas": {"shapes": ["square"], "allowed_sizes": [[32, 32], [64, 64], [128, 128]], "max_width": 128, "max_height": 128},
-        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "frame_count_policy": "depends_on_canvas_size"},
-        "adaptation": ["pad_to_target", "integer_upscale"]
+      "inputs": [
+        "text-description",
+        "action-cues",
+        "control-track"
+      ],
+      "outputs": [
+        "frame_sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
       },
-      "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],
-      "limitations": ["Text animation is restricted to square sizes up to 128x128 in the cited official tool documentation; non-square targets require explicit adaptation.", "The adapter is metadata-only and does not invoke the API or prove provider-native task metadata.", "Batch output must not silently satisfy a per-frame isolation requirement."],
+      "capabilities": {
+        "official_docs": [
+          "https://api.pixellab.ai/v2/docs",
+          "https://www.pixellab.ai/docs/tools/text2animation"
+        ],
+        "canvas": {
+          "shapes": [
+            "square"
+          ],
+          "allowed_sizes": [
+            [
+              32,
+              32
+            ],
+            [
+              64,
+              64
+            ],
+            [
+              128,
+              128
+            ],
+            [
+              256,
+              256
+            ]
+          ],
+          "max_width": 256,
+          "max_height": 256
+        },
+        "frame_behavior": {
+          "mode": "batch_animation",
+          "single_frame": false,
+          "frame_count_policy": "depends_on_canvas_size",
+          "limits_by_canvas": [
+            {
+              "canvas": [
+                32,
+                32
+              ],
+              "max_frames_per_request": 16
+            },
+            {
+              "canvas": [
+                64,
+                64
+              ],
+              "max_frames_per_request": 16
+            },
+            {
+              "canvas": [
+                128,
+                128
+              ],
+              "max_frames_per_request": 4
+            },
+            {
+              "canvas": [
+                256,
+                256
+              ],
+              "max_frames_per_request": 4
+            }
+          ]
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/ai-animation-tools-2026-report.md",
+          "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "This route creates a new animated object or character from text and an action; it is not the existing-reference Animate with text route.",
+        "The documented tool supports square 32x32, 64x64, 128x128 and 256x256 canvas sizes with frame output depending on canvas-size tier; non-square targets require explicit adaptation.",
+        "The adapter is metadata-only and does not invoke PixelLab, store Bearer tokens or prove provider-native task metadata.",
+        "Batch output must not silently satisfy a per-frame isolation requirement."
+      ],
+      "risk_level": "medium",
+      "side_effect_level": "remote_write",
+      "availability": {
+        "status": "unknown",
+        "environment": "external API/extension",
+        "reason": "API key, subscription and provider connectivity are not asserted by the registry"
+      }
+    },
+    {
+      "adapter_id": "pixellab.animate-with-text",
+      "kind": "external_provider",
+      "status": "scaffold_only",
+      "adapter_version": "0.1",
+      "invocation_mode": "api",
+      "cost_class": "external",
+      "inputs": [
+        "reference-images",
+        "action-cues",
+        "control-track"
+      ],
+      "outputs": [
+        "frame_sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
+      },
+      "availability": {
+        "status": "unknown",
+        "environment": "external API/extension",
+        "reason": "API key, subscription and provider connectivity are not asserted by the registry"
+      },
+      "capabilities": {
+        "official_docs": [
+          "https://api.pixellab.ai/v2/docs",
+          "https://www.pixellab.ai/docs/tools/animation"
+        ],
+        "canvas": {
+          "shapes": [
+            "square"
+          ],
+          "allowed_sizes": [
+            [
+              32,
+              32
+            ],
+            [
+              64,
+              64
+            ],
+            [
+              128,
+              128
+            ]
+          ],
+          "max_width": 128,
+          "max_height": 128
+        },
+        "frame_behavior": {
+          "mode": "batch_animation",
+          "single_frame": false,
+          "max_frames_per_request": 4,
+          "frame_count_policy": "fixed"
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/ai-animation-tools-2026-report.md",
+          "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "This route animates an existing reference image with text/action instructions; it is distinct from Create animated object/character.",
+        "The official route generates four animation frames or conditioned frames in its documented workflows; target canvas and provider export details still require a verified receipt before execution.",
+        "The adapter is metadata-only and does not invoke PixelLab, store Bearer tokens or prove provider-native task metadata.",
+        "Batch output must not silently satisfy a per-frame isolation requirement."
+      ],
       "risk_level": "medium",
       "side_effect_level": "remote_write"
     },
@@ -93,19 +422,81 @@
       "adapter_version": "0.1",
       "invocation_mode": "api",
       "cost_class": "external",
-      "inputs": ["reference-images", "animation-reference", "action-cues", "control-track"],
-      "outputs": ["frame_sequence", "generation-receipt"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {
-        "official_docs": ["https://api.pixellab.ai/v2/docs", "https://www.pixellab.ai/docs/tools/animation-to-animation"],
-        "canvas": {"shapes": ["square"], "allowed_sizes": [[16, 16], [32, 32], [64, 64], [128, 128]], "max_width": 128, "max_height": 128},
-        "frame_behavior": {"mode": "batch_animation", "single_frame": false, "frame_count_policy": "depends_on_canvas_size"},
-        "adaptation": ["pad_to_target", "integer_upscale"]
+      "inputs": [
+        "reference-images",
+        "animation-reference",
+        "action-cues",
+        "control-track"
+      ],
+      "outputs": [
+        "frame_sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
       },
-      "evidence": [{"path": "docs/research/ai-animation-tools-2026-report.md", "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37", "kind": "static"}],
-      "limitations": ["Animation-to-animation uses square canvas sizes and batch generation; use it as a provisional source only when the project accepts post-export isolation and validation.", "The adapter is metadata-only and does not invoke PixelLab or prove a provider-native job receipt."],
+      "capabilities": {
+        "official_docs": [
+          "https://api.pixellab.ai/v2/docs",
+          "https://www.pixellab.ai/docs/tools/animation-to-animation"
+        ],
+        "canvas": {
+          "shapes": [
+            "square"
+          ],
+          "allowed_sizes": [
+            [
+              16,
+              16
+            ],
+            [
+              32,
+              32
+            ],
+            [
+              64,
+              64
+            ],
+            [
+              128,
+              128
+            ]
+          ],
+          "max_width": 128,
+          "max_height": 128
+        },
+        "frame_behavior": {
+          "mode": "batch_animation",
+          "single_frame": false,
+          "frame_count_policy": "depends_on_canvas_size"
+        },
+        "adaptation": [
+          "pad_to_target",
+          "integer_upscale"
+        ]
+      },
+      "evidence": [
+        {
+          "path": "docs/research/ai-animation-tools-2026-report.md",
+          "sha256": "f1050dd77ecffd8ad4ff87cb66f7bb147998bd2743862f57606890a0305a1e37",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "Animation-to-animation uses square canvas sizes and batch generation; use it as a provisional source only when the project accepts post-export isolation and validation.",
+        "The adapter is metadata-only and does not invoke PixelLab or prove a provider-native job receipt."
+      ],
       "risk_level": "medium",
-      "side_effect_level": "remote_write"
+      "side_effect_level": "remote_write",
+      "availability": {
+        "status": "unknown",
+        "environment": "external API/extension",
+        "reason": "API key, subscription and provider connectivity are not asserted by the registry"
+      }
     },
     {
       "adapter_id": "internal.imagegen",
@@ -114,14 +505,47 @@
       "adapter_version": "0.1",
       "invocation_mode": "agent-mediated",
       "cost_class": "included",
-      "inputs": ["reference-images", "control-track", "prompt-hash"],
-      "outputs": ["image", "frame-sequence", "generation-receipt"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {"frame_behavior": {"mode": "unknown", "single_frame": false}},
-      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
-      "limitations": ["Adapter imports Agent-mediated ImageGen output only; it does not invoke ImageGen or prove a model, seed, license, rig compatibility, runtime quality or human approval.", "Canvas and isolation capabilities are intentionally unknown until a real export contract is supplied."],
+      "inputs": [
+        "reference-images",
+        "control-track",
+        "prompt-hash"
+      ],
+      "outputs": [
+        "image",
+        "frame-sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
+      },
+      "capabilities": {
+        "frame_behavior": {
+          "mode": "unknown",
+          "single_frame": false
+        }
+      },
+      "evidence": [
+        {
+          "path": "docs/research/agent-skill-ecosystem-notes.md",
+          "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "Adapter imports Agent-mediated ImageGen output only; it does not invoke ImageGen or prove a model, seed, license, rig compatibility, runtime quality or human approval.",
+        "Canvas and isolation capabilities are intentionally unknown until a real export contract is supplied."
+      ],
       "risk_level": "medium",
-      "side_effect_level": "user_review_required"
+      "side_effect_level": "user_review_required",
+      "availability": {
+        "status": "unknown",
+        "environment": "agent-mediated",
+        "reason": "current Agent tool availability must be resolved outside static registry metadata"
+      }
     },
     {
       "adapter_id": "openai.chatgpt",
@@ -130,14 +554,48 @@
       "adapter_version": "0.1",
       "invocation_mode": "manual",
       "cost_class": "external",
-      "inputs": ["user-provided-images", "reference-images", "control-track", "prompt-hash"],
-      "outputs": ["image", "frame-sequence", "generation-receipt"],
-      "compatibility": {"os": ["linux", "macos", "windows"]},
-      "capabilities": {"frame_behavior": {"mode": "unknown", "single_frame": false}},
-      "evidence": [{"path": "docs/research/agent-skill-ecosystem-notes.md", "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530", "kind": "static"}],
-      "limitations": ["Adapter imports user-provided ChatGPT output only; it does not invoke ChatGPT, verify a provider-native task ID, prove a model, seed, license, rig compatibility, runtime quality or human approval.", "Canvas and isolation capabilities are unknown until the user supplies a provider-specific export contract."],
+      "inputs": [
+        "user-provided-images",
+        "reference-images",
+        "control-track",
+        "prompt-hash"
+      ],
+      "outputs": [
+        "image",
+        "frame-sequence",
+        "generation-receipt"
+      ],
+      "compatibility": {
+        "os": [
+          "linux",
+          "macos",
+          "windows"
+        ]
+      },
+      "capabilities": {
+        "frame_behavior": {
+          "mode": "unknown",
+          "single_frame": false
+        }
+      },
+      "evidence": [
+        {
+          "path": "docs/research/agent-skill-ecosystem-notes.md",
+          "sha256": "18472ccd959191a4e769675b142076fa3c0103629d67b5be992fa524730cc530",
+          "kind": "static"
+        }
+      ],
+      "limitations": [
+        "Adapter imports user-provided ChatGPT output only; it does not invoke ChatGPT, verify a provider-native task ID, prove a model, seed, license, rig compatibility, runtime quality or human approval.",
+        "Canvas and isolation capabilities are unknown until the user supplies a provider-specific export contract."
+      ],
       "risk_level": "medium",
-      "side_effect_level": "user_review_required"
+      "side_effect_level": "user_review_required",
+      "availability": {
+        "status": "unknown",
+        "environment": "user-mediated",
+        "reason": "user session/output availability is not asserted by static registry metadata"
+      }
     }
   ]
 }

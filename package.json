@@ -62,6 +62,7 @@
     "schemas/artifact-adapter-registry.schema.json",
     "schemas/action-separation-verifier-evidence.schema.json",
     "schemas/asset-generation-request.schema.json",
+    "schemas/asset-generation-plan.schema.json",
     "schemas/asset-adaptation.schema.json",
     "scripts/asset-adapt.mjs",
     "artifact-adapter-registry.json",

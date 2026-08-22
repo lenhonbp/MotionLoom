@@ -59,6 +59,34 @@
         }
       }
     },
+    "project_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runtime": {"type": "string", "minLength": 1},
+        "framework": {"type": "string", "minLength": 1},
+        "existing_assets": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "rig_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "provenance_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "validation_requirements": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "provider_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preferred_adapter_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"}
+        },
+        "excluded_adapter_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"}
+        }
+      }
+    },
     "references": {
       "type": "array",
       "items": {

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lenhonbp/MotionLoom/blob/main/schemas/asset-generation-plan.schema.json",
+  "title": "MotionLoom project-aware asset generation plan",
+  "description": "Advisory MotionLoom assessment. Recommendations never grant execution authorization or approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "schema_version", "producer", "source", "identity", "status", "decision", "execution_decision",
+    "approval", "production_approved", "request", "project", "registry", "providers", "selection",
+    "recommendations", "agent_guidance", "next_steps", "warnings"
+  ],
+  "properties": {
+    "contract": {"const": "motionloom-asset-generation-plan"},
+    "schema_version": {"const": "0.2"},
+    "producer": {"const": "MotionLoom"},
+    "source": {"type": "string", "minLength": 1},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "role"],
+      "properties": {"product": {"const": "MotionLoom"}, "role": {"type": "string", "minLength": 1}}
+    },
+    "status": {"const": "plan_only"},
+    "decision": {"type": "string", "enum": ["recommendations_available", "compatible_execution_route_available", "execution_route_requires_review_or_adaptation", "no_execution_eligible_route", "no_safe_recommendation_available"]},
+    "execution_decision": {"type": "string", "enum": ["compatible_execution_route_available", "execution_route_requires_review_or_adaptation", "no_execution_eligible_route"]},
+    "approval": {"const": false},
+    "production_approved": {"const": false},
+    "request": {"type": "object"},
+    "project": {"type": "object"},
+    "registry": {"type": "object"},
+    "providers": {"type": "array", "items": {"type": "object"}},
+    "selection": {
+      "type": "object",
+      "required": ["policy", "eligible_count", "provisional_count", "blocked_count", "recommendation_count"],
+      "properties": {
+        "policy": {"type": "object"},
+        "eligible_count": {"type": "integer", "minimum": 0},
+        "provisional_count": {"type": "integer", "minimum": 0},
+        "blocked_count": {"type": "integer", "minimum": 0},
+        "recommendation_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["adapter_id", "recommendation_status", "execution_status", "execution_evidence_status", "execution_eligible", "user_preference", "availability", "project_fit", "rationale", "agent_guidance", "approval"],
+        "properties": {
+          "adapter_id": {"type": "string"},
+          "recommendation_status": {"type": "string", "enum": ["recommended", "acceptable", "not_recommended"]},
+          "execution_status": {"type": "string", "enum": ["verified", "provisional", "blocked"]},
+          "execution_evidence_status": {"type": "string", "enum": ["verified", "provisional"]},
+          "execution_eligible": {"type": "boolean"},
+          "user_preference": {"type": "object"},
+          "availability": {"type": "object"},
+          "project_fit": {"type": "string", "enum": ["high", "medium", "low"]},
+          "rationale": {"type": "array", "items": {"type": "string"}},
+          "agent_guidance": {"type": "object"},
+          "approval": {"const": false}
+        }
+      }
+    },
+    "agent_guidance": {
+      "type": "object",
+      "required": ["recommended_by", "summary", "next_step", "validation_route"],
+      "properties": {
+        "recommended_by": {"const": "MotionLoom"},
+        "summary": {"type": "string"},
+        "next_step": {"type": "string"},
+        "validation_route": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "next_steps": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

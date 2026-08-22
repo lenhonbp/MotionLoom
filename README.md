@@ -112,7 +112,7 @@ npx --no-install motionloom asset-generation-plan plan \
   --project-root . --json
 ```
 
-For PixelLab's documented square animation routes, MotionLoom can recommend a provisional square source plus explicit transparent padding into a `256x448` target, or suggest a manual/single-frame fallback when per-frame isolation is mandatory. The plan is advisory and does not call the provider, handle the Bearer token, edit the image, or approve the asset. Read the [provider-aware planner contract](docs/ASSET-GENERATION-PLANNER.md) for the decision model.
+MotionLoom does not choose PixelLab or any other provider by default. It first assesses the project target, then ranks compatible routes. A user preference such as `preferred_adapter_ids` is preserved and can elevate a provisional route, but cannot override a hard canvas/isolation failure. Normal planning may recommend a provisional/manual route while `execution_status` remains `provisional`; `--strict` remains fail-closed and requires execution eligibility. The plan exposes a human-readable `MotionLoom Project Assessment`, `MotionLoom Recommendations` and `MotionLoom Agent Guidance`, including availability, rationale and the MotionLoom validation route. For PixelLab's documented square animation routes, MotionLoom can recommend a provisional square source plus explicit transparent padding into a `256x448` target, or suggest a manual/single-frame fallback when per-frame isolation is mandatory. The plan is advisory and does not call the provider, handle the Bearer token, edit the image, or approve the asset. Read the [provider-aware planner contract](docs/ASSET-GENERATION-PLANNER.md) for the decision model.
 
 ### Advanced: start from a real project
 

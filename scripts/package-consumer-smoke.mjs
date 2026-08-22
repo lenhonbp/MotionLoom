@@ -75,7 +75,12 @@ try {
   fs.copyFileSync(requestSource, requestCopy);
   fs.copyFileSync(path.join(installedRoot, "artifact-adapter-registry.json"), registryCopy);
   const plan = JSON.parse(run(bin, ["asset-generation-plan", "plan", "--request", requestCopy, "--registry", registryCopy, "--project-root", consumer.toString(), "--json"], { cwd: consumer }));
-  if (plan.contract !== "motionloom-asset-generation-plan" || plan.approval !== false) throw new Error("installed planner contract failed");
+  if (plan.contract !== "motionloom-asset-generation-plan" || plan.schema_version !== "0.2" || plan.producer !== "MotionLoom" || plan.approval !== false) throw new Error("installed planner contract failed");
+  if (!Array.isArray(plan.recommendations) || plan.recommendations.length === 0) throw new Error("installed planner returned no normal-planning recommendations");
+  if (!plan.recommendations.some((item) => item.recommendation_status === "recommended" && item.execution_status === "provisional")) throw new Error("installed planner lost provisional recommendation/execution separation");
+  if (!plan.agent_guidance || plan.agent_guidance.recommended_by !== "MotionLoom") throw new Error("installed planner omitted MotionLoom agent guidance");
+  const humanPlan = run(bin, ["asset-generation-plan", "plan", "--request", requestCopy, "--registry", registryCopy, "--project-root", consumer.toString()], { cwd: consumer });
+  if (!humanPlan.includes("MotionLoom Project Assessment") || !humanPlan.includes("MotionLoom Recommendations")) throw new Error("installed planner human output lost MotionLoom identity");
 
   const sourceImage = path.join(installedRoot, "examples", "agent-consumer", "asset-consistency", "assets", "hero-frame-00.png");
   const adaptedImage = path.join(consumer, "adapted-frame.png");

@@ -19,6 +19,14 @@
     "allow_provider_batch_as_provisional": true,
     "integer_scale_only": true
   },
+  "project_context": {
+    "runtime": "custom-2d-game-runtime",
+    "framework": "canvas-sprite-runtime",
+    "existing_assets": ["examples/agent-consumer/asset-consistency/assets/hero-frame-00.png"],
+    "rig_requirements": ["preserve footline and pivot across frames", "keep action-specific frame identity"],
+    "provenance_requirements": ["generation receipt", "hash-bound export manifest", "human review"],
+    "validation_requirements": ["MotionLoom frame geometry", "MotionLoom action separation", "MotionLoom Dev Lab review"]
+  },
   "actions": [
     {
       "action_id": "attack",

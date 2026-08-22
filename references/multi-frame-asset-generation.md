@@ -12,9 +12,9 @@ motionloom asset-generation-plan plan \
   --project-root . --json
 ```
 
-Treat the result as a recommendation, not an approval. The planner distinguishes a provider-native canvas from a target-runtime canvas and makes adaptation explicit. For example, PixelLab animation tools documented with square canvases can be used as a provisional source for a `256x448` target only through an explicit transparent-padding plan and post-export action/frame validation; the planner must not silently crop, stretch, or claim that batch output satisfies per-frame isolation. If no adapter meets the hard constraints, the Agent must either choose a provider with a declared compatible capability or ask the user to relax a requirement.
+Treat the result as a MotionLoom recommendation, not an approval. The planner first assesses the project/task, then separates `recommendation_status` from `execution_status`. A provisional or scaffold route may remain a useful normal-planning recommendation when its project fit is strong; strict execution still requires the active execution policy. User preference is visible and may influence ranking, but cannot override a hard incompatibility. For example, PixelLab animation tools documented with square canvases can be used as a provisional source for a `256x448` target only through an explicit transparent-padding plan and post-export action/frame validation; the planner must not silently crop, stretch, or claim that batch output satisfies per-frame isolation. If no route is execution-eligible, normal planning should still expose safe provisional/manual options while strict mode fails closed.
 
-The registry is provider-neutral and metadata-driven. A provider adapter remains `scaffold_only` until real export bytes, generation receipt, target-runtime evidence and human review have been recorded. Bearer tokens belong in the connector/secret layer and never in requests, prompts, receipts or project manifests.
+The registry is provider-neutral and metadata-driven. A provider adapter remains `scaffold_only` until real export bytes, generation receipt, target-runtime evidence and human review have been recorded. Availability is separate from registry existence: an unknown or unavailable route may be shown as a MotionLoom option, but the Agent must resolve connectivity before execution. Bearer tokens belong in the connector/secret layer and never in requests, prompts, receipts or project manifests.
 
 ## Default source policy
 
@@ -83,7 +83,7 @@ If the reference bytes change, an output path escapes the asset root, two frames
 
 Isolated canvases prevent neighboring pixels from leaking into a crop, but they do not prove that a frame belongs to the intended action. For every multi-frame action, use an action-scoped manifest with one immutable `sequence_id`, `action_id`, `identity_lock_sha256`, ordered `frame_index` values and explicit `forbidden_action_ids`. Each image must have a frame envelope binding those fields to the image SHA-256.
 
-The independent action verifier must record `expected_action`, `top_competitor`, `margin`, `threshold` and `status`. A low margin or a competitor mismatch is **quarantined**, not silently relabeled or moved to another action. Validate the manifest before packing:
+The action verifier must record `expected_action`, `top_competitor`, `margin`, `threshold` and `status`. A generator-created envelope is only declared evidence; independent verification requires a separate hash-bound verifier artifact. A low margin, competitor mismatch or missing verifier provenance is **quarantined**, not silently relabeled or moved to another action. Validate the manifest before packing:
 
 ```bash
 motionloom action-separation validate \\

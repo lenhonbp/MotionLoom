@@ -150,7 +150,7 @@ jobs:
 
       - name: Upload Dev Lab snapshot artifact
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motionloom-dev-lab-snapshot-${{ github.sha }}
           path: /tmp/motionloom-devlab-snapshot
@@ -159,7 +159,7 @@ jobs:
 
       - name: Upload Dev Lab dogfood evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motionloom-dev-lab-dogfood-${{ github.sha }}
           path: /tmp/motionloom-devlab-dogfood
@@ -168,7 +168,7 @@ jobs:
 
       - name: Upload Dev Lab action library evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motionloom-dev-lab-action-library-${{ github.sha }}
           path: /tmp/motionloom-devlab-action-library
@@ -177,7 +177,7 @@ jobs:
 
       - name: Upload Dev Lab state transition evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motionloom-dev-lab-state-transitions-${{ github.sha }}
           path: /tmp/motionloom-devlab-state-transitions
@@ -186,7 +186,7 @@ jobs:
 
       - name: Upload Dev Lab diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: motionloom-dev-lab-diagnostics-${{ github.sha }}
           path: /tmp/motionloom-devlab-diagnostics
